@@ -1,0 +1,28 @@
+# OS files
+.DS_Store
+Thumbs.db
+db.properties
+*.tmp
+*.bak
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Node / Build files (if added later)
+node_modules/
+dist/
+build/
+.env
+.env.local
+.env.*.local
+
+# Antigravity temporary files
+.gemini/
+.antigravity/
+.antigravity-ide/
