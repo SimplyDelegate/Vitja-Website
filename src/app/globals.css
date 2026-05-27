@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #1a2332;
+  --color-accent: #f97316;
+  --color-bg-light: #f8f7f4;
+  --color-bg-dark: #0f1621;
+  --color-text-primary: #1a2332;
+  --color-text-secondary: #6b7280;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
+}
+
+::selection {
+  background: rgba(249, 115, 22, 0.28);
+}
+
+.section-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin-inline: auto;
+}
+
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+}
+
+.focus-ring:focus-visible {
+  outline-color: var(--color-accent);
+}
+
+.hero-mask {
+  background:
+    linear-gradient(90deg, rgba(15, 22, 33, 0.9) 0%, rgba(15, 22, 33, 0.72) 44%, rgba(15, 22, 33, 0.18) 100%),
+    linear-gradient(0deg, rgba(15, 22, 33, 0.42), rgba(15, 22, 33, 0.08));
+}
+
+.marquee-pause:hover {
+  animation-play-state: paused;
+}
