@@ -9,7 +9,7 @@ describe("Website-Inhalte", () => {
 
   it("ordnet nur fachlich belegten Leistungen ein Projektbild zu", () => {
     const illustrated = services.filter((service) => service.image);
-    const withoutImage = services.filter((service) => !service.image).map((service) => service.id);
+    const withoutImage = services.filter((service) => !service.image).map((service) => service.id).sort();
 
     expect(illustrated).toHaveLength(6);
     expect(withoutImage).toEqual(["blechherstellung", "industrieisolierung", "schiffsausbau"]);

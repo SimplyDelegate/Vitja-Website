@@ -22,6 +22,11 @@ export function Navbar() {
         <Link href="/" className="brand-link" aria-label="Triumph Technical Services – Startseite">
           <Image className="brand-desktop" src={asset("/brand/logo.svg")} alt="Triumph Technical Services" width={252} height={144} loading="eager" />
           <Image className="brand-mobile" src={asset("/brand/mark.svg")} alt="" width={42} height={42} loading="eager" />
+          <span className="brand-mobile-name" aria-hidden="true">
+            <span>Triumph</span>
+            <span>Technical</span>
+            <span>Services</span>
+          </span>
         </Link>
 
         <nav className="desktop-nav" aria-label="Hauptnavigation">

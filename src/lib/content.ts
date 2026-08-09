@@ -118,9 +118,23 @@ export const heroSlides: HeroSlide[] = [
 
 export const services: Service[] = [
   {
+    id: "industrieisolierung", title: "Industrieisolierung", requestValue: "Industrieisolierung",
+    short: "Koordinierte Isolierarbeiten an technischen Anlagen und Leitungssystemen.",
+  },
+  {
     id: "rohrbau", title: "Rohrbau & Reparaturen", requestValue: "Rohrbau & Reparaturen",
     image: { src: "/media/projects/rohrbau-fertigung.webp", alt: "Gefertigte Rohrbaugruppen mit Flanschverbindungen in einer Werkstatt", focus: "center 55%" },
     short: "Anpassung, Montage und Reparatur von Rohrleitungen und Rohrbaugruppen.",
+  },
+  {
+    id: "gfk", title: "GFK-Instandsetzung & GFK-Rohr-/Systembau", requestValue: "GFK-Instandsetzung & GFK-Rohr-/Systembau",
+    image: { src: "/media/projects/gfk-rohrbaugruppe.webp", alt: "GFK-Rohrbaugruppe während der Fertigung", focus: "center 35%" },
+    short: "Herstellung, Verbindung und Reparatur von GFK-Rohrleitungen und Systembauteilen.",
+  },
+  {
+    id: "systemintegration", title: "Systemeinbau & Integration", requestValue: "Systemeinbau & Integration",
+    image: { src: "/media/projects/systemeinbau-armaturen.webp", alt: "Integriertes Rohrsystem mit Armaturen in engem Bauraum", focus: "center 46%" },
+    short: "Einbau technischer Systeme in komplexen, räumlich begrenzten Umgebungen.",
   },
   {
     id: "stahlbau", title: "Stahlbau & Reparaturen", requestValue: "Stahlbau & Reparaturen",
@@ -140,20 +154,6 @@ export const services: Service[] = [
   {
     id: "blechherstellung", title: "Blechherstellung", requestValue: "Blechherstellung",
     short: "Projektbezogene Blechbauteile als Bestandteil einer koordinierten Gesamtlösung.",
-  },
-  {
-    id: "gfk", title: "GFK-Instandsetzung & GFK-Rohr-/Systembau", requestValue: "GFK-Instandsetzung & GFK-Rohr-/Systembau",
-    image: { src: "/media/projects/gfk-rohrbaugruppe.webp", alt: "GFK-Rohrbaugruppe während der Fertigung", focus: "center 35%" },
-    short: "Herstellung, Verbindung und Reparatur von GFK-Rohrleitungen und Systembauteilen.",
-  },
-  {
-    id: "systemintegration", title: "Systemeinbau & Integration", requestValue: "Systemeinbau & Integration",
-    image: { src: "/media/projects/systemeinbau-armaturen.webp", alt: "Integriertes Rohrsystem mit Armaturen in engem Bauraum", focus: "center 46%" },
-    short: "Einbau technischer Systeme in komplexen, räumlich begrenzten Umgebungen.",
-  },
-  {
-    id: "industrieisolierung", title: "Industrieisolierung", requestValue: "Industrieisolierung",
-    short: "Koordinierte Isolierarbeiten an technischen Anlagen und Leitungssystemen.",
   },
   {
     id: "schiffsausbau", title: "Schiffsausbau", requestValue: "Schiffsausbau",
