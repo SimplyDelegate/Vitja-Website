@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="80 80 725 725"
+     role="img"
+     aria-label="Logo"
+     shape-rendering="geometricPrecision">
+  <defs>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#965F20"/>
+      <stop offset="18%"  stop-color="#B87828"/>
+      <stop offset="38%"  stop-color="#D59A3B"/>
+      <stop offset="50%"  stop-color="#EBAE58"/>
+      <stop offset="62%"  stop-color="#D29337"/>
+      <stop offset="82%"  stop-color="#AC7026"/>
+      <stop offset="100%" stop-color="#955F20"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Upper gold arch -->
+  <path d="
+    M 133.834 278.000
+    A 350.000 350.000 0 0 1 751.166 278.000
+    L 643.435 278.000
+    A 260.000 260.000 0 0 0 241.565 278.000
+    Z"
+    fill="url(#gold)"/>
+
+  <!-- Lower black body with transparent inner opening -->
+  <path d="
+    M 125.331 295.000
+    L 759.669 295.000
+    A 350.000 350.000 0 1 1 125.331 295.000
+    Z
+
+    M 190.248 380.000
+    L 694.752 380.000
+    A 260.000 260.000 0 1 1 190.248 380.000
+    Z"
+    fill="#000000"
+    fill-rule="evenodd"/>
+
+  <!-- Central stem: slightly overlapped at top and bottom to remove visible gaps -->
+  <rect x="397.5" y="360.0" width="90.0" height="360.0" fill="#000000"/>
+</svg>

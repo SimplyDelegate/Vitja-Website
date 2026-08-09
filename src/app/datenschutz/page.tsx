@@ -1,62 +1,23 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Datenschutz",
-  description: `Datenschutzerklaerung von ${siteConfig.name}.`
-};
-
-const sections = [
-  {
-    title: "1. Verantwortlicher",
-    body: `${siteConfig.name}, ${siteConfig.address}, E-Mail: ${siteConfig.email}. Die vollstaendigen Unternehmensdaten muessen vor Veroeffentlichung ergaenzt werden.`
-  },
-  {
-    title: "2. Hosting und Server-Logs",
-    body: "Beim Besuch dieser Website werden technisch erforderliche Zugriffsdaten verarbeitet, zum Beispiel IP-Adresse, Zeitpunkt des Abrufs, Browserinformationen und angefragte Seiten. Die Verarbeitung erfolgt zur sicheren Bereitstellung der Website."
-  },
-  {
-    title: "3. Kontaktformular",
-    body: "Wenn Sie das Kontaktformular nutzen, verarbeiten wir die von Ihnen eingegebenen Daten zur Bearbeitung Ihrer Anfrage. Ohne konfigurierten E-Mail-Dienst wird die Anfrage in der lokalen Entwicklungsumgebung nicht extern versendet."
-  },
-  {
-    title: "4. Cookies und Tracking",
-    body: "Diese Umsetzung setzt keine Analyse- oder Marketing-Cookies ein. Sollten spaeter entsprechende Dienste ergaenzt werden, muss diese Erklaerung angepasst werden."
-  },
-  {
-    title: "5. Ihre Rechte",
-    body: "Sie haben nach Massgabe der DSGVO insbesondere Rechte auf Auskunft, Berichtigung, Loeschung, Einschraenkung der Verarbeitung, Datenuebertragbarkeit und Widerspruch sowie ein Beschwerderecht bei einer Aufsichtsbehoerde."
-  }
-];
+export const metadata: Metadata = { title: "Datenschutz", description: "Datenschutzhinweise von Triumph Technical Services", alternates: { canonical: "/datenschutz" }, robots: siteConfig.isDraft ? { index: false, follow: false } : undefined };
 
 export default function DatenschutzPage() {
   return (
-    <main className="bg-bgLight pb-20 pt-32">
-      <article className="section-shell max-w-3xl bg-white p-6 shadow-soft sm:p-10">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-accent">
-          Rechtliches
-        </p>
-        <h1 className="font-headline text-5xl font-semibold leading-none text-primary">
-          Datenschutzerklaerung
-        </h1>
-        <p className="mt-5 text-sm text-textSecondary">Stand: 25. Mai 2026</p>
-
-        <div className="mt-8 space-y-8 text-sm leading-7 text-textSecondary">
-          {sections.map((section) => (
-            <section key={section.title}>
-              <h2 className="font-headline text-3xl font-semibold text-primary">
-                {section.title}
-              </h2>
-              <p className="mt-3">{section.body}</p>
-            </section>
-          ))}
-
-          <p className="border-l-4 border-accent bg-bgLight p-4">
-            Hinweis: Diese Datenschutzerklaerung ist eine technische Arbeitsfassung und muss vor
-            Veroeffentlichung mit den tatsaechlich eingesetzten Diensten abgeglichen werden.
-          </p>
-        </div>
-      </article>
+    <main className="legal-main">
+      <header className="legal-hero"><div className="shell"><p className="eyebrow">Rechtliche Angaben</p><h1>Datenschutz</h1></div></header>
+      <div className="shell legal-content">
+        {siteConfig.isDraft && <div className="legal-notice"><strong>Hinweis zur Vorschau:</strong> Verantwortliche Stelle, Hosting- und Versandkonfiguration werden vor Veröffentlichung final ergänzt und rechtlich geprüft.</div>}
+        <h2>1. Verantwortliche Stelle</h2><p>{siteConfig.name}<br />{siteConfig.address}<br />E-Mail: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><br />Telefon: {siteConfig.phone}</p>
+        <h2>2. Bereitstellung der Website</h2><p>Beim Aufruf der Website verarbeitet der Hostinganbieter technisch erforderliche Verbindungsdaten, insbesondere IP-Adresse, Zeitpunkt, aufgerufene Ressource, übertragene Datenmenge und Browserinformationen. Dies ist für eine sichere und stabile Bereitstellung erforderlich. Die konkrete Hostingkonfiguration und Speicherdauer werden vor Veröffentlichung ergänzt.</p>
+        <h2>3. Kontaktformular</h2><p>Wenn Sie das Kontaktformular nutzen, verarbeiten wir Ihre Angaben zur Bearbeitung und Beantwortung der Anfrage. Pflichtfelder sind Name, E-Mail-Adresse, ausgewählte Leistung, Einsatzort beziehungsweise Region, Wunschzeitraum, Dringlichkeit, Anlagenzustand, Nachricht und Datenschutzbestätigung. Unternehmen und Telefonnummer sind freiwillig.</p><p>Optional hochgeladene Projektunterlagen werden ausschließlich zur Einordnung und Bearbeitung Ihrer Anfrage verarbeitet, nicht öffentlich zugänglich gemacht und nicht als dauerhafter Dateispeicher verwendet. Zulässige Dateitypen und Größen werden technisch geprüft. Sensible Betriebs- und CAD-Unterlagen sollen erst über einen gesondert abgestimmten Übertragungsweg bereitgestellt werden.</p><p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei vorvertraglichen oder vertraglichen Anfragen; in sonstigen Fällen Art. 6 Abs. 1 lit. f DSGVO aufgrund unseres berechtigten Interesses an einer sachgerechten Kommunikation.</p>
+        <h2>4. E-Mail-Versand</h2><p>Für die sichere Zustellung von Formularanfragen ist der Versanddienst Resend vorgesehen. Eine Übermittlung erfolgt erst nach Einrichtung einer verifizierten Unternehmensdomain und Abschluss der erforderlichen datenschutzrechtlichen Vereinbarungen. In der lokalen Vorschau werden keine Formulardaten versendet.</p>
+        <h2>5. Cookies und Analyse</h2><p>Diese Website setzt keine Marketing-Cookies, Trackingdienste oder externe Webanalyse ein. Ein Einwilligungsbanner ist daher für den vorgesehenen Funktionsumfang nicht erforderlich.</p>
+        <h2>6. Speicherdauer</h2><p>Personenbezogene Daten werden nur so lange gespeichert, wie dies zur Bearbeitung der Anfrage und zur Erfüllung gesetzlicher Aufbewahrungspflichten erforderlich ist.</p>
+        <h2>7. Ihre Rechte</h2><p>Sie haben im Rahmen der gesetzlichen Voraussetzungen Rechte auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch. Außerdem können Sie sich bei einer zuständigen Datenschutzaufsichtsbehörde beschweren.</p>
+        <h2>8. Stand und Prüfung</h2><p>Diese Datenschutzhinweise sind für die technische Vorschau vorbereitet. Vor Veröffentlichung werden die tatsächlichen Anbieter-, Vertrags- und Kontaktdaten ergänzt und rechtlich geprüft.</p>
+      </div>
     </main>
   );
 }

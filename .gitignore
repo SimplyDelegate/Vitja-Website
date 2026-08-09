@@ -8,5 +8,7 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+next-dev*.log
+*.tsbuildinfo
 .DS_Store
 .codex-screenshots/

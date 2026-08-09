@@ -1,70 +1,22 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Impressum",
-  description: `Impressum von ${siteConfig.name}.`
-};
+export const metadata: Metadata = { title: "Impressum", description: "Impressum von Triumph Technical Services", alternates: { canonical: "/impressum" }, robots: siteConfig.isDraft ? { index: false, follow: false } : undefined };
 
 export default function ImpressumPage() {
   return (
-    <main className="bg-bgLight pb-20 pt-32">
-      <article className="section-shell max-w-3xl bg-white p-6 shadow-soft sm:p-10">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-accent">
-          Rechtliches
-        </p>
-        <h1 className="font-headline text-5xl font-semibold leading-none text-primary">
-          Impressum
-        </h1>
-
-        <div className="mt-8 space-y-8 text-sm leading-7 text-textSecondary">
-          <section>
-            <h2 className="font-headline text-3xl font-semibold text-primary">
-              Angaben gemaess § 5 DDG
-            </h2>
-            <p className="mt-3">
-              {siteConfig.name}
-              <br />
-              Rechtsform / Inhaber bitte ergaenzen
-              <br />
-              {siteConfig.address}
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-headline text-3xl font-semibold text-primary">Kontakt</h2>
-            <p className="mt-3">
-              Telefon: {siteConfig.phone}
-              <br />
-              E-Mail: {siteConfig.email}
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-headline text-3xl font-semibold text-primary">
-              Register und Umsatzsteuer
-            </h2>
-            <p className="mt-3">
-              Registereintrag, Registernummer und Umsatzsteuer-ID bitte ergaenzen, sofern vorhanden
-              oder erforderlich.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="font-headline text-3xl font-semibold text-primary">
-              Verantwortlich fuer den Inhalt
-            </h2>
-            <p className="mt-3">
-              Verantwortliche Person nach § 18 Abs. 2 MStV bitte ergaenzen.
-            </p>
-          </section>
-
-          <p className="border-l-4 border-accent bg-bgLight p-4">
-            Hinweis: Diese Seite enthaelt Platzhalter, weil die vollstaendigen
-            Unternehmensangaben im bereitgestellten Plan nicht enthalten waren.
-          </p>
-        </div>
-      </article>
+    <main className="legal-main">
+      <header className="legal-hero"><div className="shell"><p className="eyebrow">Rechtliche Angaben</p><h1>Impressum</h1></div></header>
+      <div className="shell legal-content">
+        {siteConfig.isDraft && <div className="legal-notice"><strong>Hinweis zur Vorschau:</strong> Die Pflichtangaben sind noch nicht vollständig. Diese Seite darf erst nach Ergänzung und rechtlicher Prüfung veröffentlicht werden.</div>}
+        <h2>Angaben gemäß § 5 DDG</h2>
+        <p><strong>{siteConfig.legalName}</strong><br />Markenauftritt: {siteConfig.name}<br />{siteConfig.address}</p>
+        <h2>Vertreten durch</h2><p>{siteConfig.responsible}</p>
+        <h2>Kontakt</h2><p>Telefon: {siteConfig.phone}<br />E-Mail: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></p>
+        <h2>Register- und Steuerangaben</h2><p>{siteConfig.register}<br />{siteConfig.taxId}</p>
+        <h2>Verantwortlich für den Inhalt</h2><p>{siteConfig.responsible}<br />{siteConfig.address}</p>
+        <h2>Haftungshinweise</h2><p>Die finalen Haftungs- und Streitbeilegungshinweise werden nach Vorliegen der vollständigen Unternehmensdaten rechtlich geprüft und vor Veröffentlichung ergänzt.</p>
+      </div>
     </main>
   );
 }
