@@ -24,7 +24,6 @@ export function Footer() {
           <div className="footer-links">
             <a href={`tel:${siteConfig.phoneHref}`}>{siteConfig.phone}</a>
             <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-            <Link href="/#qualifikationen">Qualifikationen ansehen</Link>
             <Link href="/#kontakt">Präqualifikationsunterlagen anfordern</Link>
             <span>{siteConfig.address}</span>
           </div>

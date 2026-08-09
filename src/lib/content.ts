@@ -1,15 +1,3 @@
-import type { LucideIcon } from "lucide-react";
-import {
-  Anvil,
-  Blend,
-  Boxes,
-  Factory,
-  Flame,
-  Layers3,
-  PanelsTopLeft,
-  Ship,
-  Wrench
-} from "lucide-react";
 import evidenceData from "@/data/evidence-registry.json";
 import qualificationData from "@/data/qualifications.json";
 
@@ -20,6 +8,8 @@ export type SiteConfig = {
   email: string;
   phone: string;
   phoneHref: string;
+  contactPerson: string;
+  contactRole: string;
   address: string;
   register: string;
   taxId: string;
@@ -34,11 +24,7 @@ export type Service = {
   id: string;
   title: string;
   short: string;
-  detail: string;
-  scope: string;
-  proofPoints: string[];
-  deliverables: string[];
-  icon: LucideIcon;
+  image?: { src: string; alt: string; focus: string };
   requestValue: string;
 };
 
@@ -106,9 +92,11 @@ export const siteConfig: SiteConfig = {
   name: "Triumph Technical Services",
   legalName: process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME ?? "Rechtsträger wird vor Veröffentlichung ergänzt",
   domain: configuredDomain,
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "kontakt@triumph-technical-services.de",
-  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+49 (0) 000 000000",
-  phoneHref: process.env.NEXT_PUBLIC_CONTACT_PHONE_HREF ?? "+49000000000",
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "viktor.jakobi@triumph-technical-services.de",
+  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+49 40 000 00 000",
+  phoneHref: process.env.NEXT_PUBLIC_CONTACT_PHONE_HREF ?? "+494000000000",
+  contactPerson: "Viktor Jakobi",
+  contactRole: "Geschäftsinhaber",
   address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? "Unternehmensanschrift wird ergänzt",
   register: process.env.NEXT_PUBLIC_COMPANY_REGISTER ?? "Registerangaben werden ergänzt",
   taxId: process.env.NEXT_PUBLIC_COMPANY_TAX_ID ?? "Steuerangaben werden ergänzt",
@@ -119,10 +107,6 @@ export const siteConfig: SiteConfig = {
 
 export const navItems = [
   { label: "Leistungen", href: "/#leistungen" },
-  { label: "Qualifikationen", href: "/#qualifikationen" },
-  { label: "Projekte", href: "/#projekte" },
-  { label: "Vorgehen", href: "/#vorgehen" },
-  { label: "Unternehmen", href: "/#unternehmen" },
   { label: "Kontakt", href: "/#kontakt" }
 ];
 
@@ -134,76 +118,46 @@ export const heroSlides: HeroSlide[] = [
 
 export const services: Service[] = [
   {
-    id: "rohrbau", title: "Rohrbau & Reparaturen", icon: Blend, requestValue: "Rohrbau & Reparaturen",
+    id: "rohrbau", title: "Rohrbau & Reparaturen", requestValue: "Rohrbau & Reparaturen",
+    image: { src: "/media/projects/rohrbau-fertigung.webp", alt: "Gefertigte Rohrbaugruppen mit Flanschverbindungen in einer Werkstatt", focus: "center 55%" },
     short: "Anpassung, Montage und Reparatur von Rohrleitungen und Rohrbaugruppen.",
-    detail: "Wir bearbeiten Rohrsysteme projektbezogen – von der Bestandsaufnahme über die Vorbereitung bis zur Montage und dokumentierten Übergabe.",
-    scope: "Werkstoff, Medium, Druckbereich und Prüfumfang werden vor der Ausführung abgeglichen.",
-    proofPoints: ["Projektbezogene Personal- und Verfahrensnachweise", "Material- und Prüfanforderungen nach Vorgabe"],
-    deliverables: ["Montage-/Übergabeprotokoll", "Vereinbarte Material- und Prüfnachweise"]
   },
   {
-    id: "stahlbau", title: "Stahlbau & Reparaturen", icon: Anvil, requestValue: "Stahlbau & Reparaturen",
+    id: "stahlbau", title: "Stahlbau & Reparaturen", requestValue: "Stahlbau & Reparaturen",
+    image: { src: "/media/projects/stahlkonstruktion.webp", alt: "Gefertigte und beschichtete Stahlkonstruktion in einer Werkstatt", focus: "center 45%" },
     short: "Pragmatische Lösungen für Stahlkonstruktionen, Bauteile und Reparaturen im Bestand.",
-    detail: "Bestehende Konstruktionen werden geprüft, vorbereitet, instandgesetzt oder passgenau ergänzt – abgestimmt auf Einbausituation und Betriebsablauf.",
-    scope: "Ausführungsklasse, Werkstoff und statische beziehungsweise konstruktive Vorgaben werden auftragsbezogen geklärt.",
-    proofPoints: ["Schweißtechnische Nachweise passend zum Auftrag", "DIN EN 1090 nur im belegten Geltungsbereich"],
-    deliverables: ["Ausführungs-/Fotodokumentation", "Prüf- und Materialunterlagen nach Vereinbarung"]
   },
   {
-    id: "anlageninstandsetzung", title: "Anlageninstandsetzung", icon: Factory, requestValue: "Anlageninstandsetzung",
+    id: "anlageninstandsetzung", title: "Anlageninstandsetzung", requestValue: "Anlageninstandsetzung",
+    image: { src: "/media/projects/anlageninstandsetzung.webp", alt: "Technische Anlage mit Behälter, Rohrleitungen und Armaturen", focus: "center 42%" },
     short: "Geplante und kurzfristige Arbeiten an technischen Anlagen und Komponenten.",
-    detail: "Wir koordinieren Instandsetzungsarbeiten im Bestand mit kurzen Wegen, klaren Zuständigkeiten und Rücksicht auf laufende Prozesse.",
-    scope: "Zugang, Freigaben, Schnittstellen und Auswirkungen auf den Betrieb werden vor Beginn gemeinsam festgelegt.",
-    proofPoints: ["Gefährdungs- und Freigabeanforderungen", "Qualifikation passend zu Tätigkeit und Einsatzort"],
-    deliverables: ["Status und Restpunkte", "Geordnete Übergabe mit vereinbartem Nachweisumfang"]
   },
   {
-    id: "schweissarbeiten", title: "Schweißarbeiten", icon: Flame, requestValue: "Schweißarbeiten",
+    id: "schweissarbeiten", title: "Schweißarbeiten", requestValue: "Schweißarbeiten",
+    image: { src: "/media/projects/schweissnaht.webp", alt: "Gleichmäßige Schweißnaht an einem Rohrbauteil", focus: "center 50%" },
     short: "Projektbezogene Schweißarbeiten für Neubau, Umbau und Reparatur.",
-    detail: "Werkstoff, Verfahren, Position, Qualitätsanforderung und Prüfumfang werden vor dem Einsatz abgeglichen und nachvollziehbar festgelegt.",
-    scope: "Qualifikationen gelten nie pauschal: Der tatsächliche Geltungsbereich wird anhand Ihrer Spezifikation geprüft.",
-    proofPoints: ["Schweißer-/Bedienerqualifikation", "WPS/WPQR und Prüfanforderungen, soweit gefordert"],
-    deliverables: ["Naht- und Prüfunterlagen nach Vorgabe", "Rückverfolgbare Dokumentation im vereinbarten Umfang"]
   },
   {
-    id: "blechherstellung", title: "Blechherstellung", icon: PanelsTopLeft, requestValue: "Blechherstellung",
+    id: "blechherstellung", title: "Blechherstellung", requestValue: "Blechherstellung",
     short: "Projektbezogene Blechbauteile als Bestandteil einer koordinierten Gesamtlösung.",
-    detail: "Benötigte Blechbauteile werden nach Zeichnung, Aufmaß und Einbausituation organisiert und in den Projektablauf integriert – aus einer Hand koordiniert.",
-    scope: "Material, Toleranzen, Oberflächen und Schnittstellen werden vor Beauftragung eindeutig abgestimmt.",
-    proofPoints: ["Geprüfte Projektanforderungen", "Geregelte Einbindung qualifizierter Ausführungspartner"],
-    deliverables: ["Bauteile nach freigegebener Vorgabe", "Materialunterlagen nach Vereinbarung"]
   },
   {
-    id: "gfk", title: "GFK-Instandsetzung & GFK-Rohr-/Systembau", icon: Layers3, requestValue: "GFK-Instandsetzung & GFK-Rohr-/Systembau",
+    id: "gfk", title: "GFK-Instandsetzung & GFK-Rohr-/Systembau", requestValue: "GFK-Instandsetzung & GFK-Rohr-/Systembau",
+    image: { src: "/media/projects/gfk-rohrbaugruppe.webp", alt: "GFK-Rohrbaugruppe während der Fertigung", focus: "center 35%" },
     short: "Herstellung, Verbindung und Reparatur von GFK-Rohrleitungen und Systembauteilen.",
-    detail: "Wir fertigen und montieren GFK-Baugruppen, bearbeiten Verbindungen und setzen beschädigte Komponenten projektbezogen instand.",
-    scope: "Harzsystem, Laminataufbau, Medium, Temperatur und Prüfanforderungen werden vor Ausführung festgelegt.",
-    proofPoints: ["DVS-/Systemqualifikation passend zum Auftrag", "Material-, Verarbeitungs- und Aushärtungsanforderungen"],
-    deliverables: ["Verarbeitungs-/Fotodokumentation", "Prüf- und Materialunterlagen nach Vereinbarung"]
   },
   {
-    id: "systemintegration", title: "Systemeinbau & Integration", icon: Boxes, requestValue: "Systemeinbau & Integration",
+    id: "systemintegration", title: "Systemeinbau & Integration", requestValue: "Systemeinbau & Integration",
+    image: { src: "/media/projects/systemeinbau-armaturen.webp", alt: "Integriertes Rohrsystem mit Armaturen in engem Bauraum", focus: "center 46%" },
     short: "Einbau technischer Systeme in komplexen, räumlich begrenzten Umgebungen.",
-    detail: "Komponenten, Rohrleitungen und Armaturen werden aufeinander abgestimmt, eingebaut und in vorhandene Strukturen integriert.",
-    scope: "Schnittstellen, Zugänge, Montagefolge und Freigabepunkte werden vor dem Einbau geklärt.",
-    proofPoints: ["Projektbezogene Montagequalifikation", "Integration in kundenseitige Sicherheitsprozesse"],
-    deliverables: ["Montage- und Restpunktestatus", "Dokumentierte Übergabe"]
   },
   {
-    id: "industrieisolierung", title: "Industrieisolierung", icon: Wrench, requestValue: "Industrieisolierung",
+    id: "industrieisolierung", title: "Industrieisolierung", requestValue: "Industrieisolierung",
     short: "Koordinierte Isolierarbeiten an technischen Anlagen und Leitungssystemen.",
-    detail: "Isolierarbeiten werden passend zu Temperatur, Feuchte, Korrosionsschutz, Zugänglichkeit und betrieblichem Ablauf eingeordnet.",
-    scope: "DIN 4140, projektspezifische AGI-Vorgaben und Gefahrstoffanforderungen werden nur im passenden Einsatzfall angewendet.",
-    proofPoints: ["Ausführungskompetenz passend zum Dämmsystem", "TRGS-Nachweise nur bei entsprechendem Material"],
-    deliverables: ["Ausführungs-/Fotodokumentation", "Materialangaben nach Vereinbarung"]
   },
   {
-    id: "schiffsausbau", title: "Schiffsausbau", icon: Ship, requestValue: "Schiffsausbau",
+    id: "schiffsausbau", title: "Schiffsausbau", requestValue: "Schiffsausbau",
     short: "Technische Ausbau- und Integrationsarbeiten für maritime Einsatzbereiche.",
-    detail: "Wir verbinden handwerkliche Ausführung mit enger Abstimmung der Gewerke – insbesondere dort, wo Platz, Terminlage und Bestand besondere Anforderungen stellen.",
-    scope: "Flaggen-, Werft- und Klassifikationsanforderungen werden vor klasserelevanten Arbeiten verbindlich abgeglichen.",
-    proofPoints: ["Verfahrens-/Personalnachweise nach Projektvorgabe", "Klassifikationsfreigaben nur im belegten Umfang"],
-    deliverables: ["Ausführungs- und Übergabestatus", "Klassen-/Prüfunterlagen nach Anforderung"]
   }
 ];
 

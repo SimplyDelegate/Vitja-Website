@@ -1,6 +1,8 @@
 "use client";
 
-import { ArrowDownRight, Plus } from "lucide-react";
+import Image from "next/image";
+import { ArrowDownRight } from "lucide-react";
+import { asset } from "@/lib/assets";
 import { services } from "@/lib/content";
 
 export function ServicesGrid() {
@@ -10,31 +12,29 @@ export function ServicesGrid() {
 
   return (
     <div className="services-grid">
-      {services.map((service, index) => {
-        const Icon = service.icon;
-        return (
-          <article className="service-card reveal" key={service.id}>
-            <div className="service-card-top">
-              <span className="service-index">{String(index + 1).padStart(2, "0")}</span>
-              <Icon aria-hidden="true" />
-            </div>
+      {services.map((service) => (
+        <article className="service-card reveal" key={service.id}>
+          <div className={`service-card-media${service.image ? " has-image" : " is-empty"}`} aria-hidden={service.image ? undefined : true}>
+            {service.image && (
+              <Image
+                className="service-card-image"
+                src={asset(service.image.src)}
+                alt={service.image.alt}
+                fill
+                sizes="(max-width: 820px) calc(100vw - 38px), (max-width: 1120px) 50vw, 33vw"
+                style={{ objectPosition: service.image.focus }}
+              />
+            )}
+          </div>
+          <div className="service-card-body">
             <h3>{service.title}</h3>
             <p>{service.short}</p>
-            <details>
-              <summary><Plus aria-hidden="true" /> Details zur Leistung</summary>
-              <div className="service-detail-content">
-                <p>{service.detail}</p>
-                <div><strong>Auftragsklärung</strong><span>{service.scope}</span></div>
-                <div><strong>Nachweise</strong><ul>{service.proofPoints.map((item) => <li key={item}>{item}</li>)}</ul></div>
-                <div><strong>Übergabe</strong><ul>{service.deliverables.map((item) => <li key={item}>{item}</li>)}</ul></div>
-              </div>
-            </details>
             <a href="#kontakt" className="service-request" onClick={() => requestService(service.requestValue)}>
               Zu dieser Leistung anfragen <ArrowDownRight aria-hidden="true" />
             </a>
-          </article>
-        );
-      })}
+          </div>
+        </article>
+      ))}
     </div>
   );
 }

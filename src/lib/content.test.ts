@@ -7,6 +7,19 @@ describe("Website-Inhalte", () => {
     expect(new Set(services.map((service) => service.id)).size).toBe(9);
   });
 
+  it("ordnet nur fachlich belegten Leistungen ein Projektbild zu", () => {
+    const illustrated = services.filter((service) => service.image);
+    const withoutImage = services.filter((service) => !service.image).map((service) => service.id);
+
+    expect(illustrated).toHaveLength(6);
+    expect(withoutImage).toEqual(["blechherstellung", "industrieisolierung", "schiffsausbau"]);
+    for (const service of illustrated) {
+      expect(service.image?.src).toMatch(/^\/media\/projects\/.+\.webp$/);
+      expect(service.image?.alt).toBeTruthy();
+      expect(service.image?.focus).toMatch(/%$/);
+    }
+  });
+
   it("verwendet drei Hero-Motive und 15 echte Projektbilder", () => {
     expect(heroSlides).toHaveLength(3);
     expect(projectMedia).toHaveLength(15);
