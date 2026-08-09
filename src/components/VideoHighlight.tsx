@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
+import { asset } from "@/lib/assets";
 
 const motionQuery = "(prefers-reduced-motion: reduce)";
 const subscribeToMotion = (callback: () => void) => {
@@ -35,11 +36,11 @@ export function VideoHighlight() {
       loop
       playsInline
       preload="metadata"
-      poster="/media/hero/gfk-rohrbau.webp"
+      poster={asset("/media/hero/gfk-rohrbau.webp")}
       aria-label="GFK-Rohrbaugruppe während der Fertigung"
       controls={reducedMotion}
     >
-      {!reducedMotion && <source src="/media/video/gfk-systembau.mp4" type="video/mp4" />}
+      {!reducedMotion && <source src={asset("/media/video/gfk-systembau.mp4")} type="video/mp4" />}
     </video>
   );
 }

@@ -1,0 +1,71 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Laufende Deployments nicht abbrechen, aber nur eines gleichzeitig zulassen.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_BASE_PATH: /Vitja-Website
+      NEXT_PUBLIC_SITE_URL: https://simplydelegate.github.io/Vitja-Website
+      # Ohne diese Werte gilt die Seite als Entwurf (siehe siteConfig.isDraft in
+      # src/lib/content.ts): robots.txt sperrt dann alle Crawler aus und die
+      # sitemap bleibt leer. Als Repository Variables im Repo hinterlegen.
+      NEXT_PUBLIC_CONTACT_EMAIL: ${{ vars.NEXT_PUBLIC_CONTACT_EMAIL }}
+      NEXT_PUBLIC_CONTACT_PHONE: ${{ vars.NEXT_PUBLIC_CONTACT_PHONE }}
+      NEXT_PUBLIC_CONTACT_PHONE_HREF: ${{ vars.NEXT_PUBLIC_CONTACT_PHONE_HREF }}
+      NEXT_PUBLIC_COMPANY_ADDRESS: ${{ vars.NEXT_PUBLIC_COMPANY_ADDRESS }}
+      NEXT_PUBLIC_COMPANY_LEGAL_NAME: ${{ vars.NEXT_PUBLIC_COMPANY_LEGAL_NAME }}
+      NEXT_PUBLIC_COMPANY_REGISTER: ${{ vars.NEXT_PUBLIC_COMPANY_REGISTER }}
+      NEXT_PUBLIC_COMPANY_TAX_ID: ${{ vars.NEXT_PUBLIC_COMPANY_TAX_ID }}
+      NEXT_PUBLIC_COMPANY_RESPONSIBLE: ${{ vars.NEXT_PUBLIC_COMPANY_RESPONSIBLE }}
+      # Web3Forms-Key ist per Design oeffentlich, deshalb Variable statt Secret.
+      NEXT_PUBLIC_CONTACT_ACCESS_KEY: ${{ vars.NEXT_PUBLIC_CONTACT_ACCESS_KEY }}
+      # Erst setzen, wenn rechtliche und fachliche Freigabe vorliegen -- dann
+      # blockiert scripts/check-production.mjs unvollstaendige Deploys.
+      SITE_ENV: ${{ vars.SITE_ENV }}
+      LEGAL_REVIEW_CONFIRMED: ${{ vars.LEGAL_REVIEW_CONFIRMED }}
+      QUALIFICATION_REVIEW_CONFIRMED: ${{ vars.QUALIFICATION_REVIEW_CONFIRMED }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/configure-pages@v6
+
+      - run: npm ci
+
+      - run: npm run build
+
+      # Verhindert, dass Pages den Export durch Jekyll schickt (_next waere sonst weg).
+      - run: touch out/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

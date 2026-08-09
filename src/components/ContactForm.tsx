@@ -4,9 +4,31 @@ import Link from "next/link";
 import { ArrowUpRight, FileUp, Send } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { services, siteConfig } from "@/lib/content";
-import { maxAttachmentBytes, maxAttachmentCount } from "@/lib/contact";
+import { allowedAttachmentTypes, contactAccessKey, contactEndpoint, maxAttachmentBytes, maxAttachmentCount, validateContactPayload } from "@/lib/contact";
 
-type FormStatus = { type: "idle" | "pending" | "success" | "error"; message: string; mock?: boolean };
+type FormStatus = { type: "idle" | "pending" | "success" | "error"; message: string };
+
+// Ohne Access-Key kann der statische Export nichts versenden. Dann bekommt der
+// Besucher einen Mailto-Ausweg statt eines Formulars, das ins Leere laeuft.
+const dispatchAvailable = Boolean(contactAccessKey);
+
+function fieldsFrom(form: FormData, startedAt: number) {
+  return {
+    name: form.get("name"),
+    company: form.get("company") ?? "",
+    email: form.get("email"),
+    phone: form.get("phone") ?? "",
+    service: form.get("service"),
+    location: form.get("location"),
+    timeframe: form.get("timeframe"),
+    urgency: form.get("urgency"),
+    operationalState: form.get("operationalState"),
+    message: form.get("message"),
+    privacy: form.get("privacy") === "on" || form.get("privacy") === "true",
+    website: form.get("website") ?? "",
+    startedAt
+  };
+}
 
 export function ContactForm() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -27,33 +49,54 @@ export function ContactForm() {
   function updateFiles(input: HTMLInputElement) {
     const files = Array.from(input.files ?? []);
     const size = files.reduce((sum, file) => sum + file.size, 0);
-    if (files.length > maxAttachmentCount || size > maxAttachmentBytes) {
+    const reject = (message: string) => {
       input.value = "";
       setFilesLabel("Keine Dateien ausgewählt");
-      setStatus({ type: "error", message: "Maximal 3 Dateien mit zusammen 10 MB sind möglich." });
-      return;
+      setStatus({ type: "error", message });
+    };
+
+    if (files.length > maxAttachmentCount || size > maxAttachmentBytes) {
+      return reject("Maximal 3 Dateien mit zusammen 10 MB sind möglich.");
     }
+    // Ohne Server prueft niemand mehr nach, deshalb hier abfangen.
+    if (files.some((file) => !allowedAttachmentTypes.includes(file.type as (typeof allowedAttachmentTypes)[number]))) {
+      return reject("Erlaubt sind PDF-, JPG-, PNG- und WebP-Dateien.");
+    }
+
     setStatus({ type: "idle", message: "" });
     setFilesLabel(files.length ? files.map((file) => file.name).join(", ") : "Keine Dateien ausgewählt");
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+
+    // Die Validierung lief frueher in der API-Route und liegt jetzt hier.
+    const validation = validateContactPayload(fieldsFrom(form, startedAt));
+    if (!validation.success) {
+      setStatus({ type: "error", message: validation.error.issues[0]?.message ?? "Bitte prüfen Sie Ihre Angaben." });
+      return;
+    }
+
     setStatus({ type: "pending", message: "Anfrage und Unterlagen werden geprüft …" });
-    const form = new FormData(event.currentTarget);
-    form.set("startedAt", String(startedAt));
+
+    form.delete("website");
+    form.set("access_key", contactAccessKey);
+    form.set("botcheck", "");
+    form.set("from_name", validation.data.name);
+    form.set("subject", `Projektanfrage: ${validation.data.service} – ${validation.data.location}`);
 
     try {
-      const response = await fetch("/api/contact", { method: "POST", body: form });
-      const result = await response.json() as { ok?: boolean; message?: string; mock?: boolean };
-      if (!response.ok || !result.ok) throw new Error(result.message || "Die Anfrage konnte nicht versendet werden.");
-      setStatus({ type: "success", message: result.message || "Vielen Dank für Ihre Anfrage.", mock: result.mock });
-      if (!result.mock) {
-        event.currentTarget.reset();
-        setService("");
-        setFilesLabel("Keine Dateien ausgewählt");
-        setStartedAt(Date.now());
-      }
+      const response = await fetch(contactEndpoint, { method: "POST", body: form });
+      const result = await response.json() as { success?: boolean; message?: string };
+      if (!response.ok || !result.success) throw new Error(result.message || "Die Anfrage konnte nicht versendet werden.");
+
+      setStatus({ type: "success", message: "Vielen Dank für Ihre Anfrage. Wir melden uns zeitnah bei Ihnen." });
+      formElement.reset();
+      setService("");
+      setFilesLabel("Keine Dateien ausgewählt");
+      setStartedAt(Date.now());
     } catch (error) {
       setStatus({ type: "error", message: error instanceof Error ? error.message : "Die Anfrage konnte nicht versendet werden." });
     }
@@ -69,6 +112,13 @@ export function ContactForm() {
         {siteConfig.isDraft && <p className="preview-note"><strong>Vorschaumodus:</strong> Kontaktdaten und E-Mail-Versand werden vor der Veröffentlichung final konfiguriert.</p>}
       </div>
 
+      {!dispatchAvailable ? (
+        <div className="contact-form">
+          <p><strong>Das Anfrageformular ist noch nicht freigeschaltet.</strong></p>
+          <p>Bis dahin erreichen Sie uns direkt per E-Mail oder Telefon. Beschreiben Sie Ihre Aufgabe gern mit Einsatzort, Zeitraum und Anlagenzustand — dann können wir sie sofort einordnen.</p>
+          <p><a className="button" href={`mailto:${siteConfig.email}?subject=${encodeURIComponent("Projektanfrage über die Website")}`}><Send aria-hidden="true" />Anfrage per E-Mail senden</a></p>
+        </div>
+      ) : (
       <form ref={formRef} className="contact-form" onSubmit={handleSubmit} noValidate encType="multipart/form-data">
         <div className="form-grid">
           <label>Name *<input name="name" autoComplete="name" minLength={2} maxLength={100} required /></label>
@@ -103,6 +153,7 @@ export function ContactForm() {
           <p className={`form-status is-${status.type}`} role="status" aria-live="polite">{status.message}</p>
         </div>
       </form>
+      )}
     </div>
   );
 }

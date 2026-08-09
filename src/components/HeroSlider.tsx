@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
 import { heroSlides } from "@/lib/content";
+import { asset } from "@/lib/assets";
 
 export function HeroSlider() {
   const [active, setActive] = useState(0);
@@ -32,7 +33,7 @@ export function HeroSlider() {
           <Image
             key={slide.src}
             className={`hero-image ${active === index ? "is-active" : ""}`}
-            src={slide.src}
+            src={asset(slide.src)}
             alt={index === active ? slide.alt : ""}
             fill
             sizes="100vw"

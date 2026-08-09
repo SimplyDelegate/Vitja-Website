@@ -11,6 +11,7 @@ import { ServicesGrid } from "@/components/ServicesGrid";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { VideoHighlight } from "@/components/VideoHighlight";
 import { faqItems, processSteps, siteConfig } from "@/lib/content";
+import { asset } from "@/lib/assets";
 
 const trustItems = [
   { text: "Qualifikation passend zu Werkstoff, Verfahren und Einsatz", icon: ShieldCheck },
@@ -117,8 +118,8 @@ export default function HomePage() {
       <section className="section company-section" id="unternehmen">
         <div className="shell company-grid reveal">
           <div className="company-image">
-            <Image src="/media/projects/systemeinbau-armaturen.webp" alt="Integriertes Rohrleitungssystem mit Armaturen" fill sizes="(max-width: 900px) 100vw, 48vw" />
-            <div className="company-mark"><Image src="/brand/mark.svg" alt="" width={70} height={70} /></div>
+            <Image src={asset("/media/projects/systemeinbau-armaturen.webp")} alt="Integriertes Rohrleitungssystem mit Armaturen" fill sizes="(max-width: 900px) 100vw, 48vw" />
+            <div className="company-mark"><Image src={asset("/brand/mark.svg")} alt="" width={70} height={70} /></div>
           </div>
           <div className="company-copy">
             <p className="eyebrow eyebrow-light">Triumph Technical Services</p>

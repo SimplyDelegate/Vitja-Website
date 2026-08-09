@@ -37,14 +37,16 @@ export function validateContactPayload(input: unknown, now = Date.now()) {
   return result;
 }
 
-export function hasAllowedSignature(bytes: Uint8Array, type: string) {
-  if (type === "application/pdf") return bytes.length >= 5 && String.fromCharCode(...bytes.slice(0, 5)) === "%PDF-";
-  if (type === "image/jpeg") return bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
-  if (type === "image/png") return bytes.length >= 8 && [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((value, index) => bytes[index] === value);
-  if (type === "image/webp") return bytes.length >= 12 && String.fromCharCode(...bytes.slice(0, 4)) === "RIFF" && String.fromCharCode(...bytes.slice(8, 12)) === "WEBP";
-  return false;
-}
+// Die Seite wird statisch ausgeliefert und hat keinen eigenen Server. Der
+// Formularversand laeuft deshalb ueber einen externen Dienst; der Access-Key ist
+// bei diesen Diensten oeffentlich und darf im Client-Bundle stehen.
+export const contactEndpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT ?? "https://api.web3forms.com/submit";
+export const contactAccessKey = process.env.NEXT_PUBLIC_CONTACT_ACCESS_KEY ?? "";
 
-export function safeAttachmentName(name: string) {
-  return name.normalize("NFKC").replace(/[\\/\r\n\0]/g, "-").replace(/[^a-zA-Z0-9äöüÄÖÜß._ -]/g, "-").slice(0, 120) || "projektunterlage";
+export function contactEndpointOrigin() {
+  try {
+    return new URL(contactEndpoint).origin;
+  } catch {
+    return "";
+  }
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { navItems } from "@/lib/content";
+import { asset } from "@/lib/assets";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -19,8 +20,8 @@ export function Navbar() {
     <header className="site-header">
       <div className="shell header-inner">
         <Link href="/" className="brand-link" aria-label="Triumph Technical Services – Startseite">
-          <Image className="brand-desktop" src="/brand/logo.svg" alt="Triumph Technical Services" width={340} height={70} loading="eager" />
-          <Image className="brand-mobile" src="/brand/mark.svg" alt="" width={42} height={42} loading="eager" />
+          <Image className="brand-desktop" src={asset("/brand/logo.svg")} alt="Triumph Technical Services" width={340} height={70} loading="eager" />
+          <Image className="brand-mobile" src={asset("/brand/mark.svg")} alt="" width={42} height={42} loading="eager" />
         </Link>
 
         <nav className="desktop-nav" aria-label="Hauptnavigation">

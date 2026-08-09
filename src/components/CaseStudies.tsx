@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ArrowDownRight } from "lucide-react";
 import { caseStudies } from "@/lib/content";
+import { asset } from "@/lib/assets";
 
 export function CaseStudies() {
   return (
@@ -8,7 +9,7 @@ export function CaseStudies() {
       {caseStudies.map((study, index) => (
         <article className="case-study reveal" key={study.id}>
           <div className="case-study-media">
-            <Image src={study.image} alt={study.alt} fill sizes="(max-width: 900px) 100vw, 48vw" />
+            <Image src={asset(study.image)} alt={study.alt} fill sizes="(max-width: 900px) 100vw, 48vw" />
             <span>{String(index + 1).padStart(2, "0")} · {study.category}</span>
           </div>
           <div className="case-study-copy">
