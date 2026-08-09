@@ -50,6 +50,14 @@ export function ContactForm() {
       return;
     }
 
+    if (!dispatchAvailable) {
+      setStatus({
+        type: "error",
+        message: "Der direkte Versand ist noch nicht freigeschaltet. Bitte nutzen Sie Telefon oder E-Mail."
+      });
+      return;
+    }
+
     setStatus({ type: "pending", message: "Anfrage wird geprüft …" });
     form.delete("website");
     form.set("access_key", contactAccessKey);
@@ -98,14 +106,7 @@ export function ContactForm() {
         </div>
       </div>
 
-      {!dispatchAvailable ? (
-        <div className="contact-form">
-          <p><strong>Das Anfrageformular ist noch nicht freigeschaltet.</strong></p>
-          <p>Bis dahin erreichen Sie uns direkt per E-Mail oder Telefon. Schildern Sie kurz Ihre Aufgabe und die gewünschte Leistung.</p>
-          <p><a className="button" href={`mailto:${siteConfig.email}?subject=${encodeURIComponent("Leistungsanfrage über die Website")}`}><Send aria-hidden="true" />Anfrage per E-Mail senden</a></p>
-        </div>
-      ) : (
-        <form ref={formRef} className="contact-form" onSubmit={handleSubmit} noValidate>
+      <form ref={formRef} className="contact-form" onSubmit={handleSubmit} noValidate>
           <div className="form-grid">
             <label>Name *<input name="name" autoComplete="name" minLength={2} maxLength={100} required /></label>
             <label>Unternehmen<input name="company" autoComplete="organization" maxLength={120} /></label>
@@ -127,8 +128,7 @@ export function ContactForm() {
             <button className="button" type="submit" disabled={status.type === "pending"}><Send aria-hidden="true" />{status.type === "pending" ? "Wird geprüft …" : "Leistung besprechen"}</button>
             <p className={`form-status is-${status.type}`} role="status" aria-live="polite">{status.message}</p>
           </div>
-        </form>
-      )}
+      </form>
     </div>
   );
 }
