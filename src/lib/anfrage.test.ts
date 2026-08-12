@@ -1,0 +1,127 @@
+import { describe, expect, it } from "vitest";
+import {
+  baueZusammenfassung,
+  findePfad,
+  istEmailPlausibel,
+  minimumFillTimeMs,
+  pfade,
+  pfadeOhneProjektfragen,
+  pfadFuerAnfrageWert,
+  pfadLabels,
+  pruefeKontaktweg,
+  pruefeUpload,
+  stoerfall,
+  upload,
+  wurdeZuSchnellAusgefuellt
+} from "./anfrage";
+import { services } from "./content";
+
+describe("Pfade", () => {
+  it("bietet für jede Leistung der Website einen eigenen Pfad an", () => {
+    for (const service of services) {
+      expect(pfade.some((p) => p.id === service.id), service.id).toBe(true);
+    }
+  });
+
+  it("ordnet jeden CTA-Wert (Leistungsraster, Qualifikationsbereich) einem Pfad zu", () => {
+    for (const service of services) {
+      expect(findePfad(service.requestValue), service.requestValue).not.toBeNull();
+    }
+    expect(findePfad("Qualifikations- / Präqualifikationsunterlagen")).toBe("unterlagen");
+  });
+
+  it("löst Deeplink-Parameter, Störfall und Unbekanntes korrekt auf", () => {
+    expect(findePfad("gfk")).toBe("gfk");
+    expect(findePfad(stoerfall.id)).toBe(stoerfall.id);
+    expect(findePfad("gibt-es-nicht")).toBeNull();
+    expect(findePfad(null)).toBeNull();
+  });
+
+  it("hat für jeden Pfad vollständige Stufe-2-Texte", () => {
+    for (const pfad of pfade) {
+      expect(pfad.stufe2.titel.length, pfad.id).toBeGreaterThan(0);
+      expect(pfad.beschreibungLabel.length, pfad.id).toBeGreaterThan(0);
+      expect(pfad.submitLabel.length, pfad.id).toBeGreaterThan(0);
+    }
+  });
+
+  it("kennt jeden Pfad ohne Projektfragen auch als Pfad", () => {
+    for (const id of pfadeOhneProjektfragen) {
+      expect(pfade.some((p) => p.id === id), id).toBe(true);
+    }
+  });
+
+  it("verweist in der Zuordnungstabelle nur auf existierende Pfade", () => {
+    for (const [wert, ziel] of Object.entries(pfadFuerAnfrageWert)) {
+      expect(pfadLabels[ziel], `${wert} → ${ziel}`).toBeDefined();
+    }
+  });
+});
+
+describe("Kontaktweg-Regel", () => {
+  it("akzeptiert E-Mail oder Telefon", () => {
+    expect(pruefeKontaktweg("max@example.de", "")).toBeNull();
+    expect(pruefeKontaktweg("", "040 123456")).toBeNull();
+    expect(pruefeKontaktweg("max@example.de", "040 123456")).toBeNull();
+  });
+
+  it("verlangt mindestens einen Kontaktweg", () => {
+    expect(pruefeKontaktweg("", "")).not.toBeNull();
+    expect(pruefeKontaktweg("  ", " ")).not.toBeNull();
+  });
+
+  it("weist unplausible E-Mail-Adressen ab, wenn keine Nummer angegeben ist", () => {
+    expect(pruefeKontaktweg("max@", "")).not.toBeNull();
+    expect(istEmailPlausibel("max@example")).toBe(false);
+    expect(istEmailPlausibel("max@example.de")).toBe(true);
+  });
+});
+
+describe("Upload-Grenzen", () => {
+  it("akzeptiert Auswahl innerhalb der Grenzen", () => {
+    expect(pruefeUpload([{ size: 1024 }, { size: 2048 }])).toBeNull();
+    expect(pruefeUpload([])).toBeNull();
+  });
+
+  it("weist zu viele oder zu große Dateien ab", () => {
+    expect(pruefeUpload(Array.from({ length: upload.maxDateien + 1 }, () => ({ size: 1 })))).not.toBeNull();
+    expect(pruefeUpload([{ size: upload.maxGesamtBytes + 1 }])).not.toBeNull();
+  });
+});
+
+describe("Ausfüllzeit", () => {
+  it("erkennt zu schnelle und unplausible Zeitstempel", () => {
+    const now = Date.now();
+    expect(wurdeZuSchnellAusgefuellt(now - minimumFillTimeMs - 1, now)).toBe(false);
+    expect(wurdeZuSchnellAusgefuellt(now - 100, now)).toBe(true);
+    expect(wurdeZuSchnellAusgefuellt(now + 5000, now)).toBe(true);
+  });
+});
+
+describe("Zusammenfassung", () => {
+  it("fasst eine Standardanfrage zusammen", () => {
+    const eintraege = baueZusammenfassung({
+      akut: false,
+      pfad: "gfk",
+      werte: { zeitrahmen: "stillstand", termin: "KW 38", plz: "21079", ort: "Hamburg", firma: "Muster GmbH", name: "Max Mustermann" }
+    });
+    expect(eintraege).toEqual([
+      ["Leistung", pfadLabels.gfk],
+      ["Zeitrahmen", "zum geplanten Stillstand oder Revisionstermin (KW 38)"],
+      ["Einsatzort", "21079 Hamburg"],
+      ["Unternehmen", "Muster GmbH"],
+      ["Ansprechpartner", "Max Mustermann"]
+    ]);
+  });
+
+  it("fasst eine Störfallmeldung zusammen und lässt Leeres weg", () => {
+    const eintraege = baueZusammenfassung({
+      akut: true,
+      pfad: "",
+      werte: { stoerfall_betrieb: "stillstand", plz: "20457", firma: "Muster GmbH", name: "Max Mustermann" }
+    });
+    expect(eintraege[0]).toEqual(["Anliegen", stoerfall.label]);
+    expect(eintraege[1]).toEqual(["Betrieb", "Produktion steht"]);
+    expect(eintraege).toHaveLength(5);
+  });
+});

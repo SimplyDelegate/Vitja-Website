@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Check } from "lucide-react";
-import { ContactForm } from "@/components/ContactForm";
+import { Anfrageformular } from "@/components/anfrage/Anfrageformular";
 import { HeroSlider } from "@/components/HeroSlider";
 import { ProjectGallery } from "@/components/ProjectGallery";
 import { ServicesGrid } from "@/components/ServicesGrid";
@@ -63,7 +63,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section contact-section" id="kontakt"><div className="shell reveal"><ContactForm /></div></section>
+      <section className="section contact-section" id="kontakt" aria-labelledby="anfrage-titel"><div className="shell reveal"><Anfrageformular /></div></section>
     </main>
   );
 }
