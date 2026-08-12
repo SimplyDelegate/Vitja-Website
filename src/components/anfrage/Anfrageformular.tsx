@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, TriangleAlert } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { ChangeEvent, FormEvent, ReactNode, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   anfrageKontakt,
@@ -48,6 +48,46 @@ function sanftScrollen(): ScrollBehavior {
 const keinAbo = () => () => {};
 function useHydriert() {
   return useSyncExternalStore(keinAbo, () => true, () => false);
+}
+
+/**
+ * Im pult-Modus scrollt nur der Fragenbereich. Diese Funktion bestimmt nach
+ * Panelwechseln, Größenänderungen und beim Scrollen, ob unterhalb noch Inhalt
+ * liegt (Schatten auf der Aktionsleiste) und ob der Bereich per Tastatur
+ * erreichbar sein muss (WCAG 2.1.1). Bewusst imperativ statt React-State:
+ * die Attribute stehen nicht im JSX, React lässt sie unangetastet.
+ */
+function ueberlaufPruefen(koerper: HTMLElement) {
+  const bereich = koerper.closest("section");
+  const leiste = bereich?.querySelector<HTMLElement>("[data-panel-actions]");
+  const scrollbar = koerper.scrollHeight - koerper.clientHeight > 4;
+  const weiterUnten = scrollbar && koerper.scrollHeight - koerper.scrollTop - koerper.clientHeight > 8;
+
+  if (scrollbar) {
+    koerper.setAttribute("tabindex", "0");
+    koerper.setAttribute("role", "group");
+    koerper.setAttribute("aria-label", "Fragen zu diesem Schritt");
+  } else {
+    koerper.removeAttribute("tabindex");
+    koerper.removeAttribute("role");
+    koerper.removeAttribute("aria-label");
+  }
+
+  if (leiste) leiste.toggleAttribute("data-mehr", weiterUnten);
+}
+
+/**
+ * Das gerade sichtbare Panel (Stufe oder Störfall). Bewusst nicht per
+ * "section:not([hidden]) …"-Selektor: der matcht auch über Vorfahren
+ * außerhalb des Formulars (die Kontakt-Sektion ist selbst ein <section>).
+ */
+function sichtbaresPanel(form: HTMLFormElement | null): HTMLElement | null {
+  if (!form) return null;
+  return Array.from(form.querySelectorAll<HTMLElement>("section")).find((panel) => !panel.hidden) ?? null;
+}
+
+function sichtbarerKoerper(form: HTMLFormElement | null) {
+  return sichtbaresPanel(form)?.querySelector<HTMLElement>("[data-panel-body]") ?? null;
 }
 
 /**
@@ -173,18 +213,63 @@ export function Anfrageformular() {
     if (termin) termin.value = "";
   }, [zeitrahmen]);
 
+  /* ---------------------------------------------------- Fragenbereich messen */
+
+  // Panelwechsel: Fragenbereich startet oben, Überlauf neu bestimmen.
+  useEffect(() => {
+    const koerper = sichtbarerKoerper(formRef.current);
+    if (!koerper) return;
+    koerper.scrollTop = 0;
+    ueberlaufPruefen(koerper);
+  }, [stufe, akut, erfolg]);
+
+  // Höhenänderungen im Panel (Fehlermeldungen, Pfadfragen, Terminfeld, Status).
+  useEffect(() => {
+    const koerper = sichtbarerKoerper(formRef.current);
+    if (koerper) ueberlaufPruefen(koerper);
+  }, [fehler, pfad, zeitrahmen, statusMeldung]);
+
+  useEffect(() => {
+    let timer = 0;
+    const beiResize = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        const koerper = sichtbarerKoerper(formRef.current);
+        if (koerper) ueberlaufPruefen(koerper);
+      }, 150);
+    };
+    window.addEventListener("resize", beiResize);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("resize", beiResize);
+    };
+  }, []);
+
   /* ------------------------------------------------------------------- Fokus */
+
+  // Seite nur bewegen, wenn das Formular nicht vollständig im Bild ist — im
+  // pult-Modus steht es ohnehin, ein Sprung dorthin wäre nur Unruhe.
+  function seiteZumFormular() {
+    const kasten = formRef.current?.getBoundingClientRect();
+    if (!kasten) return;
+    if (kasten.top < 0 || kasten.bottom > window.innerHeight) {
+      formRef.current?.scrollIntoView({ behavior: sanftScrollen(), block: "start" });
+    }
+  }
 
   useEffect(() => {
     if (!fokusGewuenscht.current) return;
     fokusGewuenscht.current = false;
-    wurzelRef.current?.scrollIntoView({ behavior: sanftScrollen(), block: "start" });
-    formRef.current?.querySelector<HTMLElement>("section:not([hidden]) h4")?.focus({ preventScroll: true });
+    seiteZumFormular();
+    sichtbaresPanel(formRef.current)?.querySelector<HTMLElement>("h4")?.focus({ preventScroll: true });
   }, [stufe, akut]);
 
   useEffect(() => {
     if (!erfolg) return;
-    erfolgRef.current?.scrollIntoView({ behavior: sanftScrollen(), block: "start" });
+    const kasten = erfolgRef.current?.getBoundingClientRect();
+    if (kasten && (kasten.top < 0 || kasten.bottom > window.innerHeight)) {
+      erfolgRef.current?.scrollIntoView({ behavior: sanftScrollen(), block: "start" });
+    }
     erfolgRef.current?.focus({ preventScroll: true });
   }, [erfolg]);
 
@@ -406,24 +491,27 @@ export function Anfrageformular() {
 
   return (
     <div ref={wurzelRef} className="anfrage">
-      <header className="max-w-[46ch]">
-        <p className="eyebrow">Anfrage</p>
-        <h2 id="anfrage-titel">Sagen Sie uns, was ansteht.</h2>
-        <p className="mt-4 text-base leading-relaxed text-ink-2">
-          Drei Schritte, dann liegt Ihre Anfrage bei uns auf dem Tisch. Bei einem Störfall gehen Sie besser direkt ans Telefon.
-        </p>
-      </header>
+      <div className="grid gap-7 lg:grid-cols-[minmax(290px,330px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:max-h-[54rem]">
+        {/* Linke Spalte: Ansprache und Ansprechpartner */}
+        <div className="flex min-w-0 flex-col gap-6 pult:min-h-0 pult:overflow-y-auto pult:pr-1">
+          <header className="max-w-[46ch] shrink-0">
+            <p className="eyebrow">Anfrage</p>
+            <h2 id="anfrage-titel" className="text-4xl sm:text-5xl pult:text-3xl">Sagen Sie uns, was ansteht.</h2>
+            <p className="mt-4 text-base leading-relaxed text-ink-2 pult:mt-3 pult:text-sm">
+              Drei Schritte, dann liegt Ihre Anfrage bei uns auf dem Tisch. Bei einem Störfall gehen Sie besser direkt ans Telefon.
+            </p>
+          </header>
 
-      <div className="mt-12 grid gap-7 lg:grid-cols-[minmax(280px,320px)_minmax(0,1fr)] lg:items-start">
-        <AnfrageTrustKarte />
+          <AnfrageTrustKarte onStoerfall={zeigeStoerfall} stoerfallAktiv={akut} />
+        </div>
 
-        <div className="min-w-0">
+        <div className="flex min-w-0 flex-col pult:min-h-0">
           {/* ---------- Bestätigung nach dem Absenden ---------- */}
           {erfolg && (
             <section
               ref={erfolgRef}
               tabIndex={-1}
-              className="rounded-2xl border border-line bg-surface p-8 shadow-soft sm:p-12"
+              className="rounded-2xl border border-line bg-surface p-8 shadow-soft sm:p-12 pult:max-h-full pult:overflow-y-auto"
               aria-labelledby="anfrage-erfolg-titel"
             >
               <span className="grid size-11 place-items-center rounded-full bg-accent/10 text-lg font-bold text-accent" aria-hidden="true">✓</span>
@@ -466,7 +554,7 @@ export function Anfrageformular() {
           {/* ---------- Formular ---------- */}
           {/* Kein action-Attribut: die CSP erlaubt form-action nur auf 'self',
               der Versand läuft ausschließlich über fetch (connect-src). */}
-          <form ref={formRef} className="min-w-0" method="post" encType="multipart/form-data" noValidate hidden={erfolg} onSubmit={absenden}>
+          <form ref={formRef} className="flex min-w-0 flex-col pult:min-h-0 pult:flex-1" method="post" encType="multipart/form-data" noValidate hidden={erfolg} onSubmit={absenden}>
             <input type="hidden" name="js_enabled" value={jsBereit ? "1" : "0"} />
             <input type="hidden" name="pfad_aktiv" value={akut ? stoerfall.id : pfad} />
 
@@ -476,39 +564,10 @@ export function Anfrageformular() {
               aria-live="polite"
               tabIndex={-1}
               hidden={!statusMeldung}
-              className="mb-4 rounded-xl border border-signal/40 bg-signal/[0.06] px-4 py-3 text-sm font-semibold text-signal-dark"
+              className="mb-4 shrink-0 rounded-xl border border-signal/40 bg-signal/[0.06] px-4 py-3 text-sm font-semibold text-signal-dark"
             >
               {statusMeldung}
             </div>
-
-            {/* Kopf mit Störfall-Shortcut */}
-            <div className="flex flex-wrap items-end justify-between gap-4 pb-6">
-              <div>
-                <span className={ui.kicker}>{akut ? "Störfallmeldung" : "Ihre Anfrage in drei Schritten"}</span>
-                <h3 className="mt-2 font-display text-2xl font-bold tracking-normal text-ink">
-                  {akut ? "Wir reagieren kurzfristig." : "Wir halten es kurz."}
-                </h3>
-              </div>
-              <p className="text-xs text-mute">
-                Mit <span className="text-signal" aria-hidden="true">*</span> markierte Felder brauchen wir.
-              </p>
-            </div>
-
-            <a
-              href={`?pfad=${stoerfall.id}#kontakt`}
-              hidden={akut}
-              onClick={(event) => { event.preventDefault(); zeigeStoerfall(); }}
-              className="mb-5 flex items-center gap-3.5 rounded-xl border border-signal/35 bg-signal/[0.05] px-4 py-3.5 transition-colors hover:border-signal/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal"
-            >
-              <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-signal/10 text-signal" aria-hidden="true">
-                <TriangleAlert className="size-5" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <strong className="block text-sm font-bold text-ink">Störfall oder Anlagenstillstand</strong>
-                <small className="block text-xs text-mute">Kurzformular · Telefon {anfrageKontakt.telefonAnzeige}</small>
-              </span>
-              <ArrowRight className="size-4 shrink-0 text-signal" aria-hidden="true" />
-            </a>
 
             {/* Fortschritt */}
             <div
@@ -519,7 +578,7 @@ export function Anfrageformular() {
               aria-valuenow={stufe}
               aria-valuetext={`Schritt ${stufe} von 3: ${STUFEN_LABELS[stufe - 1]}`}
               aria-label="Fortschritt Ihrer Anfrage"
-              className="mb-4 rounded-xl border border-line bg-surface-2 px-4 py-3.5"
+              className="mb-4 shrink-0 rounded-xl border border-line bg-surface-2 px-4 py-3.5"
             >
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="text-xs font-bold uppercase tracking-wider text-mute">Schritt {stufe} von 3</span>
@@ -531,22 +590,23 @@ export function Anfrageformular() {
                   <span key={n} className={`h-1.5 rounded-full ${n <= stufe ? "bg-accent" : "bg-line"}`} />
                 ))}
               </div>
-              <p className="mt-2.5 text-xs text-mute">
-                Leistung: <strong className="font-semibold text-ink-2">{aktuellerPfad?.label ?? "noch nicht gewählt"}</strong>
+              <p className="mt-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-mute">
+                <span>Leistung: <strong className="font-semibold text-ink-2">{aktuellerPfad?.label ?? "noch nicht gewählt"}</strong></span>
+                <span>Mit <span className="text-signal" aria-hidden="true">*</span> markierte Felder brauchen wir.</span>
               </p>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-soft">
-              <fieldset className="m-0 block min-w-0 border-0 p-0" disabled={akut}>
+            <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-soft pult:flex pult:min-h-0 pult:flex-1 pult:flex-col">
+              <fieldset className={ui.panelWrapper} hidden={akut} disabled={akut}>
                 {/* ================= Stufe 1 ================= */}
-                <section hidden={akut || stufe !== 1} aria-labelledby="anfrage-stufe-1">
+                <section hidden={akut || stufe !== 1} className={ui.panel} aria-labelledby="anfrage-stufe-1">
                   <div className={ui.panelHead}>
                     <h4 id="anfrage-stufe-1" tabIndex={-1} className={ui.panelTitle}>Worum geht es?</h4>
                     <p className={ui.panelLead}>
                       Wählen Sie die Leistung, die Ihrem Vorhaben am nächsten kommt. Danach fragen wir nur noch, was dafür wirklich zählt.
                     </p>
                   </div>
-                  <div className={ui.panelBody}>
+                  <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
                     <Gruppe id="gruppe-hauptpfad" fehlerText={fehler.hauptpfad}>
                       <legend className={ui.legend}>
                         Leistung{pflichtStern}
@@ -572,7 +632,7 @@ export function Anfrageformular() {
                       </div>
                     </Gruppe>
                   </div>
-                  <div className={ui.stageActions}>
+                  <div className={ui.stageActions} data-panel-actions>
                     <span />
                     <button type="button" className={ui.btnPrimary} onClick={() => weiter(2)}>
                       Weiter zum Projekt <ArrowRight className="size-4" aria-hidden="true" />
@@ -581,7 +641,7 @@ export function Anfrageformular() {
                 </section>
 
                 {/* ================= Stufe 2 ================= */}
-                <section hidden={akut || stufe !== 2} aria-labelledby="anfrage-stufe-2">
+                <section hidden={akut || stufe !== 2} className={ui.panel} aria-labelledby="anfrage-stufe-2">
                   <div className={ui.panelHead}>
                     <h4 id="anfrage-stufe-2" tabIndex={-1} className={ui.panelTitle}>
                       {aktuellerPfad?.stufe2.titel ?? "Was sollten wir über das Vorhaben wissen?"}
@@ -591,7 +651,7 @@ export function Anfrageformular() {
                     </p>
                   </div>
 
-                  <div className={ui.panelBody}>
+                  <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
                     <Gruppe id="gruppe-beschreibung" fehlerText={fehler.beschreibung}>
                       <label className={ui.field}>
                         <span className={ui.fieldLabel}>
@@ -813,7 +873,7 @@ export function Anfrageformular() {
                     </details>
                   </div>
 
-                  <div className={ui.stageActions}>
+                  <div className={ui.stageActions} data-panel-actions>
                     <button type="button" className={ui.btnSecondary} onClick={() => zurueck(1)}>Zurück</button>
                     <button type="button" className={ui.btnPrimary} onClick={() => weiter(3)}>
                       Weiter zum Kontakt <ArrowRight className="size-4" aria-hidden="true" />
@@ -822,7 +882,7 @@ export function Anfrageformular() {
                 </section>
 
                 {/* ================= Stufe 3 ================= */}
-                <section hidden={akut || stufe !== 3} aria-labelledby="anfrage-stufe-3">
+                <section hidden={akut || stufe !== 3} className={ui.panel} aria-labelledby="anfrage-stufe-3">
                   <div className={ui.panelHead}>
                     <h4 id="anfrage-stufe-3" tabIndex={-1} className={ui.panelTitle}>Wie erreichen wir Sie?</h4>
                     <p className={ui.panelLead}>
@@ -830,7 +890,7 @@ export function Anfrageformular() {
                     </p>
                   </div>
 
-                  <div className={ui.panelBody}>
+                  <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
                     <fieldset className={ui.group} id="gruppe-firma">
                       <legend className={ui.legend}>Ihre Angaben</legend>
                       <div className={ui.fieldGrid}>
@@ -910,7 +970,7 @@ export function Anfrageformular() {
                     </label>
                   </div>
 
-                  <div className={ui.stageActions}>
+                  <div className={ui.stageActions} data-panel-actions>
                     <button type="button" className={ui.btnSecondary} onClick={() => zurueck(2)}>Zurück</button>
                     <button type="submit" className={ui.btnPrimary} disabled={sendet}>
                       {sendet ? "Wird gesendet …" : (aktuellerPfad?.submitLabel ?? "Anfrage senden")} <ArrowRight className="size-4" aria-hidden="true" />
@@ -920,8 +980,8 @@ export function Anfrageformular() {
               </fieldset>
 
               {/* ================= Störfallpfad ================= */}
-              <section hidden={!akut} aria-labelledby="anfrage-stoerfall">
-                <fieldset className="m-0 block min-w-0 border-0 p-0" disabled={!akut}>
+              <section hidden={!akut} className={ui.panel} aria-labelledby="anfrage-stoerfall">
+                <fieldset className={ui.panelWrapper} disabled={!akut}>
                   <div className={`${ui.panelHead} border-signal/25 bg-signal/[0.05]`}>
                     <button type="button" className="mb-3 inline-flex items-center gap-1.5 text-xs font-bold text-mute underline underline-offset-4 hover:text-ink" onClick={zurueckZuStandard}>
                       ← Kein Störfall, zurück zur normalen Anfrage
@@ -933,7 +993,7 @@ export function Anfrageformular() {
                     </p>
                   </div>
 
-                  <div className={ui.panelBody}>
+                  <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
                     <Gruppe id="gruppe-a_bereich" fehlerText={fehler.a_bereich}>
                       <legend className={ui.legend}>Was ist betroffen?{pflichtStern}</legend>
                       <div className={ui.choiceGrid} onChange={() => loescheFehler("a_bereich")}>
@@ -1016,7 +1076,7 @@ export function Anfrageformular() {
                     </div>
                   </div>
 
-                  <div className={ui.stageActions}>
+                  <div className={ui.stageActions} data-panel-actions>
                     <button type="button" className={ui.btnSecondary} onClick={zurueckZuStandard}>Anderes Anliegen</button>
                     <button type="submit" className={ui.btnSignal} disabled={sendet}>
                       {sendet ? "Wird gesendet …" : stoerfall.submitLabel} <ArrowRight className="size-4" aria-hidden="true" />

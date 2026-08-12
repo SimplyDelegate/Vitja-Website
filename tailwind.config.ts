@@ -8,6 +8,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        // "Pult"-Modus des Anfrageformulars: breit UND hoch genug für eine
+        // feste Arbeitsfläche, in der nur der Fragenbereich scrollt.
+        pult: { raw: "(min-width: 1024px) and (min-height: 760px)" }
+      },
       colors: {
         carbon: "#0D0F12",
         warm: "#F3F0E9",

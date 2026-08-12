@@ -70,17 +70,37 @@ export const btnPrimary = `${btnBase} bg-gold text-carbon hover:bg-[#F4BD70] foc
 export const btnSecondary = `${btnBase} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink focus-visible:outline-accent`;
 export const btnSignal = `${btnBase} bg-signal text-white hover:bg-signal-dark focus-visible:outline-signal disabled:opacity-60`;
 
-/** Aktionsleiste am Panelfuß */
-export const stageActions =
-  "flex flex-wrap items-center justify-between gap-3 border-t border-line bg-surface px-5 py-4 sm:px-8";
+/**
+ * Aktionsleiste am Panelfuß. Bleibt im pult-Modus unten stehen; `data-mehr`
+ * setzt die Logik, solange oberhalb noch Inhalt weiterscrollt — der zugehörige
+ * Schatten steht als [data-mehr]-Regel in globals.css.
+ */
+export const stageActions = [
+  "flex shrink-0 flex-wrap items-center justify-between gap-3",
+  "border-t border-line bg-surface px-5 py-4 sm:px-8",
+  "transition-shadow duration-200"
+].join(" ");
 
-/** Panelkopf */
-export const panelHead = "border-b border-line px-5 pb-5 pt-7 sm:px-8";
+/** Panelkopf — bleibt im pult-Modus stehen */
+export const panelHead = "shrink-0 border-b border-line px-5 pb-5 pt-7 sm:px-8";
 export const panelTitle = "font-display text-2xl font-bold leading-tight tracking-normal text-ink sm:text-3xl";
 export const panelLead = "mt-2 max-w-[60ch] text-sm leading-relaxed text-mute";
 
-/** Scrollbereich eines Panels */
-export const panelBody = "px-5 py-6 sm:px-8";
+/**
+ * Fragenbereich eines Panels. Im pult-Modus der einzige Bereich, der scrollt —
+ * Kopf und Aktionsleiste bleiben sichtbar, die Seite selbst steht still.
+ */
+export const panelBody = [
+  "px-5 py-6 sm:px-8",
+  "pult:min-h-0 pult:flex-1 pult:overflow-y-auto pult:overscroll-contain",
+  "pult:focus-visible:outline pult:focus-visible:-outline-offset-2 pult:focus-visible:outline-accent"
+].join(" ");
+
+/** Stufen-/Störfallpanel: im pult-Modus Flex-Spalte auf voller Arbeitsflächenhöhe */
+export const panel = "pult:flex pult:min-h-0 pult:flex-1 pult:flex-col";
+
+/** Fieldset-Wrapper (disabled-Schaltung), muss die Flex-Kette durchreichen */
+export const panelWrapper = "m-0 block min-w-0 border-0 p-0 pult:flex pult:min-h-0 pult:flex-1 pult:flex-col";
 
 /** Kontaktkanal-Link (Trust-Karte) */
 export const channel =

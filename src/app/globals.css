@@ -175,6 +175,16 @@ p { margin: 0; }
 
 /* Contact */
 .contact-section { padding: 96px 0; background: var(--paper); color: var(--carbon); }
+/* Pult-Modus (siehe tailwind.config.ts): Die Anfragesektion bindet sich an die
+   Bildschirmhöhe, damit beim Ausfüllen nur der Fragenbereich scrollt.
+   --anfrage-kopf setzt page.tsx auf die Höhe des fixierten Seitenkopfs. */
+@media (min-width: 1024px) and (min-height: 760px) {
+  .contact-section { display: flex; align-items: center; min-height: calc(100svh - var(--anfrage-kopf, 102px)); padding: 40px 0; }
+  .contact-section > .shell { width: var(--shell); }
+}
+/* Solange unterhalb der Aktionsleiste noch Fragen weiterscrollen, zeigt ein
+   feiner Schatten nach oben an, dass es weitergeht (gesetzt von der Logik). */
+[data-panel-actions][data-mehr] { box-shadow: 0 -14px 18px -18px rgba(13, 15, 18, 0.45); }
 
 /* Legal pages */
 .legal-main { min-height: 70vh; background: var(--paper); }

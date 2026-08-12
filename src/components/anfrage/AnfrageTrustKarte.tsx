@@ -1,15 +1,24 @@
-import { Mail, MapPin, PhoneCall } from "lucide-react";
-import { anfrageKontakt } from "@/lib/anfrage";
+import { ArrowRight, Mail, MapPin, PhoneCall, TriangleAlert } from "lucide-react";
+import { anfrageKontakt, stoerfall } from "@/lib/anfrage";
 import * as ui from "./anfrage-ui";
 
 /**
- * Seitenspalte des Anfrageformulars: Ansprechpartner, Direktkontakt,
- * Einsatzgebiet. Inhalte kommen aus siteConfig über lib/anfrage.ts.
+ * Seitenspalte des Anfrageformulars: Ansprechpartner, Direktkontakt inkl.
+ * Störfall-Shortcut, Einsatzgebiet. Inhalte kommen aus siteConfig über
+ * lib/anfrage.ts. Im pult-Modus kompakter, damit Überschrift und Karte
+ * zusammen in die feste Rasterhöhe passen.
  */
-export function AnfrageTrustKarte() {
+export function AnfrageTrustKarte({
+  onStoerfall,
+  stoerfallAktiv
+}: {
+  /** Öffnet das Störfall-Panel im Formular (Shortcut liegt außerhalb des <form>). */
+  onStoerfall: () => void;
+  stoerfallAktiv: boolean;
+}) {
   return (
     <aside
-      className="flex flex-col gap-6 rounded-2xl border border-line bg-surface-2 p-6 lg:sticky lg:top-24 lg:self-start"
+      className="flex min-w-0 shrink-0 flex-col gap-6 rounded-2xl border border-line bg-surface-2 p-6 pult:gap-5 pult:p-5"
       aria-labelledby="anfrage-ansprechpartner"
     >
       <div>
@@ -43,9 +52,27 @@ export function AnfrageTrustKarte() {
             <strong className="block truncate text-sm font-bold text-ink">{anfrageKontakt.email}</strong>
           </span>
         </a>
+
+        <a
+          href={`?pfad=${stoerfall.id}#kontakt`}
+          aria-current={stoerfallAktiv || undefined}
+          onClick={(event) => { event.preventDefault(); onStoerfall(); }}
+          className="flex items-center gap-3 rounded-xl border border-signal/35 bg-signal/[0.05] px-3.5 py-3 transition-colors hover:border-signal/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal aria-[current]:border-signal/60"
+        >
+          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-signal/10 text-signal" aria-hidden="true">
+            <TriangleAlert className="size-[18px]" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <small className="block text-xs text-mute">Störfall oder Anlagenstillstand</small>
+            <strong className="block truncate text-sm font-bold text-ink">Kurzformular öffnen</strong>
+          </span>
+          <ArrowRight className="size-4 shrink-0 text-signal" aria-hidden="true" />
+        </a>
       </div>
 
-      <section aria-labelledby="anfrage-einsatzgebiet" className="border-t border-line pt-5">
+      {/* Im pult-Modus ausgeblendet: Karte und Überschrift teilen sich die feste
+          Rasterhöhe, und das Einsatzgebiet steht bereits im Hero-Text. */}
+      <section aria-labelledby="anfrage-einsatzgebiet" className="border-t border-line pt-5 pult:hidden">
         <span id="anfrage-einsatzgebiet" className={ui.kicker}>
           <MapPin className="mr-1 inline size-3.5 align-[-2px]" aria-hidden="true" />
           Einsatzgebiet

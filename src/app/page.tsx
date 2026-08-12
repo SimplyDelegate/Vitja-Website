@@ -63,7 +63,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section contact-section" id="kontakt" aria-labelledby="anfrage-titel"><div className="shell reveal"><Anfrageformular /></div></section>
+      {/* --anfrage-kopf = Platzbedarf des fixierten Headers (92px) plus Luft,
+          identisch zum scroll-padding-top; Basis der Höhenrechnung im pult-Modus. */}
+      <section className="section contact-section" id="kontakt" aria-labelledby="anfrage-titel" style={{ "--anfrage-kopf": "102px" } as React.CSSProperties}><div className="shell reveal"><Anfrageformular /></div></section>
     </main>
   );
 }
