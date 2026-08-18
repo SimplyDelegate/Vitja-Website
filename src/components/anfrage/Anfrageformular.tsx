@@ -8,7 +8,6 @@ import {
   baueZusammenfassung,
   findePfad,
   pfade,
-  pfadeOhneProjektfragen,
   pruefeKontaktweg,
   pruefeUpload,
   stoerfall,
@@ -27,10 +26,10 @@ import * as ui from "./anfrage-ui";
  * ausgeschlossen. Inhalte und Prüffunktionen: src/lib/anfrage.ts.
  */
 
-const STUFEN_LABELS = ["Leistung wählen", "Projekt beschreiben", "Kontaktdaten"];
+const STUFEN_LABELS = ["Leistungen wählen", "Projekt beschreiben", "Kontaktdaten"];
 
 const FEHLER_REIHENFOLGE = [
-  "hauptpfad", "beschreibung", "plz", "ausfuehrungsort", "zeitrahmen",
+  "leistungen", "beschreibung", "plz", "ausfuehrungsort", "zeitrahmen",
   "firma", "name", "kontaktweg", "datenschutz",
   "a_bereich", "a_betrieb", "a_beschreibung", "a_plz", "a_firma", "a_name", "a_telefon", "a_datenschutz"
 ] as const;
@@ -97,19 +96,17 @@ function sichtbarerKoerper(form: HTMLFormElement | null) {
  */
 function Gruppe({
   id,
-  route,
   sichtbar = true,
   fehlerText,
   children
 }: {
   id?: string;
-  route?: string;
   sichtbar?: boolean;
   fehlerText?: string;
   children: ReactNode;
 }) {
   return (
-    <fieldset id={id} data-route={route} className={ui.group} hidden={!sichtbar} disabled={!sichtbar}>
+    <fieldset id={id} className={ui.group} hidden={!sichtbar} disabled={!sichtbar}>
       {children}
       {fehlerText && <p className={ui.fehler}>{fehlerText}</p>}
     </fieldset>
@@ -137,7 +134,7 @@ export function Anfrageformular() {
   const startedAt = useRef(Number.MAX_SAFE_INTEGER);
 
   const [stufe, setStufe] = useState(1);
-  const [pfad, setPfad] = useState("");
+  const [ausgewaehltePfade, setAusgewaehltePfade] = useState<string[]>([]);
   const [akut, setAkut] = useState(false);
   const [erfolg, setErfolg] = useState(false);
   const [sendet, setSendet] = useState(false);
@@ -151,8 +148,10 @@ export function Anfrageformular() {
   });
   const [zusammenfassung, setZusammenfassung] = useState<Array<[string, string]>>([]);
 
-  const aktuellerPfad = pfade.find((p) => p.id === pfad);
-  const projektfragen = !pfadeOhneProjektfragen.has(pfad);
+  const ausgewaehlteLeistungen = pfade.filter((pfad) => ausgewaehltePfade.includes(pfad.id));
+  const leistungsanzeige = ausgewaehlteLeistungen.length
+    ? ausgewaehlteLeistungen.map((pfad) => pfad.label).join(", ")
+    : "noch keine gewählt";
 
   /* ------------------------------------------------------------- Start & CTAs */
 
@@ -166,7 +165,7 @@ export function Anfrageformular() {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- einmalige Übernahme des URL-Zustands
       setAkut(true);
     } else if (ziel) {
-      setPfad(ziel);
+      setAusgewaehltePfade([ziel]);
       setStufe(2);
     }
   }, []);
@@ -180,7 +179,7 @@ export function Anfrageformular() {
         setAkut(true);
       } else {
         setAkut(false);
-        setPfad(ziel);
+        setAusgewaehltePfade([ziel]);
         setStufe(2);
       }
       fokusGewuenscht.current = true;
@@ -188,23 +187,6 @@ export function Anfrageformular() {
     window.addEventListener("tts:select-service", handler);
     return () => window.removeEventListener("tts:select-service", handler);
   }, []);
-
-  /* ------------------------------------------------- Aufräumen bei Pfadwechsel */
-
-  // Nicht mehr passende Pfadfragen leeren, damit beim Zurückwechseln keine
-  // veralteten Antworten stehen bleiben (gesendet würden sie ohnehin nicht).
-  useEffect(() => {
-    const form = formRef.current;
-    if (!form) return;
-    form.querySelectorAll<HTMLElement>("[data-route]").forEach((element) => {
-      const routen = (element.dataset.route ?? "").split(/\s+/).filter(Boolean);
-      if (pfad && routen.includes(pfad)) return;
-      element.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea").forEach((feld) => {
-        if (feld instanceof HTMLInputElement && (feld.type === "radio" || feld.type === "checkbox")) feld.checked = false;
-        else feld.value = "";
-      });
-    });
-  }, [pfad]);
 
   useEffect(() => {
     const form = formRef.current;
@@ -227,7 +209,7 @@ export function Anfrageformular() {
   useEffect(() => {
     const koerper = sichtbarerKoerper(formRef.current);
     if (koerper) ueberlaufPruefen(koerper);
-  }, [fehler, pfad, zeitrahmen, statusMeldung]);
+  }, [fehler, ausgewaehltePfade, zeitrahmen, statusMeldung]);
 
   useEffect(() => {
     let timer = 0;
@@ -291,14 +273,12 @@ export function Anfrageformular() {
 
   function pruefeStufe(nummer: number, werte: Record<string, string>): Fehler {
     const neu: Fehler = {};
-    if (nummer === 1 && !pfad) neu.hauptpfad = "Bitte wählen Sie eine Leistung.";
+    if (nummer === 1 && ausgewaehltePfade.length === 0) neu.leistungen = "Bitte wählen Sie mindestens eine Leistung.";
     if (nummer === 2) {
       if (!werte.beschreibung?.trim()) neu.beschreibung = "Bitte beschreiben Sie Ihr Vorhaben kurz.";
-      if (projektfragen) {
-        if (!werte.plz?.trim()) neu.plz = "Bitte geben Sie die Postleitzahl an.";
-        if (!werte.ausfuehrungsort) neu.ausfuehrungsort = "Bitte wählen Sie, wo gearbeitet werden soll.";
-        if (!werte.zeitrahmen) neu.zeitrahmen = "Bitte wählen Sie einen Zeitrahmen.";
-      }
+      if (!werte.plz?.trim()) neu.plz = "Bitte geben Sie die Postleitzahl an.";
+      if (!werte.ausfuehrungsort) neu.ausfuehrungsort = "Bitte wählen Sie, wo gearbeitet werden soll.";
+      if (!werte.zeitrahmen) neu.zeitrahmen = "Bitte wählen Sie einen Zeitrahmen.";
     }
     if (nummer === 3) {
       if (!werte.firma?.trim()) neu.firma = "Bitte geben Sie Ihr Unternehmen an.";
@@ -368,6 +348,14 @@ export function Anfrageformular() {
     setStufe(1);
   }
 
+  function leistungUmschalten(id: string, ausgewaehlt: boolean) {
+    setAusgewaehltePfade((bisher) => {
+      if (ausgewaehlt) return bisher.includes(id) ? bisher : [...bisher, id];
+      return bisher.filter((pfad) => pfad !== id);
+    });
+    loescheFehler("leistungen");
+  }
+
   /* ------------------------------------------------------------------ Uploads */
 
   function handleUpload(schluessel: "anfrage" | "stoerfall") {
@@ -421,7 +409,7 @@ export function Anfrageformular() {
 
     // Honeypot: stille Ablage, Bestätigung ohne Versand.
     if (werte.website?.trim()) {
-      setZusammenfassung(baueZusammenfassung({ akut, pfad, werte }));
+      setZusammenfassung(baueZusammenfassung({ akut, pfade: ausgewaehltePfade, werte }));
       setErfolg(true);
       return;
     }
@@ -439,11 +427,11 @@ export function Anfrageformular() {
     const form = event.currentTarget;
     const daten = new FormData(form);
     daten.delete("website");
-    daten.set("pfad_aktiv", akut ? stoerfall.id : pfad);
+    daten.set("pfad_aktiv", akut ? stoerfall.id : ausgewaehltePfade.join(", "));
     daten.set("access_key", contactAccessKey);
     daten.set("botcheck", "");
     daten.set("from_name", werte.name ?? "");
-    daten.set("subject", akut ? "Störfallmeldung über das Anfrageformular" : `Anfrage: ${aktuellerPfad?.label ?? "Allgemein"}`);
+    daten.set("subject", akut ? "Störfallmeldung über das Anfrageformular" : `Anfrage: ${leistungsanzeige}`);
 
     // Leere Datei-Slots entfernen; echte Anhänge unter dem von Web3Forms
     // erwarteten Feldnamen anhängen.
@@ -457,7 +445,7 @@ export function Anfrageformular() {
       const antwort = await fetch(contactEndpoint, { method: "POST", body: daten, headers: { Accept: "application/json" } });
       const ergebnis = (await antwort.json()) as { success?: boolean; message?: string };
       if (!antwort.ok || !ergebnis.success) throw new Error(ergebnis.message || String(antwort.status));
-      setZusammenfassung(baueZusammenfassung({ akut, pfad, werte }));
+      setZusammenfassung(baueZusammenfassung({ akut, pfade: ausgewaehltePfade, werte }));
       setErfolg(true);
     } catch {
       setStatusMeldung("Die Anfrage konnte gerade nicht übermittelt werden. Bitte versuchen Sie es erneut oder rufen Sie uns an.");
@@ -491,15 +479,12 @@ export function Anfrageformular() {
 
   return (
     <div ref={wurzelRef} className="anfrage">
-      <div className="grid gap-7 lg:grid-cols-[minmax(290px,330px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:max-h-[54rem]">
+      <div className="grid gap-7 lg:grid-cols-[minmax(350px,390px)_minmax(0,1fr)] xl:grid-cols-[minmax(390px,430px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:max-h-[54rem]">
         {/* Linke Spalte: Ansprache und Ansprechpartner */}
         <div className="flex min-w-0 flex-col gap-6 pult:min-h-0 pult:overflow-y-auto pult:pr-1">
           <header className="max-w-[46ch] shrink-0">
             <p className="eyebrow">Anfrage</p>
-            <h2 id="anfrage-titel" className="text-4xl sm:text-5xl pult:text-3xl">Sagen Sie uns, was ansteht.</h2>
-            <p className="mt-4 text-base leading-relaxed text-ink-2 pult:mt-3 pult:text-sm">
-              Drei Schritte, dann liegt Ihre Anfrage bei uns auf dem Tisch. Bei einem Störfall gehen Sie besser direkt ans Telefon.
-            </p>
+            <h2 id="anfrage-titel" className="text-5xl sm:text-6xl pult:text-4xl">Sagen Sie uns, was ansteht.</h2>
           </header>
 
           <AnfrageTrustKarte onStoerfall={zeigeStoerfall} stoerfallAktiv={akut} />
@@ -556,7 +541,7 @@ export function Anfrageformular() {
               der Versand läuft ausschließlich über fetch (connect-src). */}
           <form ref={formRef} className="flex min-w-0 flex-col pult:min-h-0 pult:flex-1" method="post" encType="multipart/form-data" noValidate hidden={erfolg} onSubmit={absenden}>
             <input type="hidden" name="js_enabled" value={jsBereit ? "1" : "0"} />
-            <input type="hidden" name="pfad_aktiv" value={akut ? stoerfall.id : pfad} />
+            <input type="hidden" name="pfad_aktiv" value={akut ? stoerfall.id : ausgewaehltePfade.join(", ")} />
 
             <div
               ref={statusRef}
@@ -591,7 +576,7 @@ export function Anfrageformular() {
                 ))}
               </div>
               <p className="mt-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-mute">
-                <span>Leistung: <strong className="font-semibold text-ink-2">{aktuellerPfad?.label ?? "noch nicht gewählt"}</strong></span>
+                <span>Leistungen: <strong className="font-semibold text-ink-2">{leistungsanzeige}</strong></span>
                 <span>Mit <span className="text-signal" aria-hidden="true">*</span> markierte Felder brauchen wir.</span>
               </p>
             </div>
@@ -603,25 +588,26 @@ export function Anfrageformular() {
                   <div className={ui.panelHead}>
                     <h4 id="anfrage-stufe-1" tabIndex={-1} className={ui.panelTitle}>Worum geht es?</h4>
                     <p className={ui.panelLead}>
-                      Wählen Sie die Leistung, die Ihrem Vorhaben am nächsten kommt. Danach fragen wir nur noch, was dafür wirklich zählt.
+                      Wählen Sie eine oder mehrere Leistungen. Danach folgen nur noch allgemeine Angaben zu Ihrem Vorhaben.
                     </p>
                   </div>
                   <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
-                    <Gruppe id="gruppe-hauptpfad" fehlerText={fehler.hauptpfad}>
+                    <Gruppe id="gruppe-leistungen" fehlerText={fehler.leistungen}>
                       <legend className={ui.legend}>
-                        Leistung{pflichtStern}
+                        Leistungen{pflichtStern}
+                        <span className={ui.hint}>mehrere möglich</span>
                         <span className="sr-only">Pflichtfeld</span>
                       </legend>
                       <div className={ui.choiceGrid}>
                         {pfade.map((p) => (
                           <label key={p.id} className={ui.choice}>
                             <input
-                              type="radio"
-                              name="hauptpfad"
+                              type="checkbox"
+                              name="leistungen[]"
                               value={p.id}
                               className={ui.choiceInput}
-                              checked={pfad === p.id}
-                              onChange={() => { setPfad(p.id); loescheFehler("hauptpfad"); }}
+                              checked={ausgewaehltePfade.includes(p.id)}
+                              onChange={(event) => leistungUmschalten(p.id, event.currentTarget.checked)}
                             />
                             <span className="min-w-0">
                               <strong className="block text-ink">{p.label}</strong>
@@ -635,7 +621,7 @@ export function Anfrageformular() {
                   <div className={ui.stageActions} data-panel-actions>
                     <span />
                     <button type="button" className={ui.btnPrimary} onClick={() => weiter(2)}>
-                      Weiter zum Projekt <ArrowRight className="size-4" aria-hidden="true" />
+                      Weiter zu den Angaben <ArrowRight className="size-4" aria-hidden="true" />
                     </button>
                   </div>
                 </section>
@@ -643,20 +629,16 @@ export function Anfrageformular() {
                 {/* ================= Stufe 2 ================= */}
                 <section hidden={akut || stufe !== 2} className={ui.panel} aria-labelledby="anfrage-stufe-2">
                   <div className={ui.panelHead}>
-                    <h4 id="anfrage-stufe-2" tabIndex={-1} className={ui.panelTitle}>
-                      {aktuellerPfad?.stufe2.titel ?? "Was sollten wir über das Vorhaben wissen?"}
-                    </h4>
+                    <h4 id="anfrage-stufe-2" tabIndex={-1} className={ui.panelTitle}>Was sollten wir über das Vorhaben wissen?</h4>
                     <p className={ui.panelLead}>
-                      {aktuellerPfad?.stufe2.hinweis ?? "Ein kurzer Überblick reicht. Details klären wir anschließend im Gespräch."}
+                      Ein kurzer Überblick reicht. Fehlende technische Details klären wir anschließend gemeinsam.
                     </p>
                   </div>
 
                   <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
                     <Gruppe id="gruppe-beschreibung" fehlerText={fehler.beschreibung}>
                       <label className={ui.field}>
-                        <span className={ui.fieldLabel}>
-                          {aktuellerPfad?.beschreibungLabel ?? "Beschreiben Sie Ihr Vorhaben"}{pflichtStern}
-                        </span>
+                        <span className={ui.fieldLabel}>Beschreiben Sie Ihr Vorhaben{pflichtStern}</span>
                         <textarea
                           name="beschreibung"
                           rows={4}
@@ -672,7 +654,7 @@ export function Anfrageformular() {
                       </p>
                     </Gruppe>
 
-                    <Gruppe id="gruppe-plz" sichtbar={projektfragen} fehlerText={fehler.plz}>
+                    <Gruppe id="gruppe-plz" fehlerText={fehler.plz}>
                       <legend className={ui.legend}>Einsatzort</legend>
                       <div className={ui.fieldGrid}>
                         <label className={ui.field}>
@@ -695,7 +677,7 @@ export function Anfrageformular() {
                       </div>
                     </Gruppe>
 
-                    <Gruppe id="gruppe-ausfuehrungsort" sichtbar={projektfragen} fehlerText={fehler.ausfuehrungsort}>
+                    <Gruppe id="gruppe-ausfuehrungsort" fehlerText={fehler.ausfuehrungsort}>
                       <legend className={ui.legend}>Wo wird gearbeitet?{pflichtStern}</legend>
                       <div className={ui.choiceGridThree} onChange={() => loescheFehler("ausfuehrungsort")}>
                         <label className={ui.choice}><input type="radio" name="ausfuehrungsort" value="vor_ort" className={ui.choiceInput} /><span>Bei Ihnen vor Ort</span></label>
@@ -704,115 +686,7 @@ export function Anfrageformular() {
                       </div>
                     </Gruppe>
 
-                    {/* ---- Pfadspezifische Fragen ---- */}
-                    <Gruppe sichtbar={pfad === "rohrbau"} route="rohrbau">
-                        <legend className={ui.legend}>Werkstoff der Leitung <span className={ui.hint}>mehrere möglich</span></legend>
-                        <div className={ui.choiceGridThree} onChange={exklusivAuswahl}>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="stahl" className={ui.choiceInput} /><span>Stahl</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="edelstahl" className={ui.choiceInput} /><span>Edelstahl</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="gfk" className={ui.choiceInput} /><span>GFK</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="pe_pp" className={ui.choiceInput} /><span>PE / PP</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="guss" className={ui.choiceInput} /><span>Guss</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="unbekannt" data-exklusiv="" className={ui.choiceInput} /><span>Noch unklar</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "rohrbau"} route="rohrbau">
-                        <legend className={ui.legend}>Umfang</legend>
-                        <div className={ui.choiceGrid}>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="neubau" className={ui.choiceInput} /><span>Neubau einer Leitung</span></label>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="umbau" className={ui.choiceInput} /><span>Umbau oder Erweiterung</span></label>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="reparatur" className={ui.choiceInput} /><span>Reparatur am Bestand</span></label>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="offen" className={ui.choiceInput} /><span>Noch offen</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "stahlbau"} route="stahlbau">
-                        <legend className={ui.legend}>Umfang</legend>
-                        <div className={ui.choiceGrid}>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="neukonstruktion" className={ui.choiceInput} /><span>Neue Konstruktion</span></label>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="reparatur" className={ui.choiceInput} /><span>Reparatur am Bestand</span></label>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="wartung" className={ui.choiceInput} /><span>Wiederkehrende Wartung</span></label>
-                          <label className={ui.choice}><input type="radio" name="umfang" value="offen" className={ui.choiceInput} /><span>Noch offen</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "anlageninstandsetzung" || pfad === "systemintegration"} route="anlageninstandsetzung systemintegration">
-                        <legend className={ui.legend}>Zustand der Anlage</legend>
-                        <div className={ui.choiceGrid}>
-                          <label className={ui.choice}><input type="radio" name="anlagenzustand" value="in_betrieb" className={ui.choiceInput} /><span>Läuft, Eingriff nur im Betrieb möglich</span></label>
-                          <label className={ui.choice}><input type="radio" name="anlagenzustand" value="stillstand_geplant" className={ui.choiceInput} /><span>Stillstand ist geplant</span></label>
-                          <label className={ui.choice}><input type="radio" name="anlagenzustand" value="ausser_betrieb" className={ui.choiceInput} /><span>Steht bereits still</span></label>
-                          <label className={ui.choice}><input type="radio" name="anlagenzustand" value="offen" className={ui.choiceInput} /><span>Noch offen</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "schweissarbeiten"} route="schweissarbeiten">
-                        <legend className={ui.legend}>Werkstoff <span className={ui.hint}>mehrere möglich</span></legend>
-                        <div className={ui.choiceGridThree} onChange={exklusivAuswahl}>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="stahl" className={ui.choiceInput} /><span>Stahl</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="edelstahl" className={ui.choiceInput} /><span>Edelstahl</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="aluminium" className={ui.choiceInput} /><span>Aluminium</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="sonder" className={ui.choiceInput} /><span>Sonderwerkstoff</span></label>
-                          <label className={ui.choice}><input type="checkbox" name="werkstoff[]" value="unbekannt" data-exklusiv="" className={ui.choiceInput} /><span>Noch unklar</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "schweissarbeiten"} route="schweissarbeiten">
-                        <legend className={ui.legend}>Dokumentation und Prüfung</legend>
-                        <div className={ui.choiceGrid}>
-                          <label className={ui.choice}><input type="radio" name="dokumentation" value="gefordert" className={ui.choiceInput} /><span>Prüfzeugnisse und Doku gefordert</span></label>
-                          <label className={ui.choice}><input type="radio" name="dokumentation" value="nicht_gefordert" className={ui.choiceInput} /><span>Nicht gefordert</span></label>
-                          <label className={ui.choice}><input type="radio" name="dokumentation" value="offen" className={ui.choiceInput} /><span>Noch offen</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "blechherstellung"} route="blechherstellung">
-                        <legend className={ui.legend}>Vorlage</legend>
-                        <div className={ui.choiceGrid}>
-                          <label className={ui.choice}><input type="radio" name="vorlage" value="cad" className={ui.choiceInput} /><span>CAD-Datei (DXF, DWG, STEP)</span></label>
-                          <label className={ui.choice}><input type="radio" name="vorlage" value="zeichnung" className={ui.choiceInput} /><span>Zeichnung oder Skizze</span></label>
-                          <label className={ui.choice}><input type="radio" name="vorlage" value="muster" className={ui.choiceInput} /><span>Muster vorhanden</span></label>
-                          <label className={ui.choice}><input type="radio" name="vorlage" value="keine" className={ui.choiceInput} /><span>Noch nichts davon</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "blechherstellung"} route="blechherstellung">
-                        <legend className={ui.legend}>Stückzahl</legend>
-                        <div className={ui.choiceGridThree}>
-                          <label className={ui.choice}><input type="radio" name="stueckzahl" value="einzelteil" className={ui.choiceInput} /><span>Einzelteil</span></label>
-                          <label className={ui.choice}><input type="radio" name="stueckzahl" value="kleinserie" className={ui.choiceInput} /><span>Kleinserie</span></label>
-                          <label className={ui.choice}><input type="radio" name="stueckzahl" value="serie" className={ui.choiceInput} /><span>Serie</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "gfk"} route="gfk">
-                        <legend className={ui.legend}>Art der Arbeit</legend>
-                        <div className={ui.choiceGrid}>
-                          <label className={ui.choice}><input type="radio" name="gfk_art" value="instandsetzung" className={ui.choiceInput} /><span>Instandsetzung an Bauteilen</span></label>
-                          <label className={ui.choice}><input type="radio" name="gfk_art" value="systembau" className={ui.choiceInput} /><span>Rohr- oder Systembau</span></label>
-                          <label className={ui.choice}><input type="radio" name="gfk_art" value="beides" className={ui.choiceInput} /><span>Beides</span></label>
-                          <label className={ui.choice}><input type="radio" name="gfk_art" value="offen" className={ui.choiceInput} /><span>Noch offen</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "gfk"} route="gfk">
-                        <legend className={ui.legend}>Medium und Beanspruchung <span className={ui.hint}>optional</span></legend>
-                        <label className={ui.field}>
-                          <input type="text" name="medium" maxLength={200} className={ui.input} placeholder="z. B. Abwasser, 40 °C, drucklos" />
-                        </label>
-                    </Gruppe>
-
-                    <Gruppe sichtbar={pfad === "systemintegration"} route="systemintegration">
-                        <legend className={ui.legend}>Art des Einbaus</legend>
-                        <div className={ui.choiceGridThree}>
-                          <label className={ui.choice}><input type="radio" name="einbau_art" value="neuanlage" className={ui.choiceInput} /><span>Neuanlage</span></label>
-                          <label className={ui.choice}><input type="radio" name="einbau_art" value="nachruestung" className={ui.choiceInput} /><span>Nachrüstung im Bestand</span></label>
-                          <label className={ui.choice}><input type="radio" name="einbau_art" value="offen" className={ui.choiceInput} /><span>Noch offen</span></label>
-                        </div>
-                    </Gruppe>
-
-                    <Gruppe id="gruppe-zeitrahmen" sichtbar={projektfragen} fehlerText={fehler.zeitrahmen}>
+                    <Gruppe id="gruppe-zeitrahmen" fehlerText={fehler.zeitrahmen}>
                       <legend className={ui.legend}>Zeitrahmen{pflichtStern}</legend>
                       <div
                         className={ui.choiceGrid}
@@ -833,7 +707,7 @@ export function Anfrageformular() {
                     </Gruppe>
 
                     {/* ---- Optionale Ergänzungen ---- */}
-                    <details className="group mt-7 rounded-xl border border-line bg-surface-2 open:bg-surface" hidden={!projektfragen}>
+                    <details className="group mt-7 rounded-xl border border-line bg-surface-2 open:bg-surface">
                       <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden">
                         <span className="min-w-0 flex-1">
                           <strong className="block text-sm font-bold text-ink">
@@ -852,13 +726,13 @@ export function Anfrageformular() {
 
                       <div className="border-t border-line px-4 pb-5 pt-4">
                         {contactUploadsEnabled && (
-                          <Gruppe sichtbar={projektfragen}>
+                          <Gruppe>
                             <legend className={ui.legend}>Zeichnungen, Isometrien oder Fotos</legend>
                             {uploadFeld("anfrage", "accent")}
                           </Gruppe>
                         )}
 
-                        <Gruppe sichtbar={projektfragen}>
+                        <Gruppe>
                           <legend className={ui.legend}>Was auf Ihrem Gelände gilt <span className={ui.hint}>mehrere möglich</span></legend>
                           <div className={ui.choiceGrid} onChange={exklusivAuswahl}>
                             <label className={ui.choice}><input type="checkbox" name="rahmen[]" value="unterweisung" className={ui.choiceInput} /><span>Sicherheitsunterweisung nötig</span></label>
@@ -973,7 +847,7 @@ export function Anfrageformular() {
                   <div className={ui.stageActions} data-panel-actions>
                     <button type="button" className={ui.btnSecondary} onClick={() => zurueck(2)}>Zurück</button>
                     <button type="submit" className={ui.btnPrimary} disabled={sendet}>
-                      {sendet ? "Wird gesendet …" : (aktuellerPfad?.submitLabel ?? "Anfrage senden")} <ArrowRight className="size-4" aria-hidden="true" />
+                      {sendet ? "Wird gesendet …" : "Anfrage senden"} <ArrowRight className="size-4" aria-hidden="true" />
                     </button>
                   </div>
                 </section>

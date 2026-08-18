@@ -9,17 +9,8 @@ import { services, siteConfig } from "./content";
  * funktionen; das Markup liegt in components/anfrage/.
  */
 
-export type PfadDetails = {
-  /** Überschrift und Einleitung von Stufe 2 */
-  stufe2: { titel: string; hinweis: string };
-  /** Beschriftung des Beschreibungsfelds in Stufe 2 */
-  beschreibungLabel: string;
-  /** Beschriftung des Absende-Buttons für diesen Pfad */
-  submitLabel: string;
-};
-
-export type Pfad = PfadDetails & {
-  /** Wert des Radio-Inputs und Schlüssel für die pfadabhängigen Fragen */
+export type Pfad = {
+  /** Wert des Checkbox-Inputs und stabiler Schlüssel der Leistung */
   id: string;
   /** Beschriftung der Auswahlkarte in Stufe 1 */
   label: string;
@@ -27,91 +18,21 @@ export type Pfad = PfadDetails & {
   hinweis: string;
 };
 
-const standardDetails: PfadDetails = {
-  stufe2: {
-    titel: "Was sollten wir über das Vorhaben wissen?",
-    hinweis: "Ein kurzer Überblick reicht. Details klären wir anschließend im Gespräch."
-  },
-  beschreibungLabel: "Beschreiben Sie Ihr Vorhaben",
-  submitLabel: "Anfrage senden"
-};
-
-const pfadDetails: Record<string, PfadDetails> = {
-  industrieisolierung: {
-    stufe2: { titel: "Was soll isoliert werden?", hinweis: "Anlagenteil, Temperaturbereich und Zugänglichkeit helfen bei der ersten Einordnung." },
-    beschreibungLabel: "Beschreiben Sie Anlagenteil und Umfang der Isolierung",
-    submitLabel: "Isolierung anfragen"
-  },
-  rohrbau: {
-    stufe2: { titel: "Was sollen wir an der Leitung machen?", hinweis: "Werkstoff, Nennweite und Medium helfen uns bei der ersten Einordnung – fehlende Angaben klären wir im Gespräch." },
-    beschreibungLabel: "Beschreiben Sie die Leitung und den geplanten Eingriff",
-    submitLabel: "Rohrbau-Anfrage senden"
-  },
-  gfk: {
-    stufe2: { titel: "Worum geht es beim GFK-Bauteil?", hinweis: "Medium, Temperatur und Druck entscheiden über Laminataufbau und Harzsystem." },
-    beschreibungLabel: "Beschreiben Sie Bauteil, Schadensbild oder geplantes System",
-    submitLabel: "GFK-Anfrage senden"
-  },
-  systemintegration: {
-    stufe2: { titel: "Was soll eingebunden werden?", hinweis: "Für die Planung ist wichtig, wie stark der laufende Betrieb betroffen ist." },
-    beschreibungLabel: "Beschreiben Sie das System und die bestehende Anlage",
-    submitLabel: "Systemeinbau anfragen"
-  },
-  stahlbau: {
-    stufe2: { titel: "Was ist an der Konstruktion zu tun?", hinweis: "Ein paar Sätze zu Bauteil, Belastung und Zustand genügen für den Einstieg." },
-    beschreibungLabel: "Beschreiben Sie die Konstruktion und den Umfang",
-    submitLabel: "Stahlbau-Anfrage senden"
-  },
-  anlageninstandsetzung: {
-    stufe2: { titel: "Um welche Anlage geht es?", hinweis: "Wichtig ist vor allem, ob die Anlage läuft und wann ein Eingriff möglich wäre." },
-    beschreibungLabel: "Beschreiben Sie Anlage, Schadensbild und bisherige Maßnahmen",
-    submitLabel: "Instandsetzung anfragen"
-  },
-  schweissarbeiten: {
-    stufe2: { titel: "Was ist zu schweißen?", hinweis: "Werkstoff und geforderte Dokumentation bestimmen Verfahren und Prüfumfang." },
-    beschreibungLabel: "Beschreiben Sie Bauteil, Nahtart und Einsatzbedingungen",
-    submitLabel: "Schweißarbeiten anfragen"
-  },
-  blechherstellung: {
-    stufe2: { titel: "Was sollen wir für Sie fertigen?", hinweis: "Mit Zeichnung geht es am schnellsten. Skizze oder Muster reichen aber auch." },
-    beschreibungLabel: "Beschreiben Sie Bauteil, Werkstoff und Blechdicke",
-    submitLabel: "Fertigung anfragen"
-  },
-  schiffsausbau: {
-    stufe2: { titel: "Worum geht es an Bord?", hinweis: "Ein paar Sätze zu Schiff, Bereich und Zeitfenster genügen für den Einstieg." },
-    beschreibungLabel: "Beschreiben Sie Schiff, Bereich und geplante Arbeiten",
-    submitLabel: "Schiffsausbau anfragen"
-  },
-  unterlagen: {
-    stufe2: { titel: "Welche Nachweise brauchen Sie?", hinweis: "Nennen Sie Anlass und gewünschten Umfang – wir stellen die passenden Unterlagen zusammen." },
-    beschreibungLabel: "Beschreiben Sie Anlass und benötigte Unterlagen",
-    submitLabel: "Unterlagen anfordern"
-  },
-  unklar: {
-    stufe2: { titel: "Was steht bei Ihnen an?", hinweis: "Beschreiben Sie das Vorhaben in eigenen Worten. Die Zuordnung übernehmen wir." },
-    beschreibungLabel: "Beschreiben Sie Ihr Vorhaben",
-    submitLabel: "Anfrage senden"
-  }
-};
-
 export const pfade: Pfad[] = [
   ...services.map((service) => ({
     id: service.id,
     label: service.title,
-    hinweis: service.short,
-    ...(pfadDetails[service.id] ?? standardDetails)
+    hinweis: service.short
   })),
   {
     id: "unterlagen",
     label: "Qualifikations- / Präqualifikationsunterlagen",
-    hinweis: "Nachweise und Unterlagen für Ihre Einkaufs- oder Lieferantenprüfung.",
-    ...pfadDetails.unterlagen
+    hinweis: "Nachweise und Unterlagen für Ihre Einkaufs- oder Lieferantenprüfung."
   },
   {
     id: "unklar",
-    label: "Mehrere Gewerke oder noch offen",
-    hinweis: "Wir ordnen Ihr Vorhaben gemeinsam ein.",
-    ...pfadDetails.unklar
+    label: "Noch nicht sicher / Sonstiges",
+    hinweis: "Wir ordnen Ihr Vorhaben gemeinsam ein."
   }
 ];
 
@@ -126,9 +47,6 @@ export const pfadLabels: Record<string, string> = {
   ...Object.fromEntries(pfade.map((p) => [p.id, p.label])),
   [stoerfall.id]: stoerfall.label
 };
-
-/** Pfade, bei denen die Projektfragen (Einsatzort, Ausführungsort, Zeitrahmen) entfallen. */
-export const pfadeOhneProjektfragen = new Set(["unterlagen"]);
 
 /** Ordnet die CTA-Werte aus Leistungsraster und Qualifikationsbereich einem Pfad zu. */
 export const pfadFuerAnfrageWert: Record<string, string> = {
@@ -196,18 +114,19 @@ export function wurdeZuSchnellAusgefuellt(startedAt: number, now = Date.now()): 
 /** Baut die Kurzzusammenfassung der Bestätigungsansicht aus den Formularwerten. */
 export function baueZusammenfassung(input: {
   akut: boolean;
-  pfad: string;
+  pfade: string[];
   werte: Record<string, string>;
 }): Array<[string, string]> {
-  const { akut, pfad, werte } = input;
+  const { akut, pfade: ausgewaehltePfade, werte } = input;
   const eintraege: Array<[string, string]> = [];
 
   if (akut) {
     eintraege.push(["Anliegen", stoerfall.label]);
     const betrieb = werte.stoerfall_betrieb ?? "";
     if (betrieb) eintraege.push(["Betrieb", stoerfallBetriebLabels[betrieb] ?? betrieb]);
-  } else if (pfad) {
-    eintraege.push(["Leistung", pfadLabels[pfad] ?? pfad]);
+  } else if (ausgewaehltePfade.length) {
+    const leistungen = ausgewaehltePfade.map((pfad) => pfadLabels[pfad] ?? pfad).join(", ");
+    eintraege.push([ausgewaehltePfade.length === 1 ? "Leistung" : "Leistungen", leistungen]);
     const zeit = werte.zeitrahmen ?? "";
     if (zeit) {
       const termin = (werte.termin ?? "").trim();

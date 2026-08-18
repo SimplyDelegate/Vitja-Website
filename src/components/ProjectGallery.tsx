@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { asset } from "@/lib/assets";
 import { projectMedia, type ProjectCategory, type ProjectMedia } from "@/lib/content";
 
-const filters: Array<"Alle" | ProjectCategory> = ["Alle", "Rohrbau", "GFK", "Schweißen", "Stahlbau", "Integration", "Instandsetzung"];
+const filters: Array<"Alle" | ProjectCategory> = ["Alle", "Industrieisolierung", "Rohrbau", "GFK", "Schweißen", "Stahlbau", "Integration", "Instandsetzung"];
 
 export function ProjectGallery() {
   const [filter, setFilter] = useState<(typeof filters)[number]>("Alle");
@@ -16,6 +16,7 @@ export function ProjectGallery() {
   const galleryFrameRef = useRef<HTMLDivElement>(null);
   const visible = filter === "Alle" ? projectMedia : projectMedia.filter((project) => project.category === filter);
   const isCollapsed = filter === "Alle" && !expanded;
+  const filteredColumns = visible.length === 4 ? 2 : Math.min(visible.length, 3);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -30,7 +31,7 @@ export function ProjectGallery() {
     const syncCardAccessibility = () => {
       const cards = frame.querySelectorAll<HTMLButtonElement>(".project-card");
       cards.forEach((card) => {
-        const fullyVisible = !isCollapsed || card.offsetTop + card.offsetHeight <= frame.clientHeight + 1;
+        const fullyVisible = !isCollapsed || window.getComputedStyle(card).display !== "none";
         card.tabIndex = fullyVisible ? 0 : -1;
         if (fullyVisible) card.removeAttribute("aria-hidden");
         else card.setAttribute("aria-hidden", "true");
@@ -70,9 +71,9 @@ export function ProjectGallery() {
         ))}
       </div>
       <div ref={galleryFrameRef} className={`project-gallery-frame${isCollapsed ? " is-collapsed" : " is-expanded"}`}>
-        <div className="project-grid" id="project-gallery-grid">
+        <div className={`project-grid${filter === "Alle" ? "" : ` is-filtered project-grid-count-${filteredColumns}`}`} id="project-gallery-grid">
           {visible.map((project, index) => (
-            <button className={`project-card project-${project.aspect} reveal`} type="button" key={project.src} onClick={() => setSelected(project)} aria-label={`${project.caption} vergrößern`}>
+            <button className={`project-card project-${project.layout}`} type="button" key={project.src} onClick={() => setSelected(project)} aria-label={`${project.caption} vergrößern`}>
               <Image src={asset(project.src)} alt={project.alt} fill sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 33vw" style={{ objectPosition: project.focus ?? "center" }} loading={filter === "Alle" && index < 3 ? "eager" : "lazy"} />
               <span className="project-overlay"><small>{project.category}</small><strong>{project.caption}</strong><ZoomIn aria-hidden="true" /></span>
             </button>
@@ -88,7 +89,22 @@ export function ProjectGallery() {
         </div>
       )}
 
-      <dialog ref={dialogRef} className="project-dialog" onClose={() => setSelected(null)} onClick={(event) => { if (event.target === dialogRef.current) setSelected(null); }}>
+      <dialog
+        ref={dialogRef}
+        className="project-dialog"
+        onCancel={(event) => {
+          event.preventDefault();
+          setSelected(null);
+        }}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") {
+            event.preventDefault();
+            setSelected(null);
+          }
+        }}
+        onClose={() => setSelected(null)}
+        onClick={(event) => { if (event.target === dialogRef.current) setSelected(null); }}
+      >
         {selected && (
           <div className="dialog-card">
             <button className="dialog-close" type="button" onClick={() => setSelected(null)} aria-label="Großansicht schließen"><X aria-hidden="true" /></button>

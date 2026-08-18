@@ -20,6 +20,10 @@ const required = [
   "NEXT_PUBLIC_COMPANY_LEGAL_NAME",
   "NEXT_PUBLIC_COMPANY_REGISTER",
   "NEXT_PUBLIC_COMPANY_TAX_ID",
+  "NEXT_PUBLIC_COMPANY_TAX_OFFICE",
+  "NEXT_PUBLIC_COMPANY_BANK_NAME",
+  "NEXT_PUBLIC_COMPANY_IBAN",
+  "NEXT_PUBLIC_COMPANY_BIC",
   "NEXT_PUBLIC_COMPANY_RESPONSIBLE",
   "NEXT_PUBLIC_CONTACT_ACCESS_KEY",
   "LEGAL_REVIEW_CONFIRMED",
@@ -37,6 +41,7 @@ if (process.env.QUALIFICATION_REVIEW_CONFIRMED !== "true") errors.push("QUALIFIC
 
 const qualifications = JSON.parse(readFileSync(resolve("src/data/qualifications.json"), "utf8"));
 const evidence = JSON.parse(readFileSync(resolve("src/data/evidence-registry.json"), "utf8"));
+const featuredProjectMetrics = JSON.parse(readFileSync(resolve("src/data/featured-project-metrics.json"), "utf8"));
 const evidenceById = new Map(evidence.map((entry) => [entry.id, entry]));
 const publicQualifications = qualifications.filter((entry) => entry.publicVisibility === "summary");
 if (!publicQualifications.length) errors.push("Mindestens ein fachlich geprüfter öffentlicher Qualifikationsnachweis fehlt.");
@@ -49,6 +54,12 @@ for (const qualification of publicQualifications) {
   const proof = evidenceById.get(qualification.evidenceId);
   if (!proof?.approved) errors.push(`Für Qualifikation ${qualification.id} fehlt ein freigegebener interner Beleg.`);
   if (proof?.legalHolder !== process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME) errors.push(`Der Rechtsträger des Belegs für ${qualification.id} stimmt nicht mit NEXT_PUBLIC_COMPANY_LEGAL_NAME überein.`);
+}
+
+for (const project of featuredProjectMetrics) {
+  if (project.status !== "verified") errors.push(`Projektkennzahlen ${project.projectId ?? "ohne ID"} sind noch nicht fachlich bestätigt.`);
+  if (!Array.isArray(project.items) || project.items.length !== 3) errors.push(`Projektkennzahlen ${project.projectId ?? "ohne ID"} müssen genau drei Werte enthalten.`);
+  if (project.items?.some((item) => !Number.isFinite(item.value) || item.value < 0 || typeof item.prefix !== "string" || typeof item.suffix !== "string" || !item.label?.trim())) errors.push(`Projektkennzahlen ${project.projectId ?? "ohne ID"} enthalten unvollständige Werte.`);
 }
 
 if (errors.length) {

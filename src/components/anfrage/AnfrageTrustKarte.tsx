@@ -18,38 +18,40 @@ export function AnfrageTrustKarte({
 }) {
   return (
     <aside
-      className="flex min-w-0 shrink-0 flex-col gap-6 rounded-2xl border border-line bg-surface-2 p-6 pult:gap-5 pult:p-5"
+      className="flex min-w-0 shrink-0 flex-col gap-7 rounded-2xl border border-line bg-surface-2 p-6 sm:p-7 pult:gap-6 pult:p-6"
       aria-labelledby="anfrage-ansprechpartner"
     >
       <div>
         <span className={ui.kicker}>Ihr Ansprechpartner</span>
-        <h3 id="anfrage-ansprechpartner" className="mt-3 font-display text-2xl font-bold tracking-normal text-ink">
+        <h3 id="anfrage-ansprechpartner" className="mt-3 font-display text-[2rem] font-bold leading-none tracking-normal text-ink">
           {anfrageKontakt.ansprechpartner}
         </h3>
-        <p className="mt-1 text-sm font-semibold text-accent">{anfrageKontakt.rolle}</p>
+        <p className="mt-2 text-base font-bold text-accent">{anfrageKontakt.rolle}</p>
 
-        <p className="mt-4 text-sm leading-relaxed text-ink-2">
-          <strong className="block font-semibold text-ink">Sie brauchen kein fertiges Leistungsverzeichnis.</strong>
-          <span className="mt-1 block text-mute">
+        <div className="mt-6">
+          <p className="rounded-xl border border-gold/70 bg-gold/25 px-4 py-3.5 text-[1.05rem] font-extrabold leading-snug text-ink">
+            Sie brauchen kein fertiges Leistungsverzeichnis.
+          </p>
+          <p className="mt-3 text-[0.95rem] leading-relaxed text-mute">
             Schildern Sie, was ansteht. Fehlende Angaben zu Werkstoff, Maßen oder Terminen klären wir gemeinsam – telefonisch oder direkt an Ihrer Anlage.
-          </span>
-        </p>
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-col gap-2" aria-label="Direkter Kontakt">
+      <div className="flex flex-col gap-2.5" aria-label="Direkter Kontakt">
         <a href={anfrageKontakt.telefonLink} className={ui.channel}>
-          <span className={ui.channelIcon}><PhoneCall className="size-[18px]" aria-hidden="true" /></span>
+          <span className={ui.channelIcon}><PhoneCall className="size-5" aria-hidden="true" /></span>
           <span className="min-w-0">
-            <small className="block text-xs text-mute">Telefon</small>
-            <strong className="block truncate text-sm font-bold text-ink">{anfrageKontakt.telefonAnzeige}</strong>
+            <small className="block text-sm leading-tight text-mute">Telefon</small>
+            <strong className="mt-0.5 block whitespace-nowrap text-[0.95rem] font-bold leading-snug text-ink xl:text-base">{anfrageKontakt.telefonAnzeige}</strong>
           </span>
         </a>
 
         <a href={`mailto:${anfrageKontakt.email}`} className={ui.channel}>
-          <span className={ui.channelIcon}><Mail className="size-[18px]" aria-hidden="true" /></span>
+          <span className={ui.channelIcon}><Mail className="size-5" aria-hidden="true" /></span>
           <span className="min-w-0">
-            <small className="block text-xs text-mute">E-Mail</small>
-            <strong className="block truncate text-sm font-bold text-ink">{anfrageKontakt.email}</strong>
+            <small className="block text-sm leading-tight text-mute">E-Mail</small>
+            <strong className="mt-0.5 block text-[0.95rem] font-bold leading-snug text-ink [overflow-wrap:anywhere] xl:text-base">{anfrageKontakt.email}</strong>
           </span>
         </a>
 
@@ -57,16 +59,16 @@ export function AnfrageTrustKarte({
           href={`?pfad=${stoerfall.id}#kontakt`}
           aria-current={stoerfallAktiv || undefined}
           onClick={(event) => { event.preventDefault(); onStoerfall(); }}
-          className="flex items-center gap-3 rounded-xl border border-signal/35 bg-signal/[0.05] px-3.5 py-3 transition-colors hover:border-signal/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal aria-[current]:border-signal/60"
+          className="flex items-center gap-3 rounded-xl border border-signal/35 bg-signal/[0.05] px-4 py-3.5 transition-colors hover:border-signal/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-signal aria-[current]:border-signal/60"
         >
-          <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-signal/10 text-signal" aria-hidden="true">
-            <TriangleAlert className="size-[18px]" />
+          <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-signal/10 text-signal" aria-hidden="true">
+            <TriangleAlert className="size-5" />
           </span>
           <span className="min-w-0 flex-1">
-            <small className="block text-xs text-mute">Störfall oder Anlagenstillstand</small>
-            <strong className="block truncate text-sm font-bold text-ink">Kurzformular öffnen</strong>
+            <small className="block text-sm leading-tight text-mute">Störfall oder Anlagenstillstand</small>
+            <strong className="mt-0.5 block text-[0.95rem] font-bold leading-snug text-ink xl:text-base">Kurzformular öffnen</strong>
           </span>
-          <ArrowRight className="size-4 shrink-0 text-signal" aria-hidden="true" />
+          <ArrowRight className="size-5 shrink-0 text-signal" aria-hidden="true" />
         </a>
       </div>
 

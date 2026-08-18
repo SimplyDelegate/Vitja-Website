@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, Inter } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Navbar } from "@/components/Navbar";
+import { ReviewOverlay } from "@/components/ReviewOverlay";
 import { asset } from "@/lib/assets";
 import { contactEndpointOrigin } from "@/lib/contact";
 import { siteConfig } from "@/lib/content";
@@ -18,7 +19,7 @@ const contentSecurityPolicy = [
   "media-src 'self'",
   "font-src 'self'",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline'",
+  process.env.NODE_ENV === "development" ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self' 'unsafe-inline'",
   ["connect-src 'self'", contactEndpointOrigin()].filter(Boolean).join(" ")
 ].join("; ");
 
@@ -49,7 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="de" className={`${inter.variable} ${barlowCondensed.variable}`}>
       <head><meta httpEquiv="Content-Security-Policy" content={contentSecurityPolicy} /></head>
-      <body><a className="skip-link" href="#main-content">Zum Inhalt springen</a><Navbar /><div id="main-content">{children}</div><Footer /></body>
+      <body><a className="skip-link" href="#main-content">Zum Inhalt springen</a><Navbar /><div id="main-content">{children}</div><Footer /><ReviewOverlay /></body>
     </html>
   );
 }

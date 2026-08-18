@@ -5,7 +5,6 @@ import {
   istEmailPlausibel,
   minimumFillTimeMs,
   pfade,
-  pfadeOhneProjektfragen,
   pfadFuerAnfrageWert,
   pfadLabels,
   pruefeKontaktweg,
@@ -32,22 +31,17 @@ describe("Pfade", () => {
 
   it("löst Deeplink-Parameter, Störfall und Unbekanntes korrekt auf", () => {
     expect(findePfad("gfk")).toBe("gfk");
+    expect(findePfad("blechherstellung")).toBe("blechherstellung");
+    expect(findePfad("Blechvorrichtungen")).toBe("blechherstellung");
     expect(findePfad(stoerfall.id)).toBe(stoerfall.id);
     expect(findePfad("gibt-es-nicht")).toBeNull();
     expect(findePfad(null)).toBeNull();
   });
 
-  it("hat für jeden Pfad vollständige Stufe-2-Texte", () => {
+  it("hat für jeden Pfad vollständige Auswahltexte", () => {
     for (const pfad of pfade) {
-      expect(pfad.stufe2.titel.length, pfad.id).toBeGreaterThan(0);
-      expect(pfad.beschreibungLabel.length, pfad.id).toBeGreaterThan(0);
-      expect(pfad.submitLabel.length, pfad.id).toBeGreaterThan(0);
-    }
-  });
-
-  it("kennt jeden Pfad ohne Projektfragen auch als Pfad", () => {
-    for (const id of pfadeOhneProjektfragen) {
-      expect(pfade.some((p) => p.id === id), id).toBe(true);
+      expect(pfad.label.length, pfad.id).toBeGreaterThan(0);
+      expect(pfad.hinweis.length, pfad.id).toBeGreaterThan(0);
     }
   });
 
@@ -102,11 +96,11 @@ describe("Zusammenfassung", () => {
   it("fasst eine Standardanfrage zusammen", () => {
     const eintraege = baueZusammenfassung({
       akut: false,
-      pfad: "gfk",
+      pfade: ["gfk", "rohrbau"],
       werte: { zeitrahmen: "stillstand", termin: "KW 38", plz: "21079", ort: "Hamburg", firma: "Muster GmbH", name: "Max Mustermann" }
     });
     expect(eintraege).toEqual([
-      ["Leistung", pfadLabels.gfk],
+      ["Leistungen", `${pfadLabels.gfk}, ${pfadLabels.rohrbau}`],
       ["Zeitrahmen", "zum geplanten Stillstand oder Revisionstermin (KW 38)"],
       ["Einsatzort", "21079 Hamburg"],
       ["Unternehmen", "Muster GmbH"],
@@ -117,7 +111,7 @@ describe("Zusammenfassung", () => {
   it("fasst eine Störfallmeldung zusammen und lässt Leeres weg", () => {
     const eintraege = baueZusammenfassung({
       akut: true,
-      pfad: "",
+      pfade: [],
       werte: { stoerfall_betrieb: "stillstand", plz: "20457", firma: "Muster GmbH", name: "Max Mustermann" }
     });
     expect(eintraege[0]).toEqual(["Anliegen", stoerfall.label]);

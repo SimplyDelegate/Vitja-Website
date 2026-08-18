@@ -7,7 +7,7 @@
  */
 
 /** Kleines Kicker-Label über Panels und Karten (entspricht .eyebrow der Site) */
-export const kicker = "font-body text-[0.67rem] font-extrabold uppercase tracking-[0.14em] text-mute";
+export const kicker = "font-body text-xs font-extrabold uppercase tracking-[0.14em] leading-snug text-mute";
 
 /** Auswahlkarte (Radio oder Checkbox) */
 export const choice = [
@@ -84,7 +84,7 @@ export const stageActions = [
 /** Panelkopf — bleibt im pult-Modus stehen */
 export const panelHead = "shrink-0 border-b border-line px-5 pb-5 pt-7 sm:px-8";
 export const panelTitle = "font-display text-2xl font-bold leading-tight tracking-normal text-ink sm:text-3xl";
-export const panelLead = "mt-2 max-w-[60ch] text-sm leading-relaxed text-mute";
+export const panelLead = "mt-2 max-w-[60ch] text-[0.9375rem] leading-relaxed text-mute";
 
 /**
  * Fragenbereich eines Panels. Im pult-Modus der einzige Bereich, der scrollt —
@@ -104,5 +104,5 @@ export const panelWrapper = "m-0 block min-w-0 border-0 p-0 pult:flex pult:min-h
 
 /** Kontaktkanal-Link (Trust-Karte) */
 export const channel =
-  "flex items-center gap-3 rounded-xl border border-line bg-surface px-3.5 py-3 transition-colors hover:border-accent/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
-export const channelIcon = "grid size-9 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent";
+  "flex min-h-[4.5rem] items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3.5 transition-colors hover:border-accent/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+export const channelIcon = "grid size-10 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent";

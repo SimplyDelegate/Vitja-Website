@@ -13,7 +13,8 @@ export default function ImpressumPage() {
         <p><strong>{siteConfig.legalName}</strong><br />Markenauftritt: {siteConfig.name}<br />{siteConfig.address}</p>
         <h2>Vertreten durch</h2><p>{siteConfig.responsible}</p>
         <h2>Kontakt</h2><p>Telefon: {siteConfig.phone}<br />E-Mail: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></p>
-        <h2>Register- und Steuerangaben</h2><p>{siteConfig.register}<br />{siteConfig.taxId}</p>
+        <h2>Register- und Steuerangaben</h2><p>{siteConfig.register}<br />{siteConfig.taxId}<br />{siteConfig.taxOffice}</p>
+        <h2>Bankverbindung</h2><p>{siteConfig.bankName}<br />IBAN: {siteConfig.iban}<br />BIC: {siteConfig.bic}</p>
         <h2>Verantwortlich für den Inhalt</h2><p>{siteConfig.responsible}<br />{siteConfig.address}</p>
         <h2>Haftungshinweise</h2><p>Die finalen Haftungs- und Streitbeilegungshinweise werden nach Vorliegen der vollständigen Unternehmensdaten rechtlich geprüft und vor Veröffentlichung ergänzt.</p>
       </div>
