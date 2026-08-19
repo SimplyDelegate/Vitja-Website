@@ -1,13 +1,8 @@
-"use client";
-
-import { ArrowDownRight, Check, FileSearch, ShieldCheck } from "lucide-react";
+import { Check, FileSearch, ShieldCheck } from "lucide-react";
 import { qualificationGroups, qualifications } from "@/lib/content";
 
 export function QualificationsSection() {
   const publicQualifications = qualifications.filter((item) => item.status === "verified" && item.publicVisibility === "summary");
-  const requestDocuments = () => {
-    window.dispatchEvent(new CustomEvent("tts:select-service", { detail: "Qualifikations- / Präqualifikationsunterlagen" }));
-  };
 
   return (
     <section className="section qualifications-section" id="qualifikationen" aria-labelledby="qualifications-title">
@@ -56,14 +51,6 @@ export function QualificationsSection() {
           ))}
         </div>
 
-        <div className="qualification-cta reveal">
-          <div>
-            <span>Für Einkauf, Technik und HSE</span>
-            <h3>Präqualifikationsunterlagen gezielt anfordern.</h3>
-            <p>Nennen Sie uns Leistungsbereich und Einsatzumgebung. Sie erhalten die dafür relevanten Nachweisgruppen – nicht einen unübersichtlichen Dokumentenstapel.</p>
-          </div>
-          <a className="button" href="#kontakt" onClick={requestDocuments}>Nachweise anfordern <ArrowDownRight aria-hidden="true" /></a>
-        </div>
       </div>
     </section>
   );

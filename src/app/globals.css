@@ -570,13 +570,6 @@ p { margin: 0; }
 .qualification-card li { display: flex; align-items: flex-start; gap: 8px; color: rgba(255,255,255,.79); font-size: .77rem; }
 .qualification-card li svg { width: 15px; flex: 0 0 auto; margin-top: 3px; color: var(--gold); }
 .qualification-note { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.11); color: rgba(255,255,255,.46); font-size: .7rem; }
-.qualification-cta { display: flex; align-items: center; justify-content: space-between; gap: 40px; margin-top: 14px; padding: 34px; border: 1px solid rgba(235,174,88,.35); border-radius: 22px; background: linear-gradient(110deg, rgba(197,134,61,.16), rgba(255,255,255,.035)); }
-.qualification-cta > div { max-width: 760px; }
-.qualification-cta span { color: var(--gold); font-size: .65rem; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
-.qualification-cta h3 { margin-top: 9px; font-size: 2.2rem; }
-.qualification-cta p { margin-top: 11px; color: rgba(255,255,255,.57); font-size: .82rem; }
-.qualification-cta .button { flex: 0 0 auto; }
-
 .case-study-list { display: grid; gap: 18px; margin-bottom: 90px; }
 .case-study { display: grid; overflow: hidden; min-height: 560px; grid-template-columns: .95fr 1.05fr; border: 1px solid rgba(255,255,255,.14); border-radius: 24px; background: #171a1f; }
 .case-study:nth-child(even) .case-study-media { order: 2; }
@@ -614,7 +607,6 @@ p { margin: 0; }
   .qualification-grid { grid-template-columns: 1fr; }
   .verified-qualification-list { grid-template-columns: 1fr; }
   .qualification-card, .qualification-card:nth-child(n+4), .qualification-card:last-child { grid-column: auto; min-height: 350px; }
-  .qualification-cta { align-items: flex-start; flex-direction: column; }
   .case-study { min-height: 0; grid-template-columns: 1fr; }
   .case-study:nth-child(even) .case-study-media { order: 0; }
   .case-study-media { min-height: min(78vw, 540px); }
@@ -630,8 +622,6 @@ p { margin: 0; }
   .qualifications-section { margin: 5px; border-radius: 22px; }
   .qualification-card { min-height: 0; padding: 23px; }
   .qualification-card-top { align-items: flex-start; flex-direction: column; }
-  .qualification-cta { padding: 25px; }
-  .qualification-cta .button { width: 100%; }
   .case-study-list { margin-bottom: 68px; }
   .case-study { border-radius: 18px; }
   .case-study-copy { padding: 28px 22px 34px; }

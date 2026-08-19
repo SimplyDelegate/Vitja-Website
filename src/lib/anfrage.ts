@@ -25,11 +25,6 @@ export const pfade: Pfad[] = [
     hinweis: service.short
   })),
   {
-    id: "unterlagen",
-    label: "Qualifikations- / Präqualifikationsunterlagen",
-    hinweis: "Nachweise und Unterlagen für Ihre Einkaufs- oder Lieferantenprüfung."
-  },
-  {
     id: "unklar",
     label: "Noch nicht sicher / Sonstiges",
     hinweis: "Wir ordnen Ihr Vorhaben gemeinsam ein."
@@ -48,10 +43,9 @@ export const pfadLabels: Record<string, string> = {
   [stoerfall.id]: stoerfall.label
 };
 
-/** Ordnet die CTA-Werte aus Leistungsraster und Qualifikationsbereich einem Pfad zu. */
+/** Ordnet die CTA-Werte aus dem Leistungsraster einem Pfad zu. */
 export const pfadFuerAnfrageWert: Record<string, string> = {
   ...Object.fromEntries(services.map((service) => [service.requestValue, service.id])),
-  "Qualifikations- / Präqualifikationsunterlagen": "unterlagen",
   "Sonstiges / Beratung": "unklar"
 };
 

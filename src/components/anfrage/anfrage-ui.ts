@@ -11,7 +11,7 @@ export const kicker = "font-body text-xs font-extrabold uppercase tracking-[0.14
 
 /** Auswahlkarte (Radio oder Checkbox) */
 export const choice = [
-  "relative flex min-h-[3.25rem] cursor-pointer items-center gap-3 rounded-xl",
+  "relative flex h-full min-h-14 cursor-pointer items-center gap-3 rounded-xl",
   "border border-line bg-surface-2 px-4 py-3 text-sm font-semibold leading-snug text-ink-2",
   "transition-colors duration-150",
   "hover:border-ink-2/40 hover:bg-surface",
@@ -29,8 +29,8 @@ export const choiceSignal = choice
 export const choiceInput = "size-4 shrink-0 accent-accent";
 
 /** Grid für Auswahlkarten */
-export const choiceGrid = "grid gap-2.5 sm:grid-cols-2";
-export const choiceGridThree = "grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3";
+export const choiceGrid = "grid gap-3 sm:grid-cols-2";
+export const choiceGridThree = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3";
 
 /** Fieldset einer Fragengruppe */
 export const group = "block min-w-0 border-0 p-0 m-0 [&+&]:mt-7";
@@ -58,14 +58,19 @@ export const textarea = `${input} min-h-[9.5rem] resize-y leading-relaxed`;
 
 /** Feldraster */
 export const fieldGrid = "grid gap-3 sm:grid-cols-2";
+export const locationGrid = "grid gap-3 sm:grid-cols-[minmax(9rem,11rem)_minmax(0,1fr)]";
 export const fieldWide = "sm:col-span-2";
 
 /** Fehlermeldung unter einer Fragengruppe */
 export const fehler = "mt-2 block text-sm font-semibold text-signal-dark";
 
+/** Ruhige Informations- und Zustimmungsflächen im Fragenbereich */
+export const infoBox = "mt-7 rounded-xl border border-line bg-surface-2 p-4 text-sm leading-relaxed text-mute";
+export const consentBox = "mt-7 rounded-xl border border-line bg-surface-2 p-4";
+
 /** Buttons */
 export const btnBase =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-body text-sm font-bold transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
+  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 font-body text-sm font-bold transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
 export const btnPrimary = `${btnBase} bg-gold text-carbon hover:bg-[#F4BD70] focus-visible:outline-accent disabled:opacity-60`;
 export const btnSecondary = `${btnBase} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink focus-visible:outline-accent`;
 export const btnSignal = `${btnBase} bg-signal text-white hover:bg-signal-dark focus-visible:outline-signal disabled:opacity-60`;
