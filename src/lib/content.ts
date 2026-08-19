@@ -153,9 +153,9 @@ export const navItems = [
 ];
 
 export const heroSlides: HeroSlide[] = [
-  { src: "/media/hero/rohrsystem.webp", alt: "Montiertes Rohrsystem in einer industriellen Anlage", focus: "center 55%" },
+  { src: "/media/hero/rohrtrasse-anlage.webp", alt: "Rohrtrasse mit isolierten Edelstahlleitungen an einer blauen Stahlkonstruktion", focus: "center 63%" },
   { src: "/media/hero/gfk-rohrbau.webp", alt: "Vollständige GFK-Rohrbaugruppe in der Werkstatt", focus: "center 48%" },
-  { src: "/media/hero/systemintegration.webp", alt: "Integriertes Rohrsystem mit roten Armaturen", focus: "center 52%" }
+  { src: "/media/hero/isolierter-behaelter.webp", alt: "Isolierter Prozessbehälter mit angeflanschter Rohrleitung in der Anlagenhalle", focus: "center 30%" }
 ];
 
 export const services: Service[] = [
