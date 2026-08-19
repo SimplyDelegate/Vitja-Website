@@ -22,11 +22,17 @@ describe("Pfade", () => {
     }
   });
 
-  it("ordnet jeden CTA-Wert (Leistungsraster, Qualifikationsbereich) einem Pfad zu", () => {
+  it("ordnet jeden CTA-Wert des Leistungsrasters einem Pfad zu", () => {
     for (const service of services) {
       expect(findePfad(service.requestValue), service.requestValue).not.toBeNull();
     }
-    expect(findePfad("Qualifikations- / Präqualifikationsunterlagen")).toBe("unterlagen");
+  });
+
+  it("bietet nur technische Leistungen und die offene Auswahl an", () => {
+    expect(pfade).toHaveLength(services.length + 1);
+    expect(pfade.at(-1)?.id).toBe("unklar");
+    expect(pfade.some((pfad) => pfad.id === "unterlagen")).toBe(false);
+    expect(findePfad("Qualifikations- / Präqualifikationsunterlagen")).toBeNull();
   });
 
   it("löst Deeplink-Parameter, Störfall und Unbekanntes korrekt auf", () => {

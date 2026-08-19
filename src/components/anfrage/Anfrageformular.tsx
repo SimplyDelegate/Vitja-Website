@@ -29,9 +29,9 @@ import * as ui from "./anfrage-ui";
 const STUFEN_LABELS = ["Leistungen wählen", "Projekt beschreiben", "Kontaktdaten"];
 
 const FEHLER_REIHENFOLGE = [
-  "leistungen", "beschreibung", "plz", "ausfuehrungsort", "zeitrahmen",
+  "leistungen",
   "firma", "name", "kontaktweg", "datenschutz",
-  "a_bereich", "a_betrieb", "a_beschreibung", "a_plz", "a_firma", "a_name", "a_telefon", "a_datenschutz"
+  "a_betrieb", "a_beschreibung", "a_plz", "a_firma", "a_name", "a_telefon", "a_datenschutz"
 ] as const;
 
 type Fehler = Partial<Record<(typeof FEHLER_REIHENFOLGE)[number], string>>;
@@ -115,10 +115,6 @@ function Gruppe({
 
 // Vollständige Klassenketten je Farbe, damit Tailwind sie statisch findet.
 const uploadStil = {
-  accent: {
-    rahmen: "block cursor-pointer rounded-xl border border-dashed border-line bg-surface px-4 py-5 text-center transition-colors hover:border-accent/50 focus-within:border-accent",
-    text: "block text-sm font-bold text-accent"
-  },
   signal: {
     rahmen: "block cursor-pointer rounded-xl border border-dashed border-line bg-surface px-4 py-5 text-center transition-colors hover:border-signal/50 focus-within:border-signal",
     text: "block text-sm font-bold text-signal-dark"
@@ -142,10 +138,7 @@ export function Anfrageformular() {
   const [statusMeldung, setStatusMeldung] = useState("");
   const [fehler, setFehler] = useState<Fehler>({});
   const [zeitrahmen, setZeitrahmen] = useState("");
-  const [uploads, setUploads] = useState<Record<"anfrage" | "stoerfall", UploadAnzeige>>({
-    anfrage: uploadStart,
-    stoerfall: uploadStart
-  });
+  const [stoerfallUpload, setStoerfallUpload] = useState<UploadAnzeige>(uploadStart);
   const [zusammenfassung, setZusammenfassung] = useState<Array<[string, string]>>([]);
 
   const ausgewaehlteLeistungen = pfade.filter((pfad) => ausgewaehltePfade.includes(pfad.id));
@@ -274,12 +267,6 @@ export function Anfrageformular() {
   function pruefeStufe(nummer: number, werte: Record<string, string>): Fehler {
     const neu: Fehler = {};
     if (nummer === 1 && ausgewaehltePfade.length === 0) neu.leistungen = "Bitte wählen Sie mindestens eine Leistung.";
-    if (nummer === 2) {
-      if (!werte.beschreibung?.trim()) neu.beschreibung = "Bitte beschreiben Sie Ihr Vorhaben kurz.";
-      if (!werte.plz?.trim()) neu.plz = "Bitte geben Sie die Postleitzahl an.";
-      if (!werte.ausfuehrungsort) neu.ausfuehrungsort = "Bitte wählen Sie, wo gearbeitet werden soll.";
-      if (!werte.zeitrahmen) neu.zeitrahmen = "Bitte wählen Sie einen Zeitrahmen.";
-    }
     if (nummer === 3) {
       if (!werte.firma?.trim()) neu.firma = "Bitte geben Sie Ihr Unternehmen an.";
       if (!werte.name?.trim()) neu.name = "Bitte geben Sie Ihren Namen an.";
@@ -292,7 +279,6 @@ export function Anfrageformular() {
 
   function pruefeStoerfall(werte: Record<string, string>): Fehler {
     const neu: Fehler = {};
-    if (!werte.stoerfall_bereich) neu.a_bereich = "Bitte wählen Sie, was betroffen ist.";
     if (!werte.stoerfall_betrieb) neu.a_betrieb = "Bitte geben Sie an, wie stark der Betrieb betroffen ist.";
     if (!werte.beschreibung?.trim()) neu.a_beschreibung = "Bitte beschreiben Sie den Schaden kurz.";
     if (!werte.plz?.trim()) neu.a_plz = "Bitte geben Sie die Postleitzahl an.";
@@ -358,37 +344,19 @@ export function Anfrageformular() {
 
   /* ------------------------------------------------------------------ Uploads */
 
-  function handleUpload(schluessel: "anfrage" | "stoerfall") {
-    return (event: ChangeEvent<HTMLInputElement>) => {
-      const feld = event.currentTarget;
-      const dateien = Array.from(feld.files ?? []);
-      const meldung = pruefeUpload(dateien);
-      if (meldung) {
-        feld.value = "";
-        setUploads((bisher) => ({ ...bisher, [schluessel]: { text: meldung, fehler: true, anzahl: 0 } }));
-        return;
-      }
-      setUploads((bisher) => ({
-        ...bisher,
-        [schluessel]: {
-          text: dateien.length ? dateien.map((datei) => datei.name).join(", ") : uploadStart.text,
-          fehler: false,
-          anzahl: dateien.length
-        }
-      }));
-    };
-  }
-
-  /* ------------------------------------------------- Exklusive Auswahlkarten */
-
-  function exklusivAuswahl(event: FormEvent<HTMLDivElement>) {
-    const ziel = event.target as HTMLInputElement;
-    if (ziel.type !== "checkbox" || !ziel.checked) return;
-    const felder = event.currentTarget.querySelectorAll<HTMLInputElement>(`input[name="${ziel.name}"]`);
-    felder.forEach((feld) => {
-      if (feld === ziel) return;
-      if (ziel.dataset.exklusiv !== undefined) feld.checked = false;
-      else if (feld.dataset.exklusiv !== undefined) feld.checked = false;
+  function handleUpload(event: ChangeEvent<HTMLInputElement>) {
+    const feld = event.currentTarget;
+    const dateien = Array.from(feld.files ?? []);
+    const meldung = pruefeUpload(dateien);
+    if (meldung) {
+      feld.value = "";
+      setStoerfallUpload({ text: meldung, fehler: true, anzahl: 0 });
+      return;
+    }
+    setStoerfallUpload({
+      text: dateien.length ? dateien.map((datei) => datei.name).join(", ") : uploadStart.text,
+      fehler: false,
+      anzahl: dateien.length
     });
   }
 
@@ -458,21 +426,21 @@ export function Anfrageformular() {
 
   const pflichtStern = <span className="text-signal" aria-hidden="true"> *</span>;
 
-  const uploadFeld = (schluessel: "anfrage" | "stoerfall", farbe: "accent" | "signal") => (
-    <label className={uploadStil[farbe].rahmen}>
+  const uploadFeld = (
+    <label className={uploadStil.signal.rahmen}>
       <input
         type="file"
         name="unterlagen[]"
         className="sr-only"
         accept={upload.akzeptiert}
         multiple
-        aria-describedby={`upload-hinweis-${schluessel}`}
-        onChange={handleUpload(schluessel)}
+        aria-describedby="upload-hinweis-stoerfall"
+        onChange={handleUpload}
       />
-      <strong className={uploadStil[farbe].text}>Dateien auswählen</strong>
-      <small id={`upload-hinweis-${schluessel}`} className="mt-1 block text-xs text-mute">{upload.hinweis}</small>
-      <em className={`mt-2 block text-xs font-semibold not-italic ${uploads[schluessel].fehler ? "text-signal-dark" : "text-ink-2"}`}>
-        {uploads[schluessel].text}
+      <strong className={uploadStil.signal.text}>Dateien auswählen</strong>
+      <small id="upload-hinweis-stoerfall" className="mt-1 block text-xs text-mute">{upload.hinweis}</small>
+      <em className={`mt-2 block text-xs font-semibold not-italic ${stoerfallUpload.fehler ? "text-signal-dark" : "text-ink-2"}`}>
+        {stoerfallUpload.text}
       </em>
     </label>
   );
@@ -577,7 +545,9 @@ export function Anfrageformular() {
               </div>
               <p className="mt-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-mute">
                 <span>Leistungen: <strong className="font-semibold text-ink-2">{leistungsanzeige}</strong></span>
-                <span>Mit <span className="text-signal" aria-hidden="true">*</span> markierte Felder brauchen wir.</span>
+                {stufe === 2
+                  ? <span>Alle Angaben in diesem Schritt sind optional.</span>
+                  : <span>Mit <span className="text-signal" aria-hidden="true">*</span> markierte Felder brauchen wir.</span>}
               </p>
             </div>
 
@@ -636,17 +606,15 @@ export function Anfrageformular() {
                   </div>
 
                   <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
-                    <Gruppe id="gruppe-beschreibung" fehlerText={fehler.beschreibung}>
+                    <Gruppe>
                       <label className={ui.field}>
-                        <span className={ui.fieldLabel}>Beschreiben Sie Ihr Vorhaben{pflichtStern}</span>
+                        <span className={ui.fieldLabel}>Beschreiben Sie Ihr Vorhaben <span className={ui.hint}>optional</span></span>
                         <textarea
                           name="beschreibung"
                           rows={4}
                           maxLength={3000}
                           className={ui.textarea}
                           placeholder="Ein paar Sätze zur Ausgangslage und zum gewünschten Ergebnis."
-                          aria-invalid={fehler.beschreibung ? true : undefined}
-                          onChange={() => loescheFehler("beschreibung")}
                         />
                       </label>
                       <p className="mt-2 text-xs text-mute">
@@ -654,45 +622,34 @@ export function Anfrageformular() {
                       </p>
                     </Gruppe>
 
-                    <Gruppe id="gruppe-plz" fehlerText={fehler.plz}>
-                      <legend className={ui.legend}>Einsatzort</legend>
-                      <div className={ui.fieldGrid}>
+                    <Gruppe>
+                      <legend className={ui.legend}>Einsatzort <span className={ui.hint}>optional</span></legend>
+                      <div className={ui.locationGrid}>
                         <label className={ui.field}>
-                          <span className={ui.fieldLabel}>Postleitzahl{pflichtStern}</span>
+                          <span className={ui.fieldLabel}>Postleitzahl</span>
                           <input
                             type="text"
                             name="plz"
                             inputMode="numeric"
                             autoComplete="postal-code"
                             maxLength={10}
-                            className={`${ui.input} sm:max-w-[11rem]`}
-                            aria-invalid={fehler.plz ? true : undefined}
-                            onChange={() => loescheFehler("plz")}
+                            className={ui.input}
                           />
                         </label>
                         <label className={ui.field}>
-                          <span className={ui.fieldLabel}>Ort oder Werk <span className={ui.hint}>optional</span></span>
+                          <span className={ui.fieldLabel}>Ort oder Werk</span>
                           <input type="text" name="ort" autoComplete="address-level2" maxLength={120} className={ui.input} />
                         </label>
                       </div>
                     </Gruppe>
 
-                    <Gruppe id="gruppe-ausfuehrungsort" fehlerText={fehler.ausfuehrungsort}>
-                      <legend className={ui.legend}>Wo wird gearbeitet?{pflichtStern}</legend>
-                      <div className={ui.choiceGridThree} onChange={() => loescheFehler("ausfuehrungsort")}>
-                        <label className={ui.choice}><input type="radio" name="ausfuehrungsort" value="vor_ort" className={ui.choiceInput} /><span>Bei Ihnen vor Ort</span></label>
-                        <label className={ui.choice}><input type="radio" name="ausfuehrungsort" value="werkstatt" className={ui.choiceInput} /><span>In unserer Fertigung</span></label>
-                        <label className={ui.choice}><input type="radio" name="ausfuehrungsort" value="offen" className={ui.choiceInput} /><span>Noch offen</span></label>
-                      </div>
-                    </Gruppe>
-
-                    <Gruppe id="gruppe-zeitrahmen" fehlerText={fehler.zeitrahmen}>
-                      <legend className={ui.legend}>Zeitrahmen{pflichtStern}</legend>
+                    <Gruppe>
+                      <legend className={ui.legend}>Zeitrahmen <span className={ui.hint}>optional</span></legend>
                       <div
                         className={ui.choiceGrid}
                         onChange={(event) => {
                           const ziel = event.target as HTMLInputElement;
-                          if (ziel.name === "zeitrahmen") { setZeitrahmen(ziel.value); loescheFehler("zeitrahmen"); }
+                          if (ziel.name === "zeitrahmen") setZeitrahmen(ziel.value);
                         }}
                       >
                         <label className={ui.choice}><input type="radio" name="zeitrahmen" value="sofort" className={ui.choiceInput} /><span>So schnell wie möglich</span></label>
@@ -706,45 +663,6 @@ export function Anfrageformular() {
                       </label>
                     </Gruppe>
 
-                    {/* ---- Optionale Ergänzungen ---- */}
-                    <details className="group mt-7 rounded-xl border border-line bg-surface-2 open:bg-surface">
-                      <summary className="flex cursor-pointer list-none items-center gap-3 px-4 py-3.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [&::-webkit-details-marker]:hidden">
-                        <span className="min-w-0 flex-1">
-                          <strong className="block text-sm font-bold text-ink">
-                            Unterlagen und Rahmenbedingungen <span className={ui.hint}>optional</span>
-                          </strong>
-                          <small className="block text-xs text-mute">
-                            {uploads.anfrage.anzahl > 0
-                              ? `${uploads.anfrage.anzahl} Datei${uploads.anfrage.anzahl === 1 ? "" : "en"} ausgewählt`
-                              : contactUploadsEnabled ? "Zeichnungen, Fotos, Zugangsregeln" : "Zugangsregeln und Anforderungen"}
-                          </small>
-                        </span>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="size-4 text-mute transition-transform group-open:rotate-180" aria-hidden="true">
-                          <path d="m7 9 5 5 5-5" />
-                        </svg>
-                      </summary>
-
-                      <div className="border-t border-line px-4 pb-5 pt-4">
-                        {contactUploadsEnabled && (
-                          <Gruppe>
-                            <legend className={ui.legend}>Zeichnungen, Isometrien oder Fotos</legend>
-                            {uploadFeld("anfrage", "accent")}
-                          </Gruppe>
-                        )}
-
-                        <Gruppe>
-                          <legend className={ui.legend}>Was auf Ihrem Gelände gilt <span className={ui.hint}>mehrere möglich</span></legend>
-                          <div className={ui.choiceGrid} onChange={exklusivAuswahl}>
-                            <label className={ui.choice}><input type="checkbox" name="rahmen[]" value="unterweisung" className={ui.choiceInput} /><span>Sicherheitsunterweisung nötig</span></label>
-                            <label className={ui.choice}><input type="checkbox" name="rahmen[]" value="ex_bereich" className={ui.choiceInput} /><span>Ex-Bereich</span></label>
-                            <label className={ui.choice}><input type="checkbox" name="rahmen[]" value="lebensmittel" className={ui.choiceInput} /><span>Lebensmittel- oder Reinbereich</span></label>
-                            <label className={ui.choice}><input type="checkbox" name="rahmen[]" value="schicht" className={ui.choiceInput} /><span>Arbeit in Schicht oder am Wochenende</span></label>
-                            <label className={ui.choice}><input type="checkbox" name="rahmen[]" value="zertifikate" className={ui.choiceInput} /><span>Normen oder Zertifikate gefordert</span></label>
-                            <label className={ui.choice}><input type="checkbox" name="rahmen[]" value="keine" data-exklusiv="" className={ui.choiceInput} /><span>Nichts davon</span></label>
-                          </div>
-                        </Gruppe>
-                      </div>
-                    </details>
                   </div>
 
                   <div className={ui.stageActions} data-panel-actions>
@@ -813,11 +731,11 @@ export function Anfrageformular() {
                       </label>
                     </fieldset>
 
-                    <p className="mt-7 rounded-xl bg-surface-2 px-4 py-3.5 text-sm leading-relaxed text-mute">
+                    <p className={ui.infoBox}>
                       Mit dem Absenden entsteht noch kein Auftrag. Wir prüfen Ihre Angaben und melden uns mit Rückfragen oder einem Terminvorschlag.
                     </p>
 
-                    <div className="mt-5 rounded-xl border border-line bg-surface-2 p-4" id="gruppe-datenschutz">
+                    <div className={ui.consentBox} id="gruppe-datenschutz">
                       <span className={ui.kicker}>Datenschutz</span>
                       <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-2">
                         <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("datenschutz")} />
@@ -868,17 +786,6 @@ export function Anfrageformular() {
                   </div>
 
                   <div className={ui.panelBody} data-panel-body onScroll={(event) => ueberlaufPruefen(event.currentTarget)}>
-                    <Gruppe id="gruppe-a_bereich" fehlerText={fehler.a_bereich}>
-                      <legend className={ui.legend}>Was ist betroffen?{pflichtStern}</legend>
-                      <div className={ui.choiceGrid} onChange={() => loescheFehler("a_bereich")}>
-                        <label className={ui.choiceSignal}><input type="radio" name="stoerfall_bereich" value="rohrleitung" className={ui.choiceInput} /><span>Rohrleitung oder Behälter</span></label>
-                        <label className={ui.choiceSignal}><input type="radio" name="stoerfall_bereich" value="stahlbau" className={ui.choiceInput} /><span>Stahlkonstruktion</span></label>
-                        <label className={ui.choiceSignal}><input type="radio" name="stoerfall_bereich" value="anlage" className={ui.choiceInput} /><span>Anlagenkomponente</span></label>
-                        <label className={ui.choiceSignal}><input type="radio" name="stoerfall_bereich" value="gfk" className={ui.choiceInput} /><span>GFK-Bauteil</span></label>
-                        <label className={ui.choiceSignal}><input type="radio" name="stoerfall_bereich" value="unklar" className={ui.choiceInput} /><span>Noch unklar</span></label>
-                      </div>
-                    </Gruppe>
-
                     <Gruppe id="gruppe-a_betrieb" fehlerText={fehler.a_betrieb}>
                       <legend className={ui.legend}>Wie stark ist der Betrieb betroffen?{pflichtStern}</legend>
                       <div className={ui.choiceGridThree} onChange={() => loescheFehler("a_betrieb")}>
@@ -897,10 +804,10 @@ export function Anfrageformular() {
 
                     <Gruppe id="gruppe-a_plz" fehlerText={fehler.a_plz}>
                       <legend className={ui.legend}>Standort</legend>
-                      <div className={ui.fieldGrid}>
+                      <div className={ui.locationGrid}>
                         <label className={ui.field}>
                           <span className={ui.fieldLabel}>Postleitzahl{pflichtStern}</span>
-                          <input type="text" name="plz" inputMode="numeric" autoComplete="postal-code" maxLength={10} className={`${ui.input} sm:max-w-[11rem]`} aria-invalid={fehler.a_plz ? true : undefined} onChange={() => loescheFehler("a_plz")} />
+                          <input type="text" name="plz" inputMode="numeric" autoComplete="postal-code" maxLength={10} className={ui.input} aria-invalid={fehler.a_plz ? true : undefined} onChange={() => loescheFehler("a_plz")} />
                         </label>
                         <label className={ui.field}>
                           <span className={ui.fieldLabel}>Ort oder Werk <span className={ui.hint}>optional</span></span>
@@ -912,7 +819,7 @@ export function Anfrageformular() {
                     {contactUploadsEnabled && (
                       <Gruppe>
                         <legend className={ui.legend}>Fotos der Schadensstelle <span className={ui.hint}>optional</span></legend>
-                        {uploadFeld("stoerfall", "signal")}
+                        {uploadFeld}
                       </Gruppe>
                     )}
 
@@ -937,7 +844,7 @@ export function Anfrageformular() {
                       </div>
                     </Gruppe>
 
-                    <div className="mt-5 rounded-xl border border-line bg-surface-2 p-4" id="gruppe-a_datenschutz">
+                    <div className={ui.consentBox} id="gruppe-a_datenschutz">
                       <span className={ui.kicker}>Datenschutz</span>
                       <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-2">
                         <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("a_datenschutz")} />
