@@ -8,6 +8,7 @@ import {
   pfadFuerAnfrageWert,
   pfadLabels,
   pruefeKontaktweg,
+  pruefeKurznachricht,
   pruefeUpload,
   stoerfall,
   upload,
@@ -74,6 +75,41 @@ describe("Kontaktweg-Regel", () => {
     expect(pruefeKontaktweg("max@", "")).not.toBeNull();
     expect(istEmailPlausibel("max@example")).toBe(false);
     expect(istEmailPlausibel("max@example.de")).toBe(true);
+  });
+});
+
+describe("Kurznachricht", () => {
+  const vollstaendig = {
+    firma: "Nordwerft GmbH",
+    email: "planung@nordwerft.de",
+    nachricht: "Wir brauchen eine Isolierung an zwei Kesseln.",
+    datenschutz: "1"
+  };
+
+  it("lässt vollständige Angaben durch", () => {
+    expect(pruefeKurznachricht(vollstaendig)).toEqual({});
+  });
+
+  it("bemängelt jedes fehlende Pflichtfeld einzeln", () => {
+    const fehler = pruefeKurznachricht({});
+    expect(Object.keys(fehler).sort()).toEqual(["datenschutz", "email", "firma", "nachricht"]);
+  });
+
+  it("wertet Eingaben aus reinen Leerzeichen als fehlend", () => {
+    const fehler = pruefeKurznachricht({ ...vollstaendig, firma: "   ", nachricht: " " });
+    expect(fehler.firma).toBeDefined();
+    expect(fehler.nachricht).toBeDefined();
+    expect(fehler.email).toBeUndefined();
+  });
+
+  it("verlangt eine plausible E-Mail-Adresse", () => {
+    expect(pruefeKurznachricht({ ...vollstaendig, email: "planung@" }).email).toBeDefined();
+    expect(pruefeKurznachricht({ ...vollstaendig, email: "planung@nordwerft.de" }).email).toBeUndefined();
+  });
+
+  it("besteht auf der Datenschutz-Zustimmung", () => {
+    expect(pruefeKurznachricht({ ...vollstaendig, datenschutz: undefined }).datenschutz).toBeDefined();
+    expect(pruefeKurznachricht({ ...vollstaendig, datenschutz: "0" }).datenschutz).toBeDefined();
   });
 });
 

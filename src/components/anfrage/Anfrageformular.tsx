@@ -12,9 +12,10 @@ import {
   pruefeUpload,
   stoerfall,
   upload,
+  versandGesperrtMeldung,
   wurdeZuSchnellAusgefuellt
 } from "@/lib/anfrage";
-import { contactAccessKey, contactEndpoint, contactUploadsEnabled } from "@/lib/contact";
+import { contactUploadsEnabled, leseFormularWerte, sendeFormular, versandFreigeschaltet } from "@/lib/contact";
 import { AnfrageTrustKarte } from "./AnfrageTrustKarte";
 import * as ui from "./anfrage-ui";
 
@@ -282,15 +283,7 @@ export function Anfrageformular() {
 
   /* -------------------------------------------------------------- Validierung */
 
-  function leseWerte(): Record<string, string> {
-    const form = formRef.current;
-    if (!form) return {};
-    const werte: Record<string, string> = {};
-    new FormData(form).forEach((wert, name) => {
-      if (typeof wert === "string" && !(name in werte)) werte[name] = wert;
-    });
-    return werte;
-  }
+  const leseWerte = () => leseFormularWerte(formRef.current);
 
   function pruefeStufe(nummer: number, werte: Record<string, string>): Fehler {
     const neu: Fehler = {};
@@ -421,8 +414,10 @@ export function Anfrageformular() {
       return;
     }
 
-    if (!contactAccessKey) {
-      setStatusMeldung(`Der direkte Versand ist noch nicht freigeschaltet. Bitte nutzen Sie Telefon (${anfrageKontakt.telefonAnzeige}) oder E-Mail (${anfrageKontakt.email}).`);
+    // Vor dem Sendezustand prüfen: ohne Freischaltung soll kein "Wird
+    // gesendet …" aufblitzen, der Hinweis steht sofort.
+    if (!versandFreigeschaltet) {
+      setStatusMeldung(versandGesperrtMeldung);
       return;
     }
 
@@ -430,10 +425,6 @@ export function Anfrageformular() {
     const daten = new FormData(form);
     daten.delete("website");
     daten.set("pfad_aktiv", akut ? stoerfall.id : ausgewaehltePfade.join(", "));
-    daten.set("access_key", contactAccessKey);
-    daten.set("botcheck", "");
-    daten.set("from_name", werte.name ?? "");
-    daten.set("subject", akut ? "Störfallmeldung über das Anfrageformular" : `Anfrage: ${leistungsanzeige}`);
 
     // Leere Datei-Slots entfernen; echte Anhänge unter dem von Web3Forms
     // erwarteten Feldnamen anhängen.
@@ -443,17 +434,18 @@ export function Anfrageformular() {
 
     setSendet(true);
     setStatusMeldung("");
-    try {
-      const antwort = await fetch(contactEndpoint, { method: "POST", body: daten, headers: { Accept: "application/json" } });
-      const ergebnis = (await antwort.json()) as { success?: boolean; message?: string };
-      if (!antwort.ok || !ergebnis.success) throw new Error(ergebnis.message || String(antwort.status));
+    const betreff = akut ? "Störfallmeldung über das Anfrageformular" : `Anfrage: ${leistungsanzeige}`;
+    const ergebnis = await sendeFormular(daten, betreff, werte.name ?? "");
+    setSendet(false);
+
+    if (ergebnis === "gesendet") {
       setZusammenfassung(baueZusammenfassung({ akut, pfade: ausgewaehltePfade, werte }));
       setErfolg(true);
-    } catch {
-      setStatusMeldung("Die Anfrage konnte gerade nicht übermittelt werden. Bitte versuchen Sie es erneut oder rufen Sie uns an.");
-    } finally {
-      setSendet(false);
+      return;
     }
+    setStatusMeldung(ergebnis === "gesperrt"
+      ? versandGesperrtMeldung
+      : "Die Anfrage konnte gerade nicht übermittelt werden. Bitte versuchen Sie es erneut oder rufen Sie uns an.");
   }
 
   /* ------------------------------------------------------------------- Markup */

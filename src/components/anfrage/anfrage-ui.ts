@@ -56,6 +56,13 @@ export const input = [
 
 export const textarea = `${input} min-h-[9.5rem] resize-y leading-relaxed`;
 
+/**
+ * Dieselben Felder auf der warmen Kartenfläche (bg-surface-2): dort würde der
+ * normale Feldgrund im Hintergrund verschwinden, also weiß statt warm.
+ */
+export const inputAufKarte = input.replace("bg-surface-2", "bg-surface");
+export const textareaAufKarte = textarea.replace("bg-surface-2", "bg-surface");
+
 /** Feldraster */
 export const fieldGrid = "grid gap-3 sm:grid-cols-2";
 export const locationGrid = "grid gap-3 sm:grid-cols-[minmax(9rem,11rem)_minmax(0,1fr)]";
@@ -63,6 +70,9 @@ export const fieldWide = "sm:col-span-2";
 
 /** Fehlermeldung unter einer Fragengruppe */
 export const fehler = "mt-2 block text-sm font-semibold text-signal-dark";
+
+/** Dieselbe Meldung in der schmalen Karte – dort zählt jede Zeile. */
+export const fehlerKlein = fehler.replace("mt-2", "mt-1.5").replace("text-sm", "text-xs");
 
 /** Ruhige Informations- und Zustimmungsflächen im Fragenbereich */
 export const infoBox = "mt-7 rounded-xl border border-line bg-surface-2 p-4 text-sm leading-relaxed text-mute";
@@ -114,6 +124,9 @@ export const channelIcon = "grid size-10 shrink-0 place-items-center rounded-lg 
 
 /** Dunkler CTA auf warmem Grund (entspricht .button-dark der Site) */
 export const btnDark = `${btnBase} bg-carbon text-white hover:bg-[#292E35] focus-visible:outline-carbon`;
+
+/** Anruf-CTA der Karte: dunkler Button mit Nummer und Handlungsaufforderung. */
+export const callButton = `${btnDark} w-full justify-center gap-3 py-3.5 text-left`;
 
 /**
  * Orangener Schleier über dem Detailformular. Liegt beim ersten Blick über der

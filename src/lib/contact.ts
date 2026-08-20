@@ -16,3 +16,44 @@ export function contactEndpointOrigin() {
     return "";
   }
 }
+
+/**
+ * Alle Textwerte eines Formulars als flaches Objekt. Dateien und Mehrfachwerte
+ * bleiben außen vor — die Prüffunktionen arbeiten ausschließlich auf Text.
+ */
+export function leseFormularWerte(form: HTMLFormElement | null): Record<string, string> {
+  if (!form) return {};
+  const werte: Record<string, string> = {};
+  new FormData(form).forEach((wert, name) => {
+    if (typeof wert === "string" && !(name in werte)) werte[name] = wert;
+  });
+  return werte;
+}
+
+/** Ohne Access-Key zeigen die Formulare nur den Hinweis auf Telefon und E-Mail. */
+export const versandFreigeschaltet = contactAccessKey.length > 0;
+
+/** Ausgang eines Versandversuchs; die Meldungstexte bleiben beim Aufrufer. */
+export type VersandErgebnis = "gesendet" | "gesperrt" | "fehler";
+
+/**
+ * Gemeinsamer Versandweg beider Formulare: ergänzt die Pflichtfelder des
+ * Dienstes und wertet die Antwort aus. Ohne Access-Key wird nichts gesendet —
+ * der Aufrufer zeigt dann seinen Hinweis auf Telefon und E-Mail.
+ */
+export async function sendeFormular(daten: FormData, betreff: string, absender: string): Promise<VersandErgebnis> {
+  if (!contactAccessKey) return "gesperrt";
+
+  daten.set("access_key", contactAccessKey);
+  daten.set("botcheck", "");
+  daten.set("from_name", absender);
+  daten.set("subject", betreff);
+
+  try {
+    const antwort = await fetch(contactEndpoint, { method: "POST", body: daten, headers: { Accept: "application/json" } });
+    const ergebnis = (await antwort.json()) as { success?: boolean };
+    return antwort.ok && ergebnis.success ? "gesendet" : "fehler";
+  } catch {
+    return "fehler";
+  }
+}

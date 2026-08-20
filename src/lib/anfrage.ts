@@ -99,6 +99,31 @@ export function pruefeKontaktweg(email: string, telefon: string): string | null 
   return null;
 }
 
+/** Fehlerschlüssel der Kurznachricht in der Ansprechpartner-Karte. */
+export type KurzFehler = Partial<Record<"firma" | "email" | "nachricht" | "datenschutz", string>>;
+
+/**
+ * Regeln der Kurznachricht. Anders als in Stufe 3 ist die E-Mail Pflicht: das
+ * kurze Formular kennt kein Telefonfeld, sie ist der einzige Rückweg.
+ */
+export function pruefeKurznachricht(werte: {
+  firma?: string;
+  email?: string;
+  nachricht?: string;
+  datenschutz?: string;
+}): KurzFehler {
+  const fehler: KurzFehler = {};
+  const email = (werte.email ?? "").trim();
+
+  if (!(werte.firma ?? "").trim()) fehler.firma = "Bitte geben Sie Ihr Unternehmen oder Ihren Namen an.";
+  if (!email) fehler.email = "Bitte geben Sie Ihre E-Mail-Adresse an.";
+  else if (!istEmailPlausibel(email)) fehler.email = "Diese E-Mail-Adresse sieht unvollständig aus.";
+  if (!(werte.nachricht ?? "").trim()) fehler.nachricht = "Bitte schildern Sie kurz, worum es geht.";
+  if (werte.datenschutz !== "1") fehler.datenschutz = "Ohne Ihre Zustimmung dürfen wir die Nachricht nicht bearbeiten.";
+
+  return fehler;
+}
+
 export const minimumFillTimeMs = 1800;
 
 export function wurdeZuSchnellAusgefuellt(startedAt: number, now = Date.now()): boolean {
@@ -150,3 +175,7 @@ export const anfrageKontakt = {
   einsatzgebietZusatz: "Abhängig von Umfang, Termin und Aufgabe auch bundesweit.",
   verantwortlich: `${siteConfig.legalName}, ${siteConfig.address}`
 } as const;
+
+/** Hinweis beider Formulare, solange kein Versand-Key hinterlegt ist. */
+export const versandGesperrtMeldung =
+  `Der direkte Versand ist noch nicht freigeschaltet. Bitte nutzen Sie Telefon (${anfrageKontakt.telefonAnzeige}) oder E-Mail (${anfrageKontakt.email}).`;
