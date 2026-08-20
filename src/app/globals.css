@@ -100,6 +100,9 @@ p { margin: 0; }
 .desktop-nav a::after { position: absolute; right: 0; bottom: -8px; left: 0; height: 1px; background: var(--gold); content: ""; transform: scaleX(0); transform-origin: left; transition: transform 180ms ease; }
 .desktop-nav a:hover { color: #8b551f; }
 .desktop-nav a:hover::after { transform: scaleX(1); }
+/* Aktiver Abschnitt (Scrollspy in Navbar.tsx): derselbe Zustand wie beim Hover, nur dauerhaft. */
+.desktop-nav a[aria-current] { color: #8b551f; }
+.desktop-nav a[aria-current]::after { transform: scaleX(1); }
 .menu-toggle { display: none; width: 44px; height: 44px; align-items: center; justify-content: center; border: 1px solid rgba(13,15,18,.32); background: transparent; color: var(--carbon); }
 .menu-toggle svg { width: 22px; }
 .mobile-nav { display: none; }
@@ -276,6 +279,8 @@ p { margin: 0; }
   .mobile-nav.is-open { max-height: 520px; border-bottom: 1px solid rgba(255,255,255,.18); }
   .mobile-nav-inner { display: grid; gap: 0; padding: 18px 0 25px; }
   .mobile-nav-inner > a:not(.button) { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.8); }
+  /* Im dunklen Panel wäre das Akzent-Braun unlesbar – dort die helle Goldvariante. */
+  .mobile-nav-inner > a[aria-current]:not(.button) { color: var(--gold); }
   .mobile-nav-inner .button { margin-top: 16px; }
   .services-grid { grid-template-columns: repeat(2, 1fr); }
   .service-card-media { height: 230px; }
@@ -853,6 +858,14 @@ html { scroll-padding-top: 102px; }
   .desktop-nav { display: flex; }
   .menu-toggle,
   .mobile-nav { display: none; }
+}
+
+/* Am unteren Rand des Desktop-Bereichs wird es mit vier Menüpunkten eng:
+   Logo, Navigation und die beiden Buttons teilen sich knapp 960px. Hier
+   rücken Abstand und Einzug zusammen, damit "Kontakt" nicht unter den
+   Anrufen-Button gerät. */
+@media (min-width: 1024px) and (max-width: 1120px) {
+  .desktop-nav { gap: 18px; margin-left: 22px; }
 }
 
 @media (max-width: 1023px) {

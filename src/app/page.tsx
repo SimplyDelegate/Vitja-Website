@@ -40,7 +40,7 @@ export default function HomePage() {
         <div className="shell"><ServicesGrid /></div>
       </section>
 
-      <section className="section project-section" id="projekte">
+      <section className="section project-section" id="galerie">
         <div className="shell">
           <div className="gallery-heading gallery-heading-standalone reveal"><h2>Echte Einblicke aus Fertigung, Reparatur und Montage.</h2></div>
           <ProjectGallery />

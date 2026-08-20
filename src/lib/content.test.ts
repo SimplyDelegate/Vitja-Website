@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { caseStudies, evidenceRegistry, featuredProjectMetrics, featuredProjects, heroSlides, processCommitments, projectMedia, qualificationGroups, qualifications, services, siteConfig } from "./content";
+import { caseStudies, evidenceRegistry, featuredProjectMetrics, featuredProjects, heroSlides, navItems, processCommitments, projectMedia, qualificationGroups, qualifications, services, siteConfig } from "./content";
 
 describe("Website-Inhalte", () => {
   it("enthält die neun vereinbarten Leistungen", () => {
@@ -198,6 +198,14 @@ describe("Website-Inhalte", () => {
     const content = JSON.stringify({ services, siteConfig, heroSlides, projectMedia, caseStudies, qualificationGroups });
     expect(content).not.toMatch(/Vitja|Struppe|Käfer|Bredo|G\+H|Weber/i);
     expect(siteConfig.name).toBe("Triumph Technical Services");
+  });
+
+  it("führt jeden Menüpunkt auf einen eigenen Anker der Startseite", () => {
+    expect(navItems.map((eintrag) => eintrag.label)).toEqual(["Leistungen", "Projekte", "Galerie", "Kontakt"]);
+    // Die Anker müssen absolut sein: der Header verlinkt aus jeder Unterseite
+    // zurück auf die Startseite, "#galerie" allein bliebe dort hängen.
+    for (const eintrag of navItems) expect(eintrag.href).toMatch(/^\/#[a-z]+$/);
+    expect(new Set(navItems.map((eintrag) => eintrag.href)).size).toBe(navItems.length);
   });
 
   it("enthält die freigegebenen Unternehmens- und Kontaktdaten", () => {
