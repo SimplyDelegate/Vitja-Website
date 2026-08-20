@@ -39,6 +39,9 @@ type UploadAnzeige = { text: string; fehler: boolean; anzahl: number };
 
 const uploadStart: UploadAnzeige = { text: "Noch keine Datei ausgewählt", fehler: false, anzahl: 0 };
 
+/** Dauer des Verwehens in ms — identisch zur Transition in ui.schleier. */
+const SCHLEIER_DAUER = 600;
+
 function sanftScrollen(): ScrollBehavior {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
 }
@@ -132,6 +135,8 @@ export function Anfrageformular() {
   const [stufe, setStufe] = useState(1);
   const [ausgewaehltePfade, setAusgewaehltePfade] = useState<string[]>([]);
   const [akut, setAkut] = useState(false);
+  // Der Schleier deckt die rechte Spalte ab, bis der Kunde ihn bewusst löst.
+  const [schleier, setSchleier] = useState<"zu" | "weht" | "offen">("zu");
   const [erfolg, setErfolg] = useState(false);
   const [sendet, setSendet] = useState(false);
   const jsBereit = useHydriert();
@@ -140,6 +145,13 @@ export function Anfrageformular() {
   const [zeitrahmen, setZeitrahmen] = useState("");
   const [stoerfallUpload, setStoerfallUpload] = useState<UploadAnzeige>(uploadStart);
   const [zusammenfassung, setZusammenfassung] = useState<Array<[string, string]>>([]);
+
+  // Ohne JavaScript gibt es keinen Schleier: das Formular bleibt im statischen
+  // Export vollständig bedienbar (wie schon die Fortschrittsleiste).
+  const schleierAktiv = jsBereit && schleier !== "offen";
+  // Gesperrt nur bis zum Klick — während des Verwehens ist das Formular schon
+  // bedienbar (der Schleier lässt Zeiger durch) und kann den Fokus annehmen.
+  const formularGesperrt = jsBereit && schleier === "zu";
 
   const ausgewaehlteLeistungen = pfade.filter((pfad) => ausgewaehltePfade.includes(pfad.id));
   const leistungsanzeige = ausgewaehlteLeistungen.length
@@ -154,10 +166,13 @@ export function Anfrageformular() {
   useEffect(() => {
     startedAt.current = Date.now();
     const ziel = findePfad(new URLSearchParams(window.location.search).get("pfad"));
+    if (!ziel) return;
+    // Wer mit Absicht kommt, braucht den Schleier gar nicht erst zu sehen.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- einmalige Übernahme des URL-Zustands
+    setSchleier("offen");
     if (ziel === stoerfall.id) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- einmalige Übernahme des URL-Zustands
       setAkut(true);
-    } else if (ziel) {
+    } else {
       setAusgewaehltePfade([ziel]);
       setStufe(2);
     }
@@ -168,6 +183,7 @@ export function Anfrageformular() {
       const ziel = findePfad((event as CustomEvent<string>).detail);
       if (!ziel) return;
       setErfolg(false);
+      schleierLoesen();
       if (ziel === stoerfall.id) {
         setAkut(true);
       } else {
@@ -238,6 +254,18 @@ export function Anfrageformular() {
     seiteZumFormular();
     sichtbaresPanel(formRef.current)?.querySelector<HTMLElement>("h4")?.focus({ preventScroll: true });
   }, [stufe, akut]);
+
+  // Der Fokus wandert erst hier ins Formular: im Klickmoment ist es noch inert.
+  // Auf schmalen Bildschirmen war der Schleier höher als das Bild — dann holt
+  // seiteZumFormular() den Formularkopf zurück ins Blickfeld (im pult-Modus
+  // steht das Formular ohnehin komplett, dort bewegt sich nichts).
+  useEffect(() => {
+    if (schleier !== "weht") return;
+    seiteZumFormular();
+    sichtbaresPanel(formRef.current)?.querySelector<HTMLElement>("h4")?.focus({ preventScroll: true });
+    const timer = window.setTimeout(() => setSchleier("offen"), SCHLEIER_DAUER);
+    return () => window.clearTimeout(timer);
+  }, [schleier]);
 
   useEffect(() => {
     if (!erfolg) return;
@@ -324,7 +352,13 @@ export function Anfrageformular() {
   function zeigeStoerfall() {
     fokusGewuenscht.current = true;
     setFehler({});
+    schleierLoesen();
     setAkut(true);
+  }
+
+  /** Startet das Verwehen; der Effekt unten beendet es nach SCHLEIER_DAUER. */
+  function schleierLoesen() {
+    setSchleier((bisher) => (bisher === "zu" ? "weht" : bisher));
   }
 
   function zurueckZuStandard() {
@@ -448,17 +482,15 @@ export function Anfrageformular() {
   return (
     <div ref={wurzelRef} className="anfrage">
       <div className="grid gap-7 lg:grid-cols-[minmax(350px,390px)_minmax(0,1fr)] xl:grid-cols-[minmax(390px,430px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:max-h-[54rem]">
-        {/* Linke Spalte: Ansprache und Ansprechpartner */}
-        <div className="flex min-w-0 flex-col gap-6 pult:min-h-0 pult:overflow-y-auto pult:pr-1">
-          <header className="max-w-[46ch] shrink-0">
-            <p className="eyebrow">Anfrage</p>
-            <h2 id="anfrage-titel" className="text-5xl sm:text-6xl pult:text-4xl">Sagen Sie uns, was ansteht.</h2>
-          </header>
-
+        {/* Linke Spalte: Ansprechpartner und Direktkontakt. Die Überschrift
+            steht nur noch für Screenreader da — die Sektion in page.tsx nennt
+            sich über aria-labelledby danach, sichtbar wäre sie Ballast. */}
+        <div className="flex min-w-0 flex-col pult:min-h-0 pult:overflow-y-auto pult:pr-1">
+          <h2 id="anfrage-titel" className="sr-only">Sagen Sie uns, was ansteht.</h2>
           <AnfrageTrustKarte onStoerfall={zeigeStoerfall} stoerfallAktiv={akut} />
         </div>
 
-        <div className="flex min-w-0 flex-col pult:min-h-0">
+        <div className="relative flex min-w-0 flex-col pult:min-h-0">
           {/* ---------- Bestätigung nach dem Absenden ---------- */}
           {erfolg && (
             <section
@@ -507,7 +539,7 @@ export function Anfrageformular() {
           {/* ---------- Formular ---------- */}
           {/* Kein action-Attribut: die CSP erlaubt form-action nur auf 'self',
               der Versand läuft ausschließlich über fetch (connect-src). */}
-          <form ref={formRef} className="flex min-w-0 flex-col pult:min-h-0 pult:flex-1" method="post" encType="multipart/form-data" noValidate hidden={erfolg} onSubmit={absenden}>
+          <form ref={formRef} className="flex min-w-0 flex-col pult:min-h-0 pult:flex-1" method="post" encType="multipart/form-data" noValidate hidden={erfolg} inert={formularGesperrt} onSubmit={absenden}>
             <input type="hidden" name="js_enabled" value={jsBereit ? "1" : "0"} />
             <input type="hidden" name="pfad_aktiv" value={akut ? stoerfall.id : ausgewaehltePfade.join(", ")} />
 
@@ -867,6 +899,28 @@ export function Anfrageformular() {
               </section>
             </div>
           </form>
+
+          {/* ---------- Schleier ---------- */}
+          {/* Liegt über Fortschritt und Panel, außerhalb des <form> (kein
+              Einfluss auf FormData). Das Formular darunter bleibt gerendert:
+              die Höhenmessung läuft weiter und beim Aufdecken springt nichts. */}
+          {schleierAktiv && (
+            <div className={`${ui.schleier} ${schleier === "weht" ? ui.schleierWeht : ""}`}>
+              <div className={ui.schleierInhalt}>
+                <div className="max-w-[32ch] text-center">
+                  <p className="font-display text-3xl font-bold leading-tight tracking-normal text-carbon sm:text-4xl">
+                    Wollen Sie uns mehr Details geben?
+                  </p>
+                  <p className="mt-3 text-[0.95rem] leading-relaxed text-carbon/80">
+                    Ein paar Angaben zu Ihrem Vorhaben – Sie brauchen kein fertiges Leistungsverzeichnis.
+                  </p>
+                  <button type="button" className={`${ui.btnDark} mt-7`} onClick={schleierLoesen}>
+                    Ja, gerne <ArrowRight className="size-4" aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

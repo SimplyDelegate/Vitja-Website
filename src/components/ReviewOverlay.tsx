@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 type Note = {
   id: number;
@@ -19,6 +19,33 @@ type ReviewFileHandle = {
 
 const storageKeyForReview = (review: string) => review === "1" ? "vitja-mobile-review-notes" : `vitja-${review}-review-notes`;
 
+/**
+ * ?review=… aus der URL. Der Parameter ändert sich zur Laufzeit nicht, deshalb
+ * genügt useSyncExternalStore ohne Abonnement: im statischen Export liefert er
+ * null, nach der Hydration den Wert. So bleibt der abgeleitete Zustand
+ * (enabled, storageKey, reviewName) reine Berechnung statt setState im Effekt.
+ */
+const keinAbo = () => () => {};
+function useReviewParameter() {
+  return useSyncExternalStore(
+    keinAbo,
+    () => new URLSearchParams(window.location.search).get("review"),
+    () => null
+  );
+}
+
+/** Notizen des laufenden Reviews. Läuft nur beim Mounten, im Export ohne window. */
+function gespeicherteNotizen(): Note[] {
+  if (typeof window === "undefined") return [];
+  const review = new URLSearchParams(window.location.search).get("review");
+  if (!review) return [];
+  try {
+    return JSON.parse(window.localStorage.getItem(storageKeyForReview(review)) ?? "[]") as Note[];
+  } catch {
+    return [];
+  }
+}
+
 function pageContext(target: EventTarget | null) {
   if (!(target instanceof Element)) return "";
   const element = target.closest("h1, h2, h3, p, a, button, li, input, textarea, label");
@@ -26,30 +53,18 @@ function pageContext(target: EventTarget | null) {
 }
 
 export function ReviewOverlay() {
-  const [enabled, setEnabled] = useState(false);
-  const [storageKey, setStorageKey] = useState("");
-  const [reviewName, setReviewName] = useState("mobile");
-  const [notes, setNotes] = useState<Note[]>([]);
+  const review = useReviewParameter();
+  const enabled = Boolean(review);
+  const storageKey = review ? storageKeyForReview(review) : "";
+  const reviewName = !review || review === "1" ? "mobile" : review;
+
+  const [notes, setNotes] = useState<Note[]>(gespeicherteNotizen);
   const [draft, setDraft] = useState("");
   const [pending, setPending] = useState<Omit<Note, "id" | "text"> | null>(null);
   const [openNote, setOpenNote] = useState<Note | null>(null);
   const [fileHandle, setFileHandle] = useState<ReviewFileHandle | null>(null);
   const [saveStatus, setSaveStatus] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    const review = new URLSearchParams(window.location.search).get("review");
-    if (!review) return;
-    const key = storageKeyForReview(review);
-    setEnabled(true);
-    setStorageKey(key);
-    setReviewName(review === "1" ? "mobile" : review);
-    try {
-      setNotes(JSON.parse(window.localStorage.getItem(key) ?? "[]"));
-    } catch {
-      setNotes([]);
-    }
-  }, []);
 
   useEffect(() => {
     if (!enabled || !storageKey) return;

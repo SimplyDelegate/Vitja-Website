@@ -5,8 +5,8 @@ import * as ui from "./anfrage-ui";
 /**
  * Seitenspalte des Anfrageformulars: Ansprechpartner, Direktkontakt inkl.
  * Störfall-Shortcut, Einsatzgebiet. Inhalte kommen aus siteConfig über
- * lib/anfrage.ts. Im pult-Modus kompakter, damit Überschrift und Karte
- * zusammen in die feste Rasterhöhe passen.
+ * lib/anfrage.ts. Im pult-Modus füllt die Karte die feste Rasterhöhe der
+ * Spalte und verteilt ihre Blöcke, damit sie so hoch steht wie das Formular.
  */
 export function AnfrageTrustKarte({
   onStoerfall,
@@ -18,7 +18,7 @@ export function AnfrageTrustKarte({
 }) {
   return (
     <aside
-      className="flex min-w-0 shrink-0 flex-col gap-7 rounded-2xl border border-line bg-surface-2 p-6 sm:p-7 pult:gap-6 pult:p-6"
+      className="flex min-w-0 shrink-0 flex-col gap-7 rounded-2xl border border-line bg-surface-2 p-6 sm:p-7 pult:min-h-full pult:justify-between pult:gap-6 pult:p-6"
       aria-labelledby="anfrage-ansprechpartner"
     >
       <div>
@@ -72,8 +72,8 @@ export function AnfrageTrustKarte({
         </a>
       </div>
 
-      {/* Im pult-Modus ausgeblendet: Karte und Überschrift teilen sich die feste
-          Rasterhöhe, und das Einsatzgebiet steht bereits im Hero-Text. */}
+      {/* Im pult-Modus ausgeblendet: die Karte soll ihre Blöcke luftig über die
+          Rasterhöhe verteilen, und das Einsatzgebiet steht bereits im Hero-Text. */}
       <section aria-labelledby="anfrage-einsatzgebiet" className="border-t border-line pt-5 pult:hidden">
         <span id="anfrage-einsatzgebiet" className={ui.kicker}>
           <MapPin className="mr-1 inline size-3.5 align-[-2px]" aria-hidden="true" />

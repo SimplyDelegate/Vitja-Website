@@ -111,3 +111,28 @@ export const panelWrapper = "m-0 block min-w-0 border-0 p-0 pult:flex pult:min-h
 export const channel =
   "flex min-h-[4.5rem] items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3.5 transition-colors hover:border-accent/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 export const channelIcon = "grid size-10 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent";
+
+/** Dunkler CTA auf warmem Grund (entspricht .button-dark der Site) */
+export const btnDark = `${btnBase} bg-carbon text-white hover:bg-[#292E35] focus-visible:outline-carbon`;
+
+/**
+ * Orangener Schleier über dem Detailformular. Liegt beim ersten Blick über der
+ * rechten Spalte, damit die Sektion aufgeräumt startet; der Kunde löst ihn
+ * bewusst aus. Deckend, damit nichts durchblitzt.
+ */
+export const schleier = [
+  "absolute inset-0 z-10 rounded-2xl",
+  "bg-gradient-to-br from-gold via-[#DDA055] to-bronze",
+  "transition-[opacity,filter,transform] duration-[600ms] ease-[cubic-bezier(.2,.75,.2,1)]",
+  "motion-reduce:transition-none"
+].join(" ");
+
+/**
+ * Ansprache im Schleier. Klebt am Blickfeld: auf schmalen Bildschirmen ist das
+ * Formular darunter deutlich höher als der Viewport — ohne sticky läge die
+ * Frage irgendwo mittig in einer langen orangen Fläche.
+ */
+export const schleierInhalt = "sticky top-0 grid min-h-[min(100svh,100%)] place-items-center px-6 py-10";
+
+/** Zustand während des Verwehens (Dauer: SCHLEIER_DAUER im Formular) */
+export const schleierWeht = "pointer-events-none opacity-0 blur-[6px] scale-[1.03]";
