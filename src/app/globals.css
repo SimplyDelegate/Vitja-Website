@@ -1071,6 +1071,7 @@ html { scroll-padding-top: 102px; }
 }
 
 .featured-projects-heading h2 { max-width: 920px; }
+
 .featured-projects-list { position: relative; z-index: 1; display: grid; }
 
 .featured-project {
@@ -1165,6 +1166,19 @@ html { scroll-padding-top: 102px; }
   color: rgba(255, 255, 255, .69);
   font-size: var(--type-body);
   line-height: 1.6;
+}
+
+/* Bezugsrahmen der Kennzahlen – bewusst ohne Gold, damit die Kategorie
+   darüber die auffälligste Zeile der Karte bleibt. */
+.featured-project-metrics-label {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, .58);
+  font-size: var(--type-label);
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
 }
 
 .featured-project-metrics {

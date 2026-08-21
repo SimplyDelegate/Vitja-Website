@@ -65,22 +65,27 @@ export function ProjectMetrics({ title, items }: ProjectMetricsProps) {
   }, [items]);
 
   return (
-    <ul className="featured-project-metrics" aria-label={`Kennzahlen zu ${title}`} ref={listRef}>
-      {items.map((metric) => (
-        <li key={metric.label}>
-          <strong aria-label={formattedMetric(metric)}>
-            {metric.prefix.trim() && <span className="featured-project-metric-affix" aria-hidden="true">{metric.prefix.trim()}</span>}
-            <span
-              aria-hidden="true"
-              data-count-value={metric.value}
-            >
-              {numberFormatter.format(metric.value)}
-            </span>
-            {metric.suffix.trim() && <span className="featured-project-metric-affix" aria-hidden="true">{metric.suffix.trim()}</span>}
-          </strong>
-          <span>{metric.label}</span>
-        </li>
-      ))}
-    </ul>
+    <>
+      {/* Die Zahlen benennen ausdrücklich den eigenen Anteil, nicht den
+          Umfang des Gesamtvorhabens. */}
+      <p className="featured-project-metrics-label">Unser Leistungsanteil</p>
+      <ul className="featured-project-metrics" aria-label={`Unser Leistungsanteil bei: ${title}`} ref={listRef}>
+        {items.map((metric) => (
+          <li key={metric.label}>
+            <strong aria-label={formattedMetric(metric)}>
+              {metric.prefix.trim() && <span className="featured-project-metric-affix" aria-hidden="true">{metric.prefix.trim()}</span>}
+              <span
+                aria-hidden="true"
+                data-count-value={metric.value}
+              >
+                {numberFormatter.format(metric.value)}
+              </span>
+              {metric.suffix.trim() && <span className="featured-project-metric-affix" aria-hidden="true">{metric.suffix.trim()}</span>}
+            </strong>
+            <span>{metric.label}</span>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }

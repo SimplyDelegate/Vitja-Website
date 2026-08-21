@@ -159,6 +159,9 @@ describe("Website-Inhalte", () => {
     ].join(" "));
     expect(JSON.stringify(publishedCopy)).not.toMatch(/Personal bereitstellen|Mitarbeiter überlassen|Zeitarbeit|Fachkräfte nach Bedarf/i);
     expect(JSON.stringify(publishedCopy)).not.toMatch(/Kunde:|Standort:|GmbH|\bAG\b/i);
+    // Gezeigt wird immer nur der eigene Leistungsanteil – die Vorhaben entstanden
+    // gemeinsam mit weiteren Gewerken. Ansprüche auf das Gesamtwerk bleiben draußen.
+    expect(JSON.stringify(publishedCopy)).not.toMatch(/schlüsselfertig|Generalunternehm|Gesamtprojekt|alleinig|komplett realisiert/i);
 
     for (const project of featuredProjects) {
       expect(project).not.toHaveProperty("number");
@@ -201,7 +204,7 @@ describe("Website-Inhalte", () => {
   });
 
   it("führt jeden Menüpunkt auf einen eigenen Anker der Startseite", () => {
-    expect(navItems.map((eintrag) => eintrag.label)).toEqual(["Leistungen", "Projekte", "Galerie", "Kontakt"]);
+    expect(navItems.map((eintrag) => eintrag.label)).toEqual(["Projekte", "Leistungen", "Galerie", "Kontakt"]);
     // Die Anker müssen absolut sein: der Header verlinkt aus jeder Unterseite
     // zurück auf die Startseite, "#galerie" allein bliebe dort hängen.
     for (const eintrag of navItems) expect(eintrag.href).toMatch(/^\/#[a-z]+$/);

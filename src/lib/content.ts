@@ -147,8 +147,8 @@ export const siteConfig: SiteConfig = {
 };
 
 export const navItems = [
-  { label: "Leistungen", href: "/#leistungen" },
   { label: "Projekte", href: "/#projektbeispiele" },
+  { label: "Leistungen", href: "/#leistungen" },
   { label: "Galerie", href: "/#galerie" },
   { label: "Kontakt", href: "/#kontakt" }
 ];

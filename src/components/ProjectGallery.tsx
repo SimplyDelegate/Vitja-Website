@@ -84,7 +84,7 @@ export function ProjectGallery() {
       {filter === "Alle" && (
         <div className="gallery-toggle-row">
           <button className="button button-ghost button-small gallery-toggle" type="button" aria-expanded={expanded} aria-controls="project-gallery-grid" onClick={toggleGallery}>
-            {expanded ? <><ChevronUp aria-hidden="true" /> Galerie einklappen</> : <>Alle Projektaufnahmen ansehen <ChevronDown aria-hidden="true" /></>}
+            {expanded ? <><ChevronUp aria-hidden="true" /> Galerie einklappen</> : <>Alle Aufnahmen ansehen <ChevronDown aria-hidden="true" /></>}
           </button>
         </div>
       )}

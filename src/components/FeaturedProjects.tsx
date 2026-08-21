@@ -9,8 +9,8 @@ export function FeaturedProjects() {
       <div className="shell">
         <header className="featured-projects-heading reveal">
           <div>
-            <p className="eyebrow">Projektbeispiele</p>
-            <h2 id="featured-projects-title">Definierte Leistungspakete.<br />Kontrolliert umgesetzt.</h2>
+            <p className="eyebrow">Projektbeteiligungen</p>
+            <h2 id="featured-projects-title">Definierte Leistungspakete.<br />Als Teil größerer Projekte.</h2>
           </div>
         </header>
 
