@@ -61,14 +61,7 @@ export const textarea = `${input} min-h-[9.5rem] resize-y leading-relaxed`;
  * normale Feldgrund im Hintergrund verschwinden, also weiß statt warm.
  */
 export const inputAufKarte = input.replace("bg-surface-2", "bg-surface");
-
-/**
- * Nachrichtenfeld der Karte: doppelte Feldhöhe statt der 9,5rem des großen
- * Formulars – mit den beiden Zeilenfeldern darüber ergibt das den Rhythmus
- * 1 : 1 : 2. Die Mindesthöhe wird ersetzt statt angehängt, sonst entschiede
- * über zwei konkurrierende min-h-Klassen die CSS-Reihenfolge.
- */
-export const textareaAufKarte = `${inputAufKarte.replace("min-h-[3rem]", "min-h-[6rem]")} resize-y leading-relaxed`;
+export const textareaAufKarte = textarea.replace("bg-surface-2", "bg-surface");
 
 /** Feldraster */
 export const fieldGrid = "grid gap-3 sm:grid-cols-2";
@@ -91,13 +84,6 @@ export const btnBase =
 export const btnPrimary = `${btnBase} bg-gold text-carbon hover:bg-[#F4BD70] focus-visible:outline-accent disabled:opacity-60`;
 export const btnSecondary = `${btnBase} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink focus-visible:outline-accent`;
 export const btnSignal = `${btnBase} bg-signal text-white hover:bg-signal-dark focus-visible:outline-signal disabled:opacity-60`;
-
-/**
- * Störfall-Shortcut der Karte: Geometrie des Senden-Buttons, aber als ruhige
- * Signalfläche statt Vollton – er ist der dritte gleichgroße Weg neben dem
- * goldenen Senden- und dem dunklen Anruf-Button, nicht deren Konkurrenz.
- */
-export const btnSignalLeise = `${btnBase} w-full border border-signal/35 bg-signal/[0.05] text-ink hover:border-signal/60 focus-visible:outline-signal aria-[current]:border-signal/60`;
 
 /**
  * Aktionsleiste am Panelfuß. Bleibt im pult-Modus unten stehen; `data-mehr`
@@ -131,11 +117,16 @@ export const panel = "pult:flex pult:min-h-0 pult:flex-1 pult:flex-col";
 /** Fieldset-Wrapper (disabled-Schaltung), muss die Flex-Kette durchreichen */
 export const panelWrapper = "m-0 block min-w-0 border-0 p-0 pult:flex pult:min-h-0 pult:flex-1 pult:flex-col";
 
+/** Kontaktkanal-Link (Trust-Karte) */
+export const channel =
+  "flex min-h-[4.5rem] items-center gap-3 rounded-xl border border-line bg-surface px-4 py-3.5 transition-colors hover:border-accent/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+export const channelIcon = "grid size-10 shrink-0 place-items-center rounded-lg bg-accent/10 text-accent";
+
 /** Dunkler CTA auf warmem Grund (entspricht .button-dark der Site) */
 export const btnDark = `${btnBase} bg-carbon text-white hover:bg-[#292E35] focus-visible:outline-carbon`;
 
-/** Anruf-CTA der Karte: dunkler Button mit der Rufnummer, sonst wie btnPrimary. */
-export const callButton = `${btnDark} w-full`;
+/** Anruf-CTA der Karte: dunkler Button mit Nummer und Handlungsaufforderung. */
+export const callButton = `${btnDark} w-full justify-center gap-3 py-3.5 text-left`;
 
 /**
  * Orangener Schleier über dem Detailformular. Liegt beim ersten Blick über der

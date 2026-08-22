@@ -123,7 +123,7 @@ export function Kurznachricht() {
   return (
     <form
       ref={formRef}
-      className="flex min-w-0 flex-col gap-3.5"
+      className="flex min-w-0 flex-col gap-3.5 pult:min-h-0 pult:flex-1"
       method="post"
       noValidate
       aria-label="Kurznachricht schreiben"
@@ -162,16 +162,16 @@ export function Kurznachricht() {
         {fehler.email && <span id="kurz-fehler-email" className={ui.fehlerKlein}>{fehler.email}</span>}
       </label>
 
-      <label className={`${ui.field} shrink-0`}>
+      <label className={`${ui.field} pult:min-h-0 pult:flex-1`}>
         <span className={ui.fieldLabel}>Ihre Nachricht{pflichtStern}</span>
         <textarea
           name="nachricht"
-          // Deckt sich mit den 6rem aus ui.textareaAufKarte – doppelte
-          // Feldhöhe, auf jedem Bildschirm gleich. Wer mehr Platz braucht,
-          // zieht das Feld per resize-y auf.
-          rows={3}
+          // rows bestimmt nur die natürliche Höhe: mobil deckelt ohnehin
+          // min-h-[9.5rem] aus ui.textarea, im pult-Modus wächst das Feld per
+          // flex-1 in die Restfläche der Karte.
+          rows={2}
           maxLength={3000}
-          className={ui.textareaAufKarte}
+          className={`${ui.textareaAufKarte} pult:min-h-[4rem] pult:flex-1`}
           placeholder="Worum geht es? Ein paar Sätze reichen."
           aria-invalid={fehler.nachricht ? true : undefined}
           aria-describedby={fehler.nachricht ? "kurz-fehler-nachricht" : undefined}

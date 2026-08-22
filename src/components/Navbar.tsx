@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, PhoneCall, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { asset } from "@/lib/assets";
@@ -13,12 +14,14 @@ import { aktiveSektion, ankerId } from "@/lib/navigation";
  * Header. Startwert null: im Hero (der hat keine id) und beim Serverrendern
  * ist kein Punkt aktiv, dadurch stimmen erster Server- und Client-Render überein.
  *
- * Der IntersectionObserver dient nur als Auslöser; die Auswahl trifft
- * aktiveSektion() aus lib/navigation.ts. Das bleibt auch am Seitenende
- * richtig, wo ein fein austarierter rootMargin danebenläge.
+ * Die Auswahl trifft aktiveSektion() aus lib/navigation.ts. Sie wird während
+ * des Scrollens höchstens einmal pro Animationsframe aktualisiert, damit auch
+ * sehr hohe Abschnitte beim Passieren der Headerkante zuverlässig aktiv
+ * werden.
  */
 function useAktiveSektion(ids: string[]): string | null {
-  const [aktiv, setAktiv] = useState<string | null>(null);
+  const pathname = usePathname();
+  const [stand, setStand] = useState<{ pathname: string; aktiv: string | null }>(() => ({ pathname, aktiv: null }));
   const schluessel = ids.join(",");
 
   useEffect(() => {
@@ -38,30 +41,38 @@ function useAktiveSektion(ids: string[]): string | null {
       return (document.querySelector(".site-header")?.getBoundingClientRect().height ?? 92) + 14;
     };
 
-    const bestimmen = () => setAktiv(aktiveSektion(
-      abschnitte.map((abschnitt) => ({ id: abschnitt.id, top: abschnitt.getBoundingClientRect().top })),
-      grenze()
-    ));
-
-    const observer = new IntersectionObserver(bestimmen, { threshold: [0, 0.25, 0.5, 0.75, 1] });
-    abschnitte.forEach((abschnitt) => observer.observe(abschnitt));
-
-    let timer = 0;
-    const beiResize = () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(bestimmen, 150);
+    const bestimmen = () => {
+      const aktiv = aktiveSektion(
+        abschnitte.map((abschnitt) => ({ id: abschnitt.id, top: abschnitt.getBoundingClientRect().top })),
+        grenze()
+      );
+      setStand((vorher) => vorher.pathname === pathname && vorher.aktiv === aktiv ? vorher : { pathname, aktiv });
     };
-    window.addEventListener("resize", beiResize);
+
+    let frame: number | null = null;
+    const aktualisieren = () => {
+      if (frame !== null) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = null;
+        bestimmen();
+      });
+    };
+
+    window.addEventListener("scroll", aktualisieren, { passive: true });
+    window.addEventListener("resize", aktualisieren);
+    window.addEventListener("hashchange", aktualisieren);
 
     bestimmen();
+    aktualisieren();
     return () => {
-      observer.disconnect();
-      window.clearTimeout(timer);
-      window.removeEventListener("resize", beiResize);
+      window.removeEventListener("scroll", aktualisieren);
+      window.removeEventListener("resize", aktualisieren);
+      window.removeEventListener("hashchange", aktualisieren);
+      if (frame !== null) window.cancelAnimationFrame(frame);
     };
-  }, [schluessel]);
+  }, [schluessel, pathname]);
 
-  return aktiv;
+  return stand.pathname === pathname ? stand.aktiv : null;
 }
 
 export function Navbar() {
