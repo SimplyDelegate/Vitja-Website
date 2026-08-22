@@ -30,23 +30,6 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c") }} />
       <HeroSlider />
 
-      <FeaturedProjects />
-
-      <section className="section services-section" id="leistungen">
-        <div className="shell services-heading reveal">
-          <p className="eyebrow">Leistungsspektrum</p>
-          <h2>Technische Leistungen.<br />{" "}Ein Ansprechpartner.</h2>
-        </div>
-        <div className="shell"><ServicesGrid /></div>
-      </section>
-
-      <section className="section project-section" id="galerie">
-        <div className="shell">
-          <div className="gallery-heading gallery-heading-standalone reveal"><h2>Einblicke in Arbeiten, an denen wir beteiligt waren.</h2></div>
-          <ProjectGallery />
-        </div>
-      </section>
-
       <section className="section highlight-section">
         <div className="shell highlight-grid reveal">
           <div className="highlight-media"><VideoHighlight /><span>GFK · Rohr- & Systembau</span></div>
@@ -61,6 +44,23 @@ export default function HomePage() {
             </ul>
             <Link className="button button-dark" href="#kontakt">Leistung besprechen</Link>
           </div>
+        </div>
+      </section>
+
+      <FeaturedProjects />
+
+      <section className="section services-section" id="leistungen">
+        <div className="shell services-heading reveal">
+          <p className="eyebrow">Leistungsspektrum</p>
+          <h2>Technische Leistungen.<br />{" "}Ein Ansprechpartner.</h2>
+        </div>
+        <div className="shell"><ServicesGrid /></div>
+      </section>
+
+      <section className="section project-section" id="galerie">
+        <div className="shell">
+          <div className="gallery-heading gallery-heading-standalone reveal"><h2>Einblicke in Arbeiten, an denen wir beteiligt waren.</h2></div>
+          <ProjectGallery />
         </div>
       </section>
 
