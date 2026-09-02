@@ -30,23 +30,6 @@ export default function HomePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c") }} />
       <HeroSlider />
 
-      <section className="section highlight-section">
-        <div className="shell highlight-grid reveal">
-          <div className="highlight-media"><VideoHighlight /><span>GFK · Rohr- & Systembau</span></div>
-          <div className="highlight-copy">
-            <p className="eyebrow">Werkstoffkompetenz GFK</p>
-            <h2>Passgenau gefertigt. Sauber verbunden.</h2>
-            <p>GFK-Systeme stellen besondere Anforderungen an Vorbereitung, Verbindung und Reparatur. Wir fertigen Rohrbaugruppen, integrieren sie in bestehende Systeme und setzen beschädigte Komponenten projektbezogen instand.</p>
-            <ul>
-              <li><Check aria-hidden="true" /> GFK-Rohr- und Formteile</li>
-              <li><Check aria-hidden="true" /> Reparatur und Instandsetzung</li>
-              <li><Check aria-hidden="true" /> Einbau und Systemintegration</li>
-            </ul>
-            <Link className="button button-dark" href="#kontakt">Leistung besprechen</Link>
-          </div>
-        </div>
-      </section>
-
       <FeaturedProjects />
 
       <section className="section services-section" id="leistungen">
@@ -61,6 +44,23 @@ export default function HomePage() {
         <div className="shell">
           <div className="gallery-heading gallery-heading-standalone reveal"><h2>Einblicke in Arbeiten, an denen wir beteiligt waren.</h2></div>
           <ProjectGallery />
+        </div>
+      </section>
+
+      <section className="section highlight-section">
+        <div className="shell highlight-grid reveal">
+          <div className="highlight-media"><VideoHighlight /><span>GFK · Rohr- & Systembau</span></div>
+          <div className="highlight-copy">
+            <p className="eyebrow">Werkstoffkompetenz GFK</p>
+            <h2>Passgenau gefertigt. Sauber verbunden.</h2>
+            <p>GFK-Systeme stellen besondere Anforderungen an Vorbereitung, Verbindung und Reparatur. Wir fertigen Rohrbaugruppen, integrieren sie in bestehende Systeme und setzen beschädigte Komponenten projektbezogen instand.</p>
+            <ul>
+              <li><Check aria-hidden="true" /> GFK-Rohr- und Formteile</li>
+              <li><Check aria-hidden="true" /> Reparatur und Instandsetzung</li>
+              <li><Check aria-hidden="true" /> Einbau und Systemintegration</li>
+            </ul>
+            <Link className="button button-dark" href="#kontakt">Leistung besprechen</Link>
+          </div>
         </div>
       </section>
 
