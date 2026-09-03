@@ -154,9 +154,9 @@ export const navItems = [
 ];
 
 export const heroSlides: HeroSlide[] = [
-  { src: "/media/hero/rohrtrasse-anlage.webp", alt: "Rohrtrasse mit isolierten Edelstahlleitungen an einer blauen Stahlkonstruktion", focus: "center 63%" },
+  { src: "/media/hero/rohrtrasse-anlagenbau.webp", alt: "Edelstahl-Rohrtrassen auf blauer Stahlkonstruktion in einer Prozessanlage", focus: "center 50%" },
   { src: "/media/hero/gfk-rohrbau.webp", alt: "Vollständige GFK-Rohrbaugruppe in der Werkstatt", focus: "center 48%" },
-  { src: "/media/hero/isolierter-behaelter.webp", alt: "Isolierter Prozessbehälter mit angeflanschter Rohrleitung in der Anlagenhalle", focus: "center 30%" }
+  { src: "/media/hero/flansch-schweissnaht.webp", alt: "Umlaufende WIG-Schweißnähte an einer geschweißten Flanschbaugruppe", focus: "center 40%" }
 ];
 
 export const services: Service[] = [
