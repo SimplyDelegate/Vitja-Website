@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Pause, Play } from "lucide-react";
 import type { CSSProperties } from "react";
@@ -68,16 +67,23 @@ export function HeroSlider() {
     >
       <div className="hero-media" aria-live="off">
         {heroSlides.map((slide, index) => (
-          <Image
-            key={slide.src}
-            className={`hero-image ${active === index ? "is-active" : ""}`}
-            src={asset(slide.src)}
-            alt={index === active ? slide.alt : ""}
-            fill
-            sizes="100vw"
-            style={{ objectPosition: slide.focus }}
-            preload={index === 0}
-          />
+          // Art Direction: auf dem Handy laedt der Browser die Hochkant-Fassung, sonst das Querformat.
+          // Dafuer braucht es <picture>. Die Bild-Komponente von Next kann das nicht und waere hier
+          // wegen images.unoptimized (statischer Export) ohnehin nur ein <img> mit Zusatz-Props.
+          <picture key={slide.src}>
+            {slide.srcMobile ? <source media="(max-width: 640px)" srcSet={asset(slide.srcMobile)} /> : null}
+            <img
+              className={`hero-image ${active === index ? "is-active" : ""}`}
+              src={asset(slide.src)}
+              alt={index === active ? slide.alt : ""}
+              style={{ objectPosition: slide.focus }}
+              // Kein loading="lazy" fuer die hinteren Slides: sie liegen deckungsgleich
+              // uebereinander und sind mit opacity 0 unsichtbar — der Browser schiebt das
+              // Laden dann auf unbestimmte Zeit, und das Karussell zeigt eine leere Flaeche,
+              // wenn es dorthin wechselt. Stattdessen laden alle drei, das erste bevorzugt.
+              fetchPriority={index === 0 ? "high" : "low"}
+            />
+          </picture>
         ))}
         <div className="hero-shade" />
       </div>

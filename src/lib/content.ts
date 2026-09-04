@@ -23,7 +23,7 @@ export type SiteConfig = {
   isDraft: boolean;
 };
 
-export type HeroSlide = { src: string; alt: string; focus: string };
+export type HeroSlide = { src: string; alt: string; focus: string; srcMobile?: string };
 
 export type ServiceImage = { src: string; alt: string; focus: string };
 
@@ -154,9 +154,9 @@ export const navItems = [
 ];
 
 export const heroSlides: HeroSlide[] = [
-  { src: "/media/hero/rohrtrasse-anlagenbau.webp", alt: "Edelstahl-Rohrtrassen auf blauer Stahlkonstruktion in einer Prozessanlage", focus: "center 50%" },
+  { src: "/media/hero/rohrtrasse-anlagenbau.webp", srcMobile: "/media/hero/rohrtrasse-anlagenbau-hoch.webp", alt: "Edelstahl-Rohrtrassen auf blauer Stahlkonstruktion in einer Prozessanlage", focus: "center 50%" },
   { src: "/media/hero/gfk-rohrbau.webp", alt: "Vollständige GFK-Rohrbaugruppe in der Werkstatt", focus: "center 48%" },
-  { src: "/media/hero/flansch-schweissnaht.webp", alt: "Umlaufende WIG-Schweißnähte an einer geschweißten Flanschbaugruppe", focus: "center 40%" }
+  { src: "/media/hero/flansch-schweissnaht.webp", srcMobile: "/media/hero/flansch-schweissnaht-hoch.webp", alt: "Umlaufende WIG-Schweißnähte an einer geschweißten Flanschbaugruppe", focus: "center 40%" }
 ];
 
 export const services: Service[] = [

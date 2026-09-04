@@ -110,6 +110,7 @@ p { margin: 0; }
 /* Hero */
 .hero { position: relative; min-height: calc(100svh - 78px); overflow: hidden; background: var(--carbon); color: white; }
 .hero-media, .hero-image, .hero-shade { position: absolute; inset: 0; }
+.hero-media picture { display: contents; }
 .hero-image { object-fit: cover; opacity: 0; transform: scale(1.015); transition: opacity 900ms ease, transform 6s linear; }
 .hero-image.is-active { opacity: 1; transform: scale(1.045); }
 .hero-shade { z-index: 1; background: linear-gradient(90deg, rgba(8,10,12,.94) 0%, rgba(8,10,12,.74) 43%, rgba(8,10,12,.18) 76%, rgba(8,10,12,.32) 100%), linear-gradient(0deg, rgba(8,10,12,.62), transparent 42%); }
@@ -365,7 +366,7 @@ p { margin: 0; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   .hero-image { display: none; transform: none; }
-  .hero-image:first-child { display: block; opacity: 1; }
+  .hero-media picture:first-child .hero-image { display: block; opacity: 1; }
 }
 
 /* Modern refinement: floating surfaces, rounded geometry and restrained motion */
@@ -1021,7 +1022,9 @@ html { scroll-padding-top: 102px; }
 
   .hero-content {
     min-height: max(720px, calc(100svh - 12px));
-    padding: 146px 0 108px;
+    /* Ohne Fliesstext und zweiten Button traegt der Block weniger Hoehe; das groessere
+       Top-Padding haelt ihn im unteren Drittel wie auf dem Desktop. */
+    padding: clamp(210px, 34vh, 300px) 0 108px;
   }
 
   .hero-content,
@@ -1035,11 +1038,11 @@ html { scroll-padding-top: 102px; }
     line-height: .94;
   }
 
-  .hero-copy {
-    margin-top: 24px;
-    font-size: 1rem;
-    line-height: 1.55;
-  }
+  /* Mobil traegt der Hero nur Headline und einen Button; der Fliesstext und der
+     primaere CTA fallen weg. */
+  .hero-copy { display: none; }
+
+  .hero-actions .button:not(.button-ghost) { display: none; }
 
   .hero-actions {
     gap: 12px;
