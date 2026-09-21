@@ -42,7 +42,12 @@ export default function HomePage() {
 
       <section className="section project-section" id="galerie">
         <div className="shell">
-          <div className="gallery-heading gallery-heading-standalone reveal"><h2>Einblicke in Arbeiten, an denen wir beteiligt waren.</h2></div>
+          <div className="gallery-heading gallery-heading-standalone reveal">
+            <div>
+              <p className="eyebrow eyebrow-light">Projektgalerie</p>
+              <h2>Einblicke in Arbeiten, an denen wir beteiligt waren.</h2>
+            </div>
+          </div>
           <ProjectGallery />
         </div>
       </section>

@@ -143,7 +143,7 @@ export const callButton = `${btnDark} w-full`;
  * bewusst aus. Deckend, damit nichts durchblitzt.
  */
 export const schleier = [
-  "absolute inset-0 z-10 rounded-2xl",
+  "anfrage-schleier absolute inset-0 z-10",
   "bg-gradient-to-br from-gold via-[#DDA055] to-bronze",
   "transition-[opacity,filter,transform] duration-[600ms] ease-[cubic-bezier(.2,.75,.2,1)]",
   "motion-reduce:transition-none"

@@ -482,7 +482,11 @@ export function Anfrageformular() {
           <AnfrageTrustKarte onStoerfall={zeigeStoerfall} stoerfallAktiv={akut} />
         </div>
 
-        <div className="relative flex min-w-0 flex-col pult:min-h-0">
+        <div
+          className={`relative flex min-w-0 flex-col pult:min-h-0 ${
+            schleierAktiv ? "anfrage-kachel-geschlossen" : ""
+          }`}
+        >
           {/* ---------- Bestätigung nach dem Absenden ---------- */}
           {erfolg && (
             <section

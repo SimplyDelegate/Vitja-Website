@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, PhoneCall, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { asset } from "@/lib/assets";
 import { navItems, siteConfig } from "@/lib/content";
 import { aktiveSektion, ankerId } from "@/lib/navigation";
@@ -80,6 +80,16 @@ export function Navbar() {
   const ankerIds = useMemo(() => navItems.map((item) => ankerId(item.href)), []);
   const aktiv = useAktiveSektion(ankerIds);
 
+  const zurStartseite = (event: MouseEvent<HTMLAnchorElement>) => {
+    const istNormalerLinksklick = event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+    if (!istNormalerLinksklick || window.location.pathname !== "/") return;
+
+    event.preventDefault();
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.search}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setOpen(false);
+  };
+
   useEffect(() => {
     const close = () => setOpen(false);
     window.addEventListener("hashchange", close);
@@ -89,7 +99,7 @@ export function Navbar() {
   return (
     <header className="site-header">
       <div className="shell header-inner">
-        <Link href="/" className="brand-link" aria-label="Triumph Technical Services – Startseite">
+        <Link href="/" className="brand-link" aria-label="Triumph Technical Services – Startseite" onClick={zurStartseite}>
           <Image className="brand-desktop" src={asset("/brand/logo.svg")} alt="Triumph Technical Services" width={252} height={144} loading="eager" />
           <Image className="brand-mobile" src={asset("/brand/mark.svg")} alt="" width={42} height={42} loading="eager" />
           <span className="brand-mobile-name" aria-hidden="true">

@@ -13,6 +13,7 @@ export function HeroSlider() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [mobileStatic, setMobileStatic] = useState(false);
   const timerRef = useRef<number | null>(null);
   const timerStartedAtRef = useRef<number | null>(null);
   const remainingTimeRef = useRef(HERO_SLIDE_DURATION);
@@ -26,7 +27,19 @@ export function HeroSlider() {
   }, []);
 
   useEffect(() => {
-    if (paused || reducedMotion || heroSlides.length < 2) return;
+    const query = window.matchMedia("(max-width: 640px)");
+    const update = () => {
+      setMobileStatic(query.matches);
+      if (query.matches) setActive(0);
+    };
+
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    if (paused || reducedMotion || mobileStatic || heroSlides.length < 2) return;
 
     const duration = remainingTimeRef.current;
     const startedAt = performance.now();
@@ -47,7 +60,7 @@ export function HeroSlider() {
         timerStartedAtRef.current = null;
       }
     };
-  }, [active, paused, reducedMotion]);
+  }, [active, mobileStatic, paused, reducedMotion]);
 
   const selectSlide = (index: number) => {
     if (index === active) return;
@@ -101,18 +114,20 @@ export function HeroSlider() {
         </div>
       </div>
 
-      <div className="shell hero-controls" aria-label="Hero-Bildsteuerung">
-        <div className="hero-dots">
-          {heroSlides.map((slide, index) => (
-            <button key={slide.src} className={active === index ? "is-active" : ""} onClick={() => selectSlide(index)} aria-label={`Bild ${index + 1} anzeigen`} aria-current={active === index ? "true" : undefined} />
-          ))}
+      {!mobileStatic && (
+        <div className="shell hero-controls" aria-label="Hero-Bildsteuerung">
+          <div className="hero-dots">
+            {heroSlides.map((slide, index) => (
+              <button key={slide.src} className={active === index ? "is-active" : ""} onClick={() => selectSlide(index)} aria-label={`Bild ${index + 1} anzeigen`} aria-current={active === index ? "true" : undefined} />
+            ))}
+          </div>
+          {!reducedMotion && (
+            <button className="hero-pause" type="button" onClick={() => setPaused((value) => !value)} aria-label={paused ? "Bildwechsel fortsetzen" : "Bildwechsel pausieren"}>
+              {paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
+            </button>
+          )}
         </div>
-        {!reducedMotion && (
-          <button className="hero-pause" type="button" onClick={() => setPaused((value) => !value)} aria-label={paused ? "Bildwechsel fortsetzen" : "Bildwechsel pausieren"}>
-            {paused ? <Play aria-hidden="true" /> : <Pause aria-hidden="true" />}
-          </button>
-        )}
-      </div>
+      )}
     </section>
   );
 }

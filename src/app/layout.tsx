@@ -26,7 +26,7 @@ const contentSecurityPolicy = [
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
 const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], display: "swap", weight: ["500", "600", "700"], variable: "--font-barlow-condensed" });
 
-export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0D0F12" };
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#EFEAE1" };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.domain),
