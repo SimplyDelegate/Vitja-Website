@@ -8,3 +8,12 @@ export const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export function asset(path: string) {
   return path.startsWith("/") ? `${basePath}${path}` : path;
 }
+
+/**
+ * Absolute URL fuer oeffentliche Assets, insbesondere strukturierte Daten.
+ * `siteUrl` kann selbst bereits den GitHub-Pages-Unterpfad enthalten; deshalb
+ * wird der von `asset()` gesetzte basePath an dessen Origin aufgeloest.
+ */
+export function absoluteAssetUrl(path: string, siteUrl: string) {
+  return new URL(asset(path), new URL(siteUrl).origin).toString();
+}

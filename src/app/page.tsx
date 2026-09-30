@@ -7,7 +7,7 @@ import { ProjectGallery } from "@/components/ProjectGallery";
 import { ServicesGrid } from "@/components/ServicesGrid";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { VideoHighlight } from "@/components/VideoHighlight";
-import { asset } from "@/lib/assets";
+import { absoluteAssetUrl } from "@/lib/assets";
 import { siteConfig } from "@/lib/content";
 
 export default function HomePage() {
@@ -21,7 +21,7 @@ export default function HomePage() {
     telephone: siteConfig.phone,
     areaServed: ["Norddeutschland", "Deutschland"],
     description: siteConfig.description,
-    logo: `${siteConfig.domain}${asset("/brand/logo.svg")}`
+    logo: absoluteAssetUrl("/brand/logo.svg", siteConfig.domain)
   };
 
   return (

@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { caseStudies, evidenceRegistry, featuredProjectMetrics, featuredProjects, heroSlides, navItems, processCommitments, projectMedia, publicValue, qualificationGroups, qualifications, services, siteConfig } from "./content";
+import { caseStudies, evidenceRegistry, faqItems, featuredProjectMetrics, featuredProjects, heroSlides, navItems, processCommitments, projectMedia, publicValue, qualificationGroups, qualifications, services, siteConfig } from "./content";
 
 describe("Website-Inhalte", () => {
   it("verwendet öffentliche Standardwerte bei fehlenden oder leeren CI-Variablen", () => {
@@ -174,7 +174,7 @@ describe("Website-Inhalte", () => {
       expect(project).not.toHaveProperty("number");
       expect(project.description.length).toBeLessThanOrEqual(140);
       expect(project.metrics.projectId).toBe(project.id);
-      expect(project.metrics.status).toBe("placeholder");
+      expect(project.metrics.status).toBe("verified");
       expect(project.metrics.items).toHaveLength(3);
       expect(project.metrics.items.every((metric) => Number.isFinite(metric.value) && metric.value >= 0 && metric.label.trim())).toBe(true);
       expect(project.metrics.items.every((metric) => typeof metric.prefix === "string" && typeof metric.suffix === "string")).toBe(true);
@@ -208,6 +208,12 @@ describe("Website-Inhalte", () => {
     const content = JSON.stringify({ services, siteConfig, heroSlides, projectMedia, caseStudies, qualificationGroups });
     expect(content).not.toMatch(/Vitja|Struppe|Käfer|Bredo|G\+H|Weber/i);
     expect(siteConfig.name).toBe("Triumph Technical Services");
+  });
+
+  it("unterscheidet Schiffsausbau eindeutig vom nicht angebotenen Schiffbau", () => {
+    const publicCopy = JSON.stringify({ siteConfig, services, faqItems });
+    expect(publicCopy).toMatch(/Schiffsausbau/i);
+    expect(publicCopy).not.toMatch(/\bSchiffbau\b/i);
   });
 
   it("führt jeden Menüpunkt auf einen eigenen Anker der Startseite", () => {

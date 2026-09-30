@@ -151,7 +151,7 @@ export const siteConfig: SiteConfig = {
   iban: publicValue(process.env.NEXT_PUBLIC_COMPANY_IBAN, "DE29 2802 0050 1022 4707 00"),
   bic: publicValue(process.env.NEXT_PUBLIC_COMPANY_BIC, "OLBODEH2XXX"),
   responsible: publicValue(process.env.NEXT_PUBLIC_COMPANY_RESPONSIBLE, "Viktor Jakobi, Geschäftsführer"),
-  description: "Technische Projektleistungen für Industrie und Schiffbau: Rohrbau, GFK-Systeme, Instandsetzung, Schweißarbeiten und Systemintegration aus einer Hand koordiniert.",
+  description: "Technische Projektleistungen für Industrie und Schiffsausbau: Rohrbau, GFK-Systeme, Instandsetzung, Schweißarbeiten und Systemintegration aus einer Hand koordiniert.",
   isDraft: !process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_CONTACT_PHONE
 };
 
@@ -433,7 +433,7 @@ export const faqItems = [
   { question: "Wie gehen Sie mit Nachunternehmern oder Ausführungspartnern um?", answer: "Projektpartner werden nicht pauschal eingesetzt. Zuständigkeit, Qualifikation, Schnittstellen und geforderte Nachweise werden vor ihrem Einsatz geprüft und in die Projektsteuerung eingebunden." },
   { question: "Wie integrieren Sie sich in unsere Arbeitssicherheitsprozesse?", answer: "Gefährdungen, Unterweisungen, Freigaben und Erlaubnisscheine werden vor Arbeitsbeginn abgestimmt. Besondere Anforderungen wie Freimessen, Brandwache, PSAgA oder Rettung werden nur mit passender Qualifikation eingeplant." },
   { question: "Wie wird die Ausführung dokumentiert?", answer: "Der Umfang wird vorab vereinbart. Möglich sind Status- und Fotodokumentation, Material- und Prüfunterlagen, Naht- beziehungsweise Verfahrensnachweise sowie ein Übergabeprotokoll mit Restpunkten." },
-  { question: "Übernehmen Sie klasserelevante Arbeiten im Schiffbau?", answer: "Solche Arbeiten werden erst nach Abgleich der Werft-, Flaggen- und Klassifikationsanforderungen bestätigt. Erforderliche Personal-, Verfahrens- und Freigabenachweise müssen zum konkreten Auftrag passen." },
+  { question: "Übernehmen Sie klasserelevante Arbeiten im Schiffsausbau?", answer: "Solche Arbeiten werden erst nach Abgleich der Werft-, Flaggen- und Klassifikationsanforderungen bestätigt. Erforderliche Personal-, Verfahrens- und Freigabenachweise müssen zum konkreten Auftrag passen." },
   { question: "Sind auch kurzfristige Arbeiten möglich?", answer: "Kurzfristige Arbeiten sind nach Abstimmung möglich. Entscheidend sind Umfang, Zugänglichkeit, Materialverfügbarkeit, Sicherheitsvorgaben und die erforderlichen Qualifikationen." },
   { question: "Arbeiten Sie auch in bestehenden Anlagen?", answer: "Ja. Ablauf, Schutzmaßnahmen, Freigaben und Schnittstellen werden auf die jeweilige Betriebssituation abgestimmt, damit Beeinträchtigungen möglichst begrenzt bleiben." },
   { question: "In welchem Gebiet führen Sie Projekte aus?", answer: "Unser Schwerpunkt liegt in Norddeutschland. Abhängig von Umfang, Termin und Aufgabe übernehmen wir Einsätze auch bundesweit." }

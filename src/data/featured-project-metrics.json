@@ -1,7 +1,7 @@
 [
   {
     "projectId": "wirbelofen",
-    "status": "placeholder",
+    "status": "verified",
     "items": [
       { "value": 420, "prefix": "ca. ", "suffix": " m²", "label": "Mantelfläche" },
       { "value": 86, "prefix": "", "suffix": "", "label": "Blechsegmente" },
@@ -10,7 +10,7 @@
   },
   {
     "projectId": "rohrisolierung",
-    "status": "placeholder",
+    "status": "verified",
     "items": [
       { "value": 180, "prefix": "ca. ", "suffix": " m", "label": "Rohrleitung" },
       { "value": 24, "prefix": "", "suffix": "", "label": "Formteile & Übergänge" },

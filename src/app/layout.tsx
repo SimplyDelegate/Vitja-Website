@@ -30,7 +30,7 @@ export const viewport: Viewport = { width: "device-width", initialScale: 1, them
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.domain),
-  title: { default: "Triumph Technical Services | Technische Lösungen für Industrie & Schiffbau", template: "%s | Triumph Technical Services" },
+  title: { default: "Triumph Technical Services | Technische Lösungen für Industrie & Schiffsausbau", template: "%s | Triumph Technical Services" },
   description: siteConfig.description,
   alternates: { canonical: "/" },
   icons: { icon: asset("/brand/mark.svg"), shortcut: asset("/brand/mark.svg"), apple: asset("/brand/mark.svg") },
@@ -50,7 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="de" className={`${inter.variable} ${barlowCondensed.variable}`}>
       <head><meta httpEquiv="Content-Security-Policy" content={contentSecurityPolicy} /></head>
-      <body><a className="skip-link" href="#main-content">Zum Inhalt springen</a><Navbar /><div id="main-content">{children}</div><Footer /><ReviewOverlay /></body>
+      <body><a className="skip-link" href="#main-content">Zum Inhalt springen</a><Navbar /><div id="main-content">{children}</div><Footer />{process.env.NODE_ENV === "development" && <ReviewOverlay />}</body>
     </html>
   );
 }
