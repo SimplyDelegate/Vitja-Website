@@ -1073,32 +1073,37 @@ html { scroll-padding-top: 102px; }
 
   .hero-content {
     min-height: max(720px, calc(100svh - 12px));
-    /* Ohne Fliesstext und zweiten Button traegt der Block weniger Hoehe; das groessere
-       Top-Padding haelt ihn im unteren Drittel wie auf dem Desktop. */
-    padding: clamp(210px, 34vh, 300px) 0 108px;
+    /* Der Inhalt bleibt im bildruhigen unteren Bereich, ohne dass die zwei CTAs
+       auf kleinen Displays an den unteren Rand gedrängt werden. */
+    padding: clamp(184px, 28vh, 240px) 0 clamp(60px, 8vh, 76px);
   }
 
   .hero-content,
   .hero-controls { width: calc(100vw - 36px); }
 
-  .hero-content .eyebrow { margin-bottom: 18px; }
+  .hero-content .eyebrow {
+    margin-bottom: 16px;
+    line-height: 1.45;
+  }
 
   .hero h1 {
     max-width: 100%;
-    font-size: clamp(3.35rem, 14.2vw, 4.4rem);
-    line-height: .94;
+    font-size: clamp(3.25rem, 13.8vw, 4.15rem);
+    line-height: .95;
   }
 
-  /* Mobil traegt der Hero nur Headline und einen Button; der Fliesstext und der
-     primaere CTA fallen weg. */
+  .hero-title-line { text-wrap: balance; }
+
+  /* Der Fliesstext bleibt mobil zugunsten einer klaren Hierarchie ausgeblendet. */
   .hero-copy { display: none; }
 
-  .hero-actions .button:not(.button-ghost) { display: none; }
-
   .hero-actions {
-    gap: 12px;
-    margin-top: 28px;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 26px;
   }
+
+  .hero-actions .button { min-height: 52px; }
 
   .hero-controls { bottom: 24px; }
 }
