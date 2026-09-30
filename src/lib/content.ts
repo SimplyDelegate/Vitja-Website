@@ -123,25 +123,34 @@ export type FeaturedProject = {
 export type ProjectCategory = "Industrieisolierung" | "Rohrbau" | "GFK" | "Schweißen" | "Stahlbau" | "Integration" | "Instandsetzung";
 export type ProjectMedia = { src: string; category: ProjectCategory; alt: string; caption: string; layout: "standard" | "wide" | "tall"; focus?: string };
 
-const configuredDomain = process.env.NEXT_PUBLIC_SITE_URL ?? "https://preview.triumph-technical-services.de";
+/**
+ * GitHub Actions resolves missing Repository Variables to an empty string.
+ * Nullish coalescing does not catch that value, so public fallback data would
+ * otherwise disappear from the statically exported site.
+ */
+export function publicValue(value: string | undefined, fallback: string): string {
+  return value?.trim() || fallback;
+}
+
+const configuredDomain = publicValue(process.env.NEXT_PUBLIC_SITE_URL, "https://preview.triumph-technical-services.de");
 
 export const siteConfig: SiteConfig = {
   name: "Triumph Technical Services",
-  legalName: process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME ?? "Triumphbaugesellschaft UG",
+  legalName: publicValue(process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME, "Triumphbaugesellschaft UG"),
   domain: configuredDomain,
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "info@triumph-baugesellschaft.de",
-  phone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+49 176 40076405",
-  phoneHref: process.env.NEXT_PUBLIC_CONTACT_PHONE_HREF ?? "+4917640076405",
+  email: publicValue(process.env.NEXT_PUBLIC_CONTACT_EMAIL, "info@triumph-baugesellschaft.de"),
+  phone: publicValue(process.env.NEXT_PUBLIC_CONTACT_PHONE, "+49 176 40076405"),
+  phoneHref: publicValue(process.env.NEXT_PUBLIC_CONTACT_PHONE_HREF, "+4917640076405"),
   contactPerson: "Viktor Jakobi",
   contactRole: "Geschäftsführer",
-  address: process.env.NEXT_PUBLIC_COMPANY_ADDRESS ?? "Auf dem Jarten 6, 27607 Geestland",
-  register: process.env.NEXT_PUBLIC_COMPANY_REGISTER ?? "Handelsregister: HRB 211.346",
-  taxId: process.env.NEXT_PUBLIC_COMPANY_TAX_ID ?? "Steuernummer: 49/200/32853",
-  taxOffice: process.env.NEXT_PUBLIC_COMPANY_TAX_OFFICE ?? "Finanzamt Wesermünde",
-  bankName: process.env.NEXT_PUBLIC_COMPANY_BANK_NAME ?? "Oldenburgische Landesbank AG",
-  iban: process.env.NEXT_PUBLIC_COMPANY_IBAN ?? "DE29 2802 0050 1022 4707 00",
-  bic: process.env.NEXT_PUBLIC_COMPANY_BIC ?? "OLBODEH2XXX",
-  responsible: process.env.NEXT_PUBLIC_COMPANY_RESPONSIBLE ?? "Viktor Jakobi, Geschäftsführer",
+  address: publicValue(process.env.NEXT_PUBLIC_COMPANY_ADDRESS, "Auf dem Jarten 6, 27607 Geestland"),
+  register: publicValue(process.env.NEXT_PUBLIC_COMPANY_REGISTER, "Handelsregister: HRB 211.346"),
+  taxId: publicValue(process.env.NEXT_PUBLIC_COMPANY_TAX_ID, "Steuernummer: 49/200/32853"),
+  taxOffice: publicValue(process.env.NEXT_PUBLIC_COMPANY_TAX_OFFICE, "Finanzamt Wesermünde"),
+  bankName: publicValue(process.env.NEXT_PUBLIC_COMPANY_BANK_NAME, "Oldenburgische Landesbank AG"),
+  iban: publicValue(process.env.NEXT_PUBLIC_COMPANY_IBAN, "DE29 2802 0050 1022 4707 00"),
+  bic: publicValue(process.env.NEXT_PUBLIC_COMPANY_BIC, "OLBODEH2XXX"),
+  responsible: publicValue(process.env.NEXT_PUBLIC_COMPANY_RESPONSIBLE, "Viktor Jakobi, Geschäftsführer"),
   description: "Technische Projektleistungen für Industrie und Schiffbau: Rohrbau, GFK-Systeme, Instandsetzung, Schweißarbeiten und Systemintegration aus einer Hand koordiniert.",
   isDraft: !process.env.NEXT_PUBLIC_SITE_URL || !process.env.NEXT_PUBLIC_CONTACT_PHONE
 };

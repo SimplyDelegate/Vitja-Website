@@ -1,9 +1,16 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { caseStudies, evidenceRegistry, featuredProjectMetrics, featuredProjects, heroSlides, navItems, processCommitments, projectMedia, qualificationGroups, qualifications, services, siteConfig } from "./content";
+import { caseStudies, evidenceRegistry, featuredProjectMetrics, featuredProjects, heroSlides, navItems, processCommitments, projectMedia, publicValue, qualificationGroups, qualifications, services, siteConfig } from "./content";
 
 describe("Website-Inhalte", () => {
+  it("verwendet öffentliche Standardwerte bei fehlenden oder leeren CI-Variablen", () => {
+    expect(publicValue(undefined, "Standardwert")).toBe("Standardwert");
+    expect(publicValue("", "Standardwert")).toBe("Standardwert");
+    expect(publicValue("   ", "Standardwert")).toBe("Standardwert");
+    expect(publicValue(" konfiguriert ", "Standardwert")).toBe("konfiguriert");
+  });
+
   it("enthält die neun vereinbarten Leistungen", () => {
     expect(services).toHaveLength(9);
     expect(new Set(services.map((service) => service.id)).size).toBe(9);
