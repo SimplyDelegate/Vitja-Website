@@ -92,6 +92,11 @@ export const btnPrimary = `${btnBase} bg-gold text-carbon hover:bg-[#F4BD70] foc
 export const btnSecondary = `${btnBase} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink focus-visible:outline-accent`;
 export const btnSignal = `${btnBase} bg-signal text-white hover:bg-signal-dark focus-visible:outline-signal disabled:opacity-60`;
 
+/** Kompakte Varianten für zwei gleich breite Aktionen auf schmalen Displays. */
+const btnBaseCompact = `${btnBase.replace("px-5", "px-2").replace("text-sm", "text-xs")} w-full min-w-0 whitespace-nowrap sm:w-auto sm:px-5 sm:text-sm`;
+export const btnSecondaryCompact = `${btnBaseCompact} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink focus-visible:outline-accent`;
+export const btnSignalCompact = `${btnBaseCompact} bg-signal text-white hover:bg-signal-dark focus-visible:outline-signal disabled:opacity-60`;
+
 /**
  * Störfall-Shortcut der Karte: Geometrie des Senden-Buttons, aber als ruhige
  * Signalfläche statt Vollton – er ist der dritte gleichgroße Weg neben dem
@@ -106,6 +111,13 @@ export const btnSignalLeise = `${btnBase} w-full border border-signal/35 bg-sign
  */
 export const stageActions = [
   "flex shrink-0 flex-wrap items-center justify-between gap-3",
+  "border-t border-line bg-surface px-5 py-4 sm:px-8",
+  "transition-shadow duration-200"
+].join(" ");
+
+/** Störfallaktionen bleiben mobil als zwei gleich breite Buttons in einer Zeile. */
+export const stageActionsPair = [
+  "grid shrink-0 grid-cols-2 items-center gap-2 sm:flex sm:justify-between sm:gap-3",
   "border-t border-line bg-surface px-5 py-4 sm:px-8",
   "transition-shadow duration-200"
 ].join(" ");

@@ -885,10 +885,10 @@ export function Anfrageformular() {
                     </div>
                   </div>
 
-                  <div className={ui.stageActions} data-panel-actions>
-                    <button type="button" className={ui.btnSecondary} onClick={zurueckZuStandard}>Anderes Anliegen</button>
-                    <button type="submit" className={ui.btnSignal} disabled={sendet}>
-                      {sendet ? "Wird gesendet …" : stoerfall.submitLabel} <ArrowRight className="size-4" aria-hidden="true" />
+                  <div className={ui.stageActionsPair} data-panel-actions>
+                    <button type="button" className={ui.btnSecondaryCompact} onClick={zurueckZuStandard}>Anderes Anliegen</button>
+                    <button type="submit" className={ui.btnSignalCompact} disabled={sendet}>
+                      {sendet ? "Wird gesendet …" : stoerfall.submitLabel} <ArrowRight className="hidden size-4 shrink-0 sm:block" aria-hidden="true" />
                     </button>
                   </div>
                 </fieldset>
