@@ -473,11 +473,11 @@ export function Anfrageformular() {
 
   return (
     <div ref={wurzelRef} className="anfrage">
-      <div className="grid gap-7 lg:grid-cols-[minmax(350px,390px)_minmax(0,1fr)] xl:grid-cols-[minmax(390px,430px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:max-h-[54rem]">
+      <div className="grid gap-7 lg:grid-cols-[minmax(350px,390px)_minmax(0,1fr)] xl:grid-cols-[minmax(390px,430px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:min-h-[44rem] pult:max-h-[54rem]">
         {/* Linke Spalte: Ansprechpartner und Direktkontakt. Die Überschrift
             steht nur noch für Screenreader da — die Sektion in page.tsx nennt
             sich über aria-labelledby danach, sichtbar wäre sie Ballast. */}
-        <div className="flex min-w-0 flex-col pult:min-h-0 pult:overflow-y-auto pult:pr-1">
+        <div className="flex min-w-0 flex-col">
           <h2 id="anfrage-titel" className="sr-only">Sagen Sie uns, was ansteht.</h2>
           <AnfrageTrustKarte onStoerfall={zeigeStoerfall} stoerfallAktiv={akut} />
         </div>
