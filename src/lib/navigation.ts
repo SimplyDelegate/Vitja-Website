@@ -9,6 +9,15 @@ export function ankerId(href: string): string {
 }
 
 /**
+ * Erkennt Links auf dieselbe Seite auch unter einem Hosting-Unterpfad.
+ * Ein optionaler abschliessender Slash darf das Ergebnis nicht veraendern.
+ */
+export function gleicherSeitenpfad(aktuell: string, ziel: string): boolean {
+  const normalisieren = (pfad: string) => pfad.replace(/\/+$/, "") || "/";
+  return normalisieren(aktuell) === normalisieren(ziel);
+}
+
+/**
  * Der Abschnitt, in dem gerade gelesen wird: von allen, deren Oberkante die
  * Unterkante des Headers bereits passiert hat, der zuletzt passierte.
  *

@@ -7,7 +7,7 @@ import { Menu, PhoneCall, X } from "lucide-react";
 import { useEffect, useMemo, useState, type MouseEvent } from "react";
 import { asset } from "@/lib/assets";
 import { navItems, siteConfig } from "@/lib/content";
-import { aktiveSektion, ankerId } from "@/lib/navigation";
+import { aktiveSektion, ankerId, gleicherSeitenpfad } from "@/lib/navigation";
 
 /**
  * Der Abschnitt, in dem der Besucher gerade liest — für die Hervorhebung im
@@ -82,7 +82,7 @@ export function Navbar() {
 
   const zurStartseite = (event: MouseEvent<HTMLAnchorElement>) => {
     const istNormalerLinksklick = event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
-    if (!istNormalerLinksklick || window.location.pathname !== "/") return;
+    if (!istNormalerLinksklick || !gleicherSeitenpfad(window.location.pathname, event.currentTarget.pathname)) return;
 
     event.preventDefault();
     window.history.replaceState(window.history.state, "", `${window.location.pathname}${window.location.search}`);

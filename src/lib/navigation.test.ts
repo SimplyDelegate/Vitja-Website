@@ -1,10 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { aktiveSektion, ankerId } from "./navigation";
+import { aktiveSektion, ankerId, gleicherSeitenpfad } from "./navigation";
 
 describe("Ankerkennung", () => {
   it("liest die Kennung aus einem Menü-Link", () => {
     expect(ankerId("/#galerie")).toBe("galerie");
     expect(ankerId("#kontakt")).toBe("kontakt");
+  });
+});
+
+describe("Startseitenpfad", () => {
+  it("erkennt die Startseite lokal und unter dem GitHub-Pages-Unterpfad", () => {
+    expect(gleicherSeitenpfad("/", "/")).toBe(true);
+    expect(gleicherSeitenpfad("/Vitja-Website/", "/Vitja-Website/")).toBe(true);
+    expect(gleicherSeitenpfad("/Vitja-Website", "/Vitja-Website/")).toBe(true);
+  });
+
+  it("faengt den Klick von einer Unterseite nicht ab", () => {
+    expect(gleicherSeitenpfad("/Vitja-Website/impressum/", "/Vitja-Website/")).toBe(false);
   });
 });
 
