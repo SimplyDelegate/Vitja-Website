@@ -116,8 +116,7 @@ p { margin: 0; }
 .hero { position: relative; min-height: calc(100svh - 78px); overflow: hidden; background: var(--carbon); color: white; }
 .hero-media, .hero-image, .hero-shade { position: absolute; inset: 0; }
 .hero-media picture { display: contents; }
-.hero-image { object-fit: cover; opacity: 0; transform: scale(1.015); transition: opacity 900ms ease, transform 6s linear; }
-.hero-image.is-active { opacity: 1; transform: scale(1.045); }
+.hero-image { width: 100%; height: 100%; object-fit: cover; }
 .hero-shade { z-index: 1; background: linear-gradient(90deg, rgba(8,10,12,.94) 0%, rgba(8,10,12,.74) 43%, rgba(8,10,12,.18) 76%, rgba(8,10,12,.32) 100%), linear-gradient(0deg, rgba(8,10,12,.62), transparent 42%); }
 .hero-shade::after { position: absolute; top: -30vw; left: -32vw; width: 68vw; height: 68vw; border: 1px solid rgba(235,174,88,.16); border-radius: 50%; content: ""; box-shadow: 0 0 0 9vw rgba(235,174,88,.025), 0 0 0 18vw rgba(235,174,88,.02); }
 .hero-content { position: relative; z-index: 2; display: flex; min-height: calc(100svh - 78px); flex-direction: column; align-items: flex-start; justify-content: center; padding: 76px 0 132px; }
@@ -125,18 +124,6 @@ p { margin: 0; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 38px; }
 .hero-proof-link { display: inline-flex; align-items: center; gap: 9px; margin-top: 22px; border-bottom: 1px solid rgba(235,174,88,.7); color: rgba(255,255,255,.78); font-size: .78rem; font-weight: 750; letter-spacing: .025em; }
 .hero-proof-link:hover { color: white; border-color: var(--gold); }
-.hero-controls { position: absolute; right: 0; bottom: 34px; left: 0; z-index: 3; display: flex; align-items: center; gap: 17px; }
-.hero-dots { display: flex; align-items: center; gap: 9px; }
-.hero-dots button { position: relative; width: 38px; height: 3px; overflow: hidden; padding: 0; border: 0; background: rgba(255,255,255,.35); cursor: pointer; transition: width 180ms; }
-.hero-dots button.is-active { width: 68px; }
-.hero-dots button.is-active::after { position: absolute; inset: 0; background: var(--gold); content: ""; transform: scaleX(0); transform-origin: left; animation: hero-slide-progress var(--hero-slide-duration, 6000ms) linear forwards; }
-.hero.is-paused .hero-dots button.is-active::after { animation-play-state: paused; }
-.hero-pause { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid rgba(255,255,255,.45); border-radius: 50%; background: rgba(13,15,18,.3); color: white; cursor: pointer; }
-.hero-pause svg { width: 15px; }
-
-@keyframes hero-slide-progress {
-  to { transform: scaleX(1); }
-}
 
 /* Section intros */
 .section-heading { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .55fr); gap: clamp(40px, 5vw, 64px); margin-bottom: var(--section-heading-gap); align-items: end; }
@@ -370,7 +357,6 @@ p { margin: 0; }
   .hero-copy { margin-top: 24px; font-size: .98rem; }
   .hero-actions { width: 100%; margin-top: 29px; }
   .hero-actions .button { width: 100%; }
-  .hero-controls { bottom: 24px; }
   .section-heading { gap: 25px; }
   .services-heading { margin-bottom: var(--section-heading-gap); }
   .service-card { min-height: 0; padding: 0; }
@@ -852,10 +838,7 @@ html { scroll-padding-top: 102px; }
     linear-gradient(0deg, rgba(8,10,12,.64), transparent 44%);
 }
 
-.hero-content,
-.hero-controls {
-  width: min(1400px, calc(100vw - 64px));
-}
+.hero-content { width: min(1400px, calc(100vw - 64px)); }
 
 .hero-content {
   min-height: calc(100svh - 20px);
@@ -889,7 +872,6 @@ html { scroll-padding-top: 102px; }
 }
 
 .hero-actions .button { min-height: 54px; }
-.hero-controls { bottom: 30px; }
 
 @media (min-width: 1024px) {
   .desktop-nav { display: flex; }
@@ -977,8 +959,7 @@ html { scroll-padding-top: 102px; }
   .hero,
   .hero-content { min-height: max(760px, calc(100svh - 14px)); }
 
-  .hero-content,
-  .hero-controls { width: calc(100vw - 44px); }
+  .hero-content { width: calc(100vw - 44px); }
 
   .hero-content {
     padding: 184px 0 112px;
@@ -1056,19 +1037,9 @@ html { scroll-padding-top: 102px; }
     margin: 6px;
   }
 
-  /* Mobil bleibt die Hochkantfassung des ersten Motivs vollflaechig stehen.
-     Die weiteren Slides und ihre Steuerung sind bereits vor der Hydrierung
-     unsichtbar; der Client stoppt zusaetzlich den Bildwechsel. */
-  .hero-media picture:not(:first-child),
-  .hero-controls { display: none; }
-
-  .hero-media picture:first-child .hero-image {
+  /* Mobil bleibt die Hochkantfassung desselben statischen Motivs vollflächig. */
+  .hero-media .hero-image {
     display: block;
-    width: 100%;
-    height: 100%;
-    opacity: 1;
-    transform: none;
-    transition: none;
   }
 
   .hero-content {
@@ -1078,8 +1049,7 @@ html { scroll-padding-top: 102px; }
     padding: clamp(184px, 28vh, 240px) 0 clamp(60px, 8vh, 76px);
   }
 
-  .hero-content,
-  .hero-controls { width: calc(100vw - 36px); }
+  .hero-content { width: calc(100vw - 36px); }
 
   .hero-content .eyebrow {
     margin-bottom: 16px;
@@ -1105,7 +1075,6 @@ html { scroll-padding-top: 102px; }
 
   .hero-actions .button { min-height: 52px; }
 
-  .hero-controls { bottom: 24px; }
 }
 
 /* Featured projects: proof-led outsourcing examples between competence and services */
