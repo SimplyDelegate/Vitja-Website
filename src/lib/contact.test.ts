@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { contactAccessKey, contactEndpointOrigin, contactUploadsEnabled, sendeFormular } from "./contact";
+import { contactEndpointOrigin, contactUploadsEnabled } from "./contact";
 
 describe("Versand-Konfiguration", () => {
   it("liest den Origin des Versand-Endpunkts für die CSP aus", () => {
@@ -87,6 +87,9 @@ describe("Versandschleuse", () => {
   it("meldet ohne Access-Key 'gesperrt' und rührt das Netz nicht an", async () => {
     // Ohne Freischaltung darf kein fetch stattfinden — sonst liefe die Anfrage
     // ins Leere und der Nutzer bekäme eine Fehlermeldung statt des Hinweises.
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_CONTACT_ACCESS_KEY", "");
+    const { contactAccessKey, sendeFormular } = await import("./contact");
     expect(contactAccessKey).toBe("");
     const daten = new FormData();
     const netz = vi.fn();
@@ -97,6 +100,7 @@ describe("Versandschleuse", () => {
       expect(daten.get("access_key")).toBeNull();
     } finally {
       vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
     }
   });
 });

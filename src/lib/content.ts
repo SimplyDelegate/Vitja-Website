@@ -156,7 +156,7 @@ export const siteConfig: SiteConfig = {
   name: "Triumph Technical Services",
   legalName: publicValue(process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME, "Triumph Technical Services UG (haftungsbeschränkt)"),
   domain: configuredDomain,
-  email: publicValue(process.env.NEXT_PUBLIC_CONTACT_EMAIL, "info@triumph-baugesellschaft.de"),
+  email: publicValue(process.env.NEXT_PUBLIC_CONTACT_EMAIL, "Jakobi@triumph-ts.de"),
   phone: publicValue(process.env.NEXT_PUBLIC_CONTACT_PHONE, "+49 176 40076405"),
   phoneHref: publicValue(process.env.NEXT_PUBLIC_CONTACT_PHONE_HREF, "+4917640076405"),
   contactPerson: "Viktor Jakobi",

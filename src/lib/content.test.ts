@@ -211,7 +211,7 @@ describe("Website-Inhalte", () => {
   it("enthält die freigegebenen Unternehmens- und Kontaktdaten", () => {
     expect(siteConfig).toMatchObject({
       legalName: "Triumph Technical Services UG (haftungsbeschränkt)",
-      email: "info@triumph-baugesellschaft.de",
+      email: "Jakobi@triumph-ts.de",
       phone: "+49 176 40076405",
       phoneHref: "+4917640076405",
       contactPerson: "Viktor Jakobi",

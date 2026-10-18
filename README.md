@@ -45,6 +45,8 @@ Pages-Adressen bleiben über HTTP-Header von der Indexierung ausgeschlossen. Ein
 ## Unternehmensdaten und Datenschutz
 
 Am 18.10.2026 vom Betreiber bestätigt: Triumph Technical Services UG (haftungsbeschränkt), Amtsgericht Tostedt, HRB 211346, Auf dem Jarten 6, 27607 Geestland; Geschäftsführer Viktor Jakobi. Keine USt-IdNr. oder Wirtschafts-ID angegeben. Die interne Steuernummer und die Bankverbindung werden nicht als Impressumspflichten veröffentlicht.
+Am 18.10.2026 als öffentliche Kontakt- und Formular-Empfängeradresse bestätigt: `Jakobi@triumph-ts.de`.
+Web3Forms ist für dieses Postfach angelegt. Verpflichtendes hCaptcha und automatische Löschung der gespeicherten Anfragen nach sieben Tagen sind im Dienst eingestellt. Der öffentliche Formularschlüssel wird in Cloudflare und lokal über Umgebungsvariablen eingebunden.
 Die Datenschutzhinweise beschreiben Cloudflare Pages, Web3Forms, dessen Unterauftragsverarbeiter und die nach Aktivierung geladene hCaptcha-Prüfung. Bei Änderungen an Anbietern, Analysefunktionen, Empfänger- oder Unternehmensdaten sind die Texte anzupassen. Die Umsetzung ist keine anwaltliche Freigabe.
 
 ## Sicherheitsprüfung
