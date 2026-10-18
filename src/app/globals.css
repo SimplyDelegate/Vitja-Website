@@ -91,14 +91,16 @@ button { color: inherit; }
 }
 .action-button:active:not(:disabled), .button:active { filter: brightness(.96); }
 .action-button:disabled, button:disabled { cursor: not-allowed; }
-.captcha-control { position: relative; width: 100%; min-width: 0; }
+.captcha-control { position: relative; display: grid; width: 100%; min-width: 0; grid-template-columns: minmax(0, 1fr) 116px; }
 .captcha-trigger {
+  grid-area: 1 / 1 / 2 / -1;
   display: flex;
   width: 100%;
-  min-height: 76px;
+  min-width: 0;
+  min-height: 80px;
   align-items: center;
   gap: 12px;
-  padding: 14px 116px 14px 14px;
+  padding: 14px 128px 14px 14px;
   border: 1px solid #d9d5cb;
   border-radius: 12px;
   background: white;
@@ -116,9 +118,10 @@ button { color: inherit; }
 .captcha-checkmark { display: grid; width: 24px; height: 24px; flex: 0 0 24px; place-items: center; border: 1px solid #a49a8b; border-radius: 5px; background: white; }
 .captcha-checkmark svg { width: 17px; height: 17px; }
 .captcha-control[data-verified] .captcha-checkmark { border-color: #8b551f; background: #8b551f; color: white; }
-.captcha-provider { position: absolute; top: 50%; right: 12px; display: grid; width: 94px; justify-items: center; color: #687078; line-height: 1.2; transform: translateY(-50%); }
-.captcha-provider .captcha-brand { font-size: .8125rem; font-weight: 800; letter-spacing: -.025em; }
-.captcha-provider > span { display: flex; align-items: center; gap: 2px; font-size: .53125rem; white-space: nowrap; }
+.captcha-provider { position: relative; grid-area: 1 / 2; display: grid; min-width: 0; align-self: center; justify-items: center; margin: 8px 12px 8px 0; color: #687078; line-height: 1.2; }
+.captcha-provider .captcha-brand { gap: 4px; font-size: .8125rem; font-weight: 800; letter-spacing: -.025em; }
+.captcha-provider .captcha-brand img { width: 24px; height: 24px; flex-shrink: 0; }
+.captcha-provider > span { display: flex; max-width: 100%; flex-wrap: wrap; align-items: center; justify-content: center; column-gap: 6px; font-size: .5625rem; }
 .captcha-provider a { display: inline-flex; min-height: 24px; align-items: center; }
 .captcha-provider a:hover { color: #8b551f; text-decoration: underline; text-underline-offset: 2px; }
 @media (forced-colors: active) {

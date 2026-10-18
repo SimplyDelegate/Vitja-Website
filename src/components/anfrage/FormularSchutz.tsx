@@ -2,8 +2,10 @@
 
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Check, LoaderCircle } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { asset } from "@/lib/assets";
 
 export type FormularSchutzHandle = { token: () => string; reset: () => void };
 type Pruefstatus = "laedt" | "bereit" | "prueft" | "bestaetigt" | "abgelaufen" | "fehler";
@@ -76,10 +78,12 @@ export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
           <span aria-live="polite">{beschriftung[status]}</span>
         </button>
         <div className="captcha-provider">
-          <a href="https://www.hcaptcha.com/" target="_blank" rel="noopener noreferrer" className="captcha-brand" aria-label="Geschützt durch hCaptcha">hCaptcha</a>
+          <a href="https://www.hcaptcha.com/" target="_blank" rel="noopener noreferrer" className="captcha-brand" aria-label="Geschützt durch hCaptcha">
+            <Image src={asset("/brand/hcaptcha.svg")} width={24} height={24} alt="" />
+            <span>hCaptcha</span>
+          </a>
           <span>
             <a href="https://www.hcaptcha.com/privacy" target="_blank" rel="noopener noreferrer">Datenschutz</a>
-            <span aria-hidden="true"> · </span>
             <a href="https://www.hcaptcha.com/terms" target="_blank" rel="noopener noreferrer">Bedingungen</a>
           </span>
         </div>
