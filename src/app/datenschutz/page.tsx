@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Datenschutz", description: "Datenschutzhinweise von Triumph Technical Services", alternates: { canonical: "/datenschutz" }, robots: siteConfig.isDraft ? { index: false, follow: false } : undefined };
+export const metadata: Metadata = pageMetadata("Datenschutz | Triumph Technical Services", "Informationen zur Verarbeitung personenbezogener Daten, zur Kontaktaufnahme und zu Ihren Datenschutzrechten bei Triumph Technical Services.", "datenschutz/");
 
 export default function DatenschutzPage() {
   return (
     <main className="legal-main">
       <header className="legal-hero"><div className="shell"><p className="eyebrow">Rechtliche Angaben</p><h1>Datenschutz</h1></div></header>
       <div className="shell legal-content">
-        {siteConfig.isDraft && <div className="legal-notice"><strong>Hinweis zur Vorschau:</strong> Verantwortliche Stelle, Hosting- und Versandkonfiguration werden vor Veröffentlichung final ergänzt und rechtlich geprüft.</div>}
         <h2>1. Verantwortliche Stelle</h2><p><strong>{siteConfig.legalName}</strong><br />Markenauftritt: {siteConfig.name}<br />{siteConfig.address}<br />Vertreten durch: {siteConfig.responsible}<br />E-Mail: <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><br />Telefon: {siteConfig.phone}</p>
         <h2>2. Bereitstellung der Website</h2><p>Beim Aufruf der Website verarbeitet der Hostinganbieter technisch erforderliche Verbindungsdaten, insbesondere IP-Adresse, Zeitpunkt, aufgerufene Ressource, übertragene Datenmenge und Browserinformationen. Dies ist für eine sichere und stabile Bereitstellung erforderlich. Die konkrete Hostingkonfiguration und Speicherdauer werden vor Veröffentlichung ergänzt.</p>
         <h2>3. Kontaktformular</h2><p>Wenn Sie das Kontaktformular nutzen, verarbeiten wir Ihre Angaben zur Bearbeitung und Beantwortung der Anfrage. Pflichtfelder sind Unternehmen und Name, mindestens eine ausgewählte Leistung, ein Kontaktweg und die Datenschutzbestätigung. Angaben zum Vorhaben, Einsatzort und Zeitrahmen sind freiwillig.</p><p>Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei vorvertraglichen oder vertraglichen Anfragen; in sonstigen Fällen Art. 6 Abs. 1 lit. f DSGVO aufgrund unseres berechtigten Interesses an einer sachgerechten Kommunikation.</p>

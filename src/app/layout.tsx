@@ -6,11 +6,12 @@ import { ReviewOverlay } from "@/components/ReviewOverlay";
 import { asset } from "@/lib/assets";
 import { contactEndpointOrigin } from "@/lib/contact";
 import { siteConfig } from "@/lib/content";
+import { homeTitle, pageMetadata } from "@/lib/seo";
 import "./globals.css";
 
 // Beim statischen Export setzt kein Server Response-Header. Per <meta http-equiv>
-// wirkt nur CSP -- frame-ancestors, X-Content-Type-Options, Referrer-Policy und
-// Permissions-Policy lassen sich so nicht abbilden und entfallen bewusst.
+// wirkt nur CSP. Ergänzende HTTP-Sicherheitsheader stehen für Cloudflare Pages
+// in public/_headers.
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -29,21 +30,9 @@ const barlowCondensed = Barlow_Condensed({ subsets: ["latin"], display: "swap", 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#EFEAE1" };
 
 export const metadata: Metadata = {
+  ...pageMetadata(homeTitle, siteConfig.description),
   metadataBase: new URL(siteConfig.domain),
-  title: { default: "Triumph Technical Services | Technische Lösungen für Industrie & Schiffsausbau", template: "%s | Triumph Technical Services" },
-  description: siteConfig.description,
-  alternates: { canonical: "/" },
-  icons: { icon: asset("/brand/mark.svg"), shortcut: asset("/brand/mark.svg"), apple: asset("/brand/mark.svg") },
-  openGraph: {
-    title: "Technische Lösungen, die im Betrieb bestehen.",
-    description: siteConfig.description,
-    url: "/",
-    siteName: siteConfig.name,
-    locale: "de_DE",
-    type: "website",
-    images: [{ url: "/brand/social-preview.jpg", width: 1200, height: 630, alt: "Triumph Technical Services – Technische Lösungen, die im Betrieb bestehen" }]
-  },
-  twitter: { card: "summary_large_image", title: "Triumph Technical Services", description: siteConfig.description, images: ["/brand/social-preview.jpg"] }
+  icons: { icon: asset("/brand/mark.svg"), shortcut: asset("/brand/mark.svg"), apple: asset("/brand/mark.svg") }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

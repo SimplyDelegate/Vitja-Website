@@ -24,14 +24,14 @@ export function HeroSlider() {
       </div>
 
       <div className="shell hero-content">
-        <p className="eyebrow eyebrow-light">Industrieisolierung · Rohrbau · Instandsetzung</p>
+        <p className="eyebrow eyebrow-light">Industrieisolierung · Rohrleitungsbau · Instandhaltung</p>
         <h1 id="hero-title">
           <span className="hero-title-line">Technische Lösungen,</span>
           <span className="hero-title-line">die im Betrieb bestehen.</span>
         </h1>
-        <p className="hero-copy">Triumph Technical Services ist Ihr Partner für Industrieisolierung, Rohrbau, Instandsetzung und Schweißarbeiten – in Norddeutschland und bundesweit.</p>
+        <p className="hero-copy">Triumph Technical Services ist Ihr Partner für Industrieisolierung, Rohrleitungsbau, Instandhaltung und Schweißarbeiten – in Norddeutschland und bundesweit.</p>
         <div className="hero-actions">
-          <Link className="button" href="#kontakt">Leistung besprechen</Link>
+          <Link className="button" href="#kontakt">Leistungen besprechen</Link>
           <Link className="button button-ghost" href="#leistungen">Leistungen ansehen</Link>
         </div>
       </div>

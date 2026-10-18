@@ -11,7 +11,6 @@ export function Footer() {
           <div className="footer-logo-plate">
             <Image src={asset("/brand/logo-tagline.svg")} alt="Triumph Technical Services – Ihr Partner für Industrielösungen" width={390} height={130} />
           </div>
-          <p>Technische Ausführungskompetenz für Industrie, Anlagenbau und maritime Einsatzbereiche.</p>
         </div>
         <div>
           <p className="footer-label">Navigation</p>

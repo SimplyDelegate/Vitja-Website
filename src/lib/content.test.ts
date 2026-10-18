@@ -11,17 +11,17 @@ describe("Website-Inhalte", () => {
     expect(publicValue(" konfiguriert ", "Standardwert")).toBe("konfiguriert");
   });
 
-  it("enthält die neun vereinbarten Leistungen", () => {
-    expect(services).toHaveLength(9);
-    expect(new Set(services.map((service) => service.id)).size).toBe(9);
+  it("enthält die acht vereinbarten Leistungen", () => {
+    expect(services).toHaveLength(8);
+    expect(new Set(services.map((service) => service.id)).size).toBe(8);
   });
 
   it("ordnet nur fachlich belegten Leistungen ein Projektbild zu", () => {
     const illustrated = services.filter((service) => service.image || service.gallery);
     const withoutImage = services.filter((service) => !service.image && !service.gallery).map((service) => service.id).sort();
 
-    expect(illustrated).toHaveLength(9);
-    expect(withoutImage).toEqual([]);
+    expect(illustrated).toHaveLength(7);
+    expect(withoutImage).toEqual(["blechherstellung"]);
     for (const service of illustrated) {
       const images = service.gallery ?? (service.image ? [service.image] : []);
       for (const image of images) {
@@ -31,18 +31,11 @@ describe("Website-Inhalte", () => {
         expect(existsSync(join(process.cwd(), "public", image.src.replace(/^\//, "")))).toBe(true);
       }
     }
-
-    const shipbuilding = services.find((service) => service.id === "schiffsausbau");
-    expect(shipbuilding?.image).toEqual({
-      src: "/media/services/schiffsausbau/schiffsausbau-rohrsystem-montage.webp",
-      alt: "Rohrleitungssystem mit Armaturen im technisch ausgebauten Schiffsbereich",
-      focus: "center 50%"
-    });
   });
 
-  it("stellt für Industrieisolierung, Rohrbau, GFK, Anlageninstandsetzung, Schweißarbeiten und Blechvorrichtungen eindeutige Galerien bereit", () => {
+  it("stellt für Industrieisolierung, Rohrleitungsbau, GFK, Anlageninstandhaltung und Schweißarbeiten eindeutige Galerien bereit", () => {
     const galleryServices = services.filter((service) => service.gallery);
-    expect(galleryServices.map((service) => service.id)).toEqual(["industrieisolierung", "rohrbau", "gfk", "anlageninstandsetzung", "schweissarbeiten", "blechherstellung"]);
+    expect(galleryServices.map((service) => service.id)).toEqual(["industrieisolierung", "rohrbau", "gfk", "anlageninstandsetzung", "schweissarbeiten"]);
 
     const insulationGallery = galleryServices.find((service) => service.id === "industrieisolierung")?.gallery ?? [];
     expect(insulationGallery).toHaveLength(5);
@@ -56,30 +49,29 @@ describe("Website-Inhalte", () => {
     ]);
 
     const rohrbauGallery = galleryServices.find((service) => service.id === "rohrbau")?.gallery ?? [];
-    expect(rohrbauGallery).toHaveLength(3);
-    expect(new Set(rohrbauGallery.map((image) => image.src)).size).toBe(3);
+    expect(rohrbauGallery).toHaveLength(2);
+    expect(new Set(rohrbauGallery.map((image) => image.src)).size).toBe(2);
     expect(rohrbauGallery.map((image) => image.src)).toEqual([
       "/media/services/rohrbau/rohrbau-fertigungskomponenten.webp",
-      "/media/projects/rohrbau-fertigung.webp",
-      "/media/services/rohrbau/rohrbau-anlagenbestand.webp"
+      "/media/projects/rohrbau-fertigung.webp"
     ]);
 
     const gfkGallery = galleryServices.find((service) => service.id === "gfk")?.gallery ?? [];
-    expect(gfkGallery).toHaveLength(3);
-    expect(new Set(gfkGallery.map((image) => image.src)).size).toBe(3);
+    expect(gfkGallery).toHaveLength(4);
+    expect(new Set(gfkGallery.map((image) => image.src)).size).toBe(4);
     expect(gfkGallery.map((image) => image.src)).toEqual([
       "/media/services/gfk/gfk-sammelleitung-fertigung.webp",
       "/media/projects/gfk-rohrbaugruppe.webp",
-      "/media/services/gfk/gfk-flanschverbindung-detail.webp"
+      "/media/services/gfk/gfk-flanschverbindung-detail.webp",
+      "/media/services/schiffsausbau/schiffsausbau-rohrsystem-montage.webp"
     ]);
 
     const maintenanceGallery = galleryServices.find((service) => service.id === "anlageninstandsetzung")?.gallery ?? [];
-    expect(maintenanceGallery).toHaveLength(3);
-    expect(new Set(maintenanceGallery.map((image) => image.src)).size).toBe(3);
+    expect(maintenanceGallery).toHaveLength(2);
+    expect(new Set(maintenanceGallery.map((image) => image.src)).size).toBe(2);
     expect(maintenanceGallery.map((image) => image.src)).toEqual([
       "/media/projects/anlageninstandsetzung.webp",
-      "/media/services/anlageninstandsetzung/anlageninstandsetzung-aggregat-arbeitsbereich.webp",
-      "/media/services/anlageninstandsetzung/anlageninstandsetzung-ventilbank.webp"
+      "/media/services/anlageninstandsetzung/anlageninstandsetzung-aggregat-arbeitsbereich.webp"
     ]);
 
     const weldingGallery = galleryServices.find((service) => service.id === "schweissarbeiten")?.gallery ?? [];
@@ -89,14 +81,6 @@ describe("Website-Inhalte", () => {
       "/media/projects/schweissnaht.webp",
       "/media/services/schweissarbeiten/schweissnaht-rohrabzweig.webp",
       "/media/services/schweissarbeiten/schweissnaht-flansch-detail.webp"
-    ]);
-
-    const sheetMetalGallery = galleryServices.find((service) => service.id === "blechherstellung")?.gallery ?? [];
-    expect(sheetMetalGallery).toHaveLength(2);
-    expect(new Set(sheetMetalGallery.map((image) => image.src)).size).toBe(2);
-    expect(sheetMetalGallery.map((image) => image.src)).toEqual([
-      "/media/services/blechvorrichtungen/blechvorrichtung-zugangsklappen.webp",
-      "/media/services/blechvorrichtungen/blechvorrichtung-frontansicht.webp"
     ]);
   });
 
@@ -115,12 +99,12 @@ describe("Website-Inhalte", () => {
     expect(new Set(projectMedia.map((item) => item.src)).size).toBe(18);
     expect(new Set(projectMedia.map((item) => item.category))).toEqual(new Set([
       "Industrieisolierung",
-      "Rohrbau",
+      "Rohrleitungsbau",
       "GFK",
       "Schweißen",
       "Stahlbau",
       "Integration",
-      "Instandsetzung"
+      "Instandhaltung"
     ]));
     expect(projectMedia.filter((item) => item.layout === "wide")).toHaveLength(4);
     expect(projectMedia.filter((item) => item.layout === "tall")).toHaveLength(2);

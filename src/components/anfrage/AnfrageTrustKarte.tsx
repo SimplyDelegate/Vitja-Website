@@ -4,7 +4,7 @@ import { Kurznachricht } from "./Kurznachricht";
 import * as ui from "./anfrage-ui";
 
 /**
- * Seitenspalte des Anfrageformulars: Ansprechpartner, Kurznachricht, der
+ * Seitenspalte des Anfrageformulars: Kurznachricht, der
  * direkte Anruf und darunter der Störfall-Shortcut. Der kurze Weg für alle,
  * denen das dreistufige Formular daneben zu viel ist.
  *
@@ -23,16 +23,8 @@ export function AnfrageTrustKarte({
   return (
     <aside
       className="flex min-w-0 shrink-0 flex-col gap-5 rounded-2xl border border-line bg-surface-2 p-6 sm:p-7 pult:min-h-full pult:gap-4 pult:p-6"
-      aria-labelledby="anfrage-ansprechpartner"
+      aria-label="Kurznachricht und Direktkontakt"
     >
-      <div className="shrink-0">
-        <span className={ui.kicker}>Ihr Ansprechpartner</span>
-        <h3 id="anfrage-ansprechpartner" className="mt-1.5 font-display text-2xl font-bold leading-none tracking-normal text-ink">
-          {anfrageKontakt.ansprechpartner}
-        </h3>
-        <p className="mt-1 text-[0.9rem] font-bold text-accent">{anfrageKontakt.rolle}</p>
-      </div>
-
       <Kurznachricht />
 
       {/* Beide Kontaktwege als ein Block, vom Formular durch die Linie

@@ -474,7 +474,7 @@ export function Anfrageformular() {
   return (
     <div ref={wurzelRef} className="anfrage">
       <div className="grid gap-7 lg:grid-cols-[minmax(350px,390px)_minmax(0,1fr)] xl:grid-cols-[minmax(390px,430px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:min-h-[44rem] pult:max-h-[54rem]">
-        {/* Linke Spalte: Ansprechpartner und Direktkontakt. Die Überschrift
+        {/* Linke Spalte: Kurznachricht und Direktkontakt. Die Überschrift
             steht nur noch für Screenreader da — die Sektion in page.tsx nennt
             sich über aria-labelledby danach, sichtbar wäre sie Ballast. */}
         <div className="flex min-w-0 flex-col">

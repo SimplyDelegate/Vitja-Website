@@ -8,20 +8,59 @@ import { ServicesGrid } from "@/components/ServicesGrid";
 import { ScrollReveal } from "@/components/ScrollReveal";
 import { VideoHighlight } from "@/components/VideoHighlight";
 import { absoluteAssetUrl } from "@/lib/assets";
-import { siteConfig } from "@/lib/content";
+import { services, siteConfig } from "@/lib/content";
+import { homeTitle, siteUrl } from "@/lib/seo";
 
 export default function HomePage() {
   const organizationJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: siteConfig.name,
-    legalName: siteConfig.legalName,
-    url: siteConfig.domain,
-    email: siteConfig.email,
-    telephone: siteConfig.phone,
-    areaServed: ["Norddeutschland", "Deutschland"],
-    description: siteConfig.description,
-    logo: absoluteAssetUrl("/brand/logo.svg", siteConfig.domain)
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": siteUrl("#unternehmen"),
+        name: siteConfig.name,
+        legalName: siteConfig.legalName,
+        url: siteUrl(),
+        email: siteConfig.email,
+        telephone: siteConfig.phone,
+        address: siteConfig.address,
+        areaServed: ["Norddeutschland", "Deutschland"],
+        description: siteConfig.description,
+        logo: absoluteAssetUrl("/brand/logo.svg", siteConfig.domain),
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "Technische Leistungen",
+          itemListElement: services.map((service) => ({
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: service.title,
+              description: service.short,
+              url: siteUrl("#leistungen"),
+              provider: { "@id": siteUrl("#unternehmen") }
+            }
+          }))
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": siteUrl("#website"),
+        url: siteUrl(),
+        name: siteConfig.name,
+        inLanguage: "de-DE",
+        publisher: { "@id": siteUrl("#unternehmen") }
+      },
+      {
+        "@type": "WebPage",
+        "@id": siteUrl("#webseite"),
+        url: siteUrl(),
+        name: homeTitle,
+        description: siteConfig.description,
+        isPartOf: { "@id": siteUrl("#website") },
+        about: { "@id": siteUrl("#unternehmen") },
+        inLanguage: "de-DE"
+      }
+    ]
   };
 
   return (
@@ -61,10 +100,10 @@ export default function HomePage() {
             <p>GFK-Systeme stellen besondere Anforderungen an Vorbereitung, Verbindung und Reparatur. Wir fertigen Rohrbaugruppen, integrieren sie in bestehende Systeme und setzen beschädigte Komponenten projektbezogen instand.</p>
             <ul>
               <li><Check aria-hidden="true" /> GFK-Rohr- und Formteile</li>
-              <li><Check aria-hidden="true" /> Reparatur und Instandsetzung</li>
+              <li><Check aria-hidden="true" /> Reparatur und Instandhaltung</li>
               <li><Check aria-hidden="true" /> Einbau und Systemintegration</li>
             </ul>
-            <Link className="button button-dark" href="#kontakt">Leistung besprechen</Link>
+            <Link className="button button-dark" href="#kontakt">Leistungen besprechen</Link>
           </div>
         </div>
       </section>

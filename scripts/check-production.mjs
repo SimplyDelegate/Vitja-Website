@@ -13,6 +13,7 @@ if (!isProduction) {
 
 const required = [
   "NEXT_PUBLIC_SITE_URL",
+  "NEXT_PUBLIC_SITE_INDEXING",
   "NEXT_PUBLIC_CONTACT_EMAIL",
   "NEXT_PUBLIC_CONTACT_PHONE",
   "NEXT_PUBLIC_CONTACT_PHONE_HREF",
@@ -35,7 +36,14 @@ const errors = [];
 if (missing.length) errors.push(`Fehlende Variablen: ${missing.join(", ")}`);
 
 const url = process.env.NEXT_PUBLIC_SITE_URL ?? "";
-if (/preview|localhost|example|placeholder/i.test(url)) errors.push("NEXT_PUBLIC_SITE_URL enthält eine Vorschau- oder Platzhalterdomain.");
+try {
+  const parsedUrl = new URL(url);
+  if (parsedUrl.protocol !== "https:" || parsedUrl.username || parsedUrl.password || parsedUrl.search || parsedUrl.hash || parsedUrl.port || !parsedUrl.hostname.includes(".")) errors.push("NEXT_PUBLIC_SITE_URL muss eine vollständige öffentliche HTTPS-URL ohne Zugangsdaten, Port, Query oder Fragment sein.");
+  if (/preview|localhost|example|placeholder|ihre-domain/i.test(parsedUrl.hostname) || /(?:\.(?:test|invalid|local)|\.pages\.dev|\.workers\.dev)$/.test(parsedUrl.hostname) || /^(?:\d{1,3}\.){3}\d{1,3}$/.test(parsedUrl.hostname)) errors.push("NEXT_PUBLIC_SITE_URL enthält eine Vorschau- oder Platzhalterdomain.");
+} catch {
+  errors.push("NEXT_PUBLIC_SITE_URL ist keine gültige URL.");
+}
+if (process.env.NEXT_PUBLIC_SITE_INDEXING !== "true") errors.push("NEXT_PUBLIC_SITE_INDEXING muss für den öffentlichen Produktionsbuild true sein.");
 if (process.env.LEGAL_REVIEW_CONFIRMED !== "true") errors.push("LEGAL_REVIEW_CONFIRMED muss nach rechtlicher Prüfung auf true gesetzt werden.");
 if (process.env.QUALIFICATION_REVIEW_CONFIRMED !== "true") errors.push("QUALIFICATION_REVIEW_CONFIRMED muss nach Prüfung von Rechtsträger, Qualifikationen und Geltungsbereichen auf true gesetzt werden.");
 

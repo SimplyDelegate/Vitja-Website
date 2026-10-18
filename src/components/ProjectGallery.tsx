@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { asset } from "@/lib/assets";
 import { projectMedia, type ProjectCategory, type ProjectMedia } from "@/lib/content";
 
-const filters: Array<"Alle" | ProjectCategory> = ["Alle", "Industrieisolierung", "Rohrbau", "GFK", "Schweißen", "Stahlbau", "Integration", "Instandsetzung"];
+const filters: Array<"Alle" | ProjectCategory> = ["Alle", "Industrieisolierung", "Rohrleitungsbau", "GFK", "Schweißen", "Stahlbau", "Integration", "Instandhaltung"];
 
 export function ProjectGallery() {
   const [filter, setFilter] = useState<(typeof filters)[number]>("Alle");

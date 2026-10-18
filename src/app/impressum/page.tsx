@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Impressum", description: "Impressum von Triumph Technical Services", alternates: { canonical: "/impressum" }, robots: siteConfig.isDraft ? { index: false, follow: false } : undefined };
+export const metadata: Metadata = pageMetadata("Impressum | Triumph Technical Services", "Unternehmensangaben, Kontaktdaten und rechtliche Informationen zu Triumph Technical Services, einem Markenauftritt der Triumphbaugesellschaft UG in Geestland.", "impressum/");
 
 export default function ImpressumPage() {
   return (
     <main className="legal-main">
       <header className="legal-hero"><div className="shell"><p className="eyebrow">Rechtliche Angaben</p><h1>Impressum</h1></div></header>
       <div className="shell legal-content">
-        {siteConfig.isDraft && <div className="legal-notice"><strong>Hinweis zur Vorschau:</strong> Die Pflichtangaben sind noch nicht vollständig. Diese Seite darf erst nach Ergänzung und rechtlicher Prüfung veröffentlicht werden.</div>}
         <h2>Angaben gemäß § 5 DDG</h2>
         <p><strong>{siteConfig.legalName}</strong><br />Markenauftritt: {siteConfig.name}<br />{siteConfig.address}</p>
         <h2>Vertreten durch</h2><p>{siteConfig.responsible}</p>
