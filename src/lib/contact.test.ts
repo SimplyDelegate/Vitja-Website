@@ -25,6 +25,8 @@ describe("Formularübermittlung mit konfiguriertem Dienst", () => {
   function testDaten() {
     const daten = new FormData();
     daten.set("h-captcha-response", "test-token");
+    daten.set("hcaptcha_einwilligung_am", "2026-10-19T12:00:00.000Z");
+    daten.set("hcaptcha_einwilligung_version", "2026-10-19");
     daten.set("telefon", "+49 123 456789");
     daten.set("email", "");
     return daten;
@@ -35,6 +37,16 @@ describe("Formularübermittlung mit konfiguriertem Dienst", () => {
     vi.stubGlobal("fetch", netz);
     const { sendeFormular: senden } = await import("./contact");
     await expect(senden(new FormData(), "Test", "Test")).resolves.toBe("pruefung");
+    expect(netz).not.toHaveBeenCalled();
+  });
+
+  it("sendet trotz Captcha-Token ohne dokumentierte Einwilligung nichts", async () => {
+    const netz = vi.fn();
+    vi.stubGlobal("fetch", netz);
+    const { sendeFormular: senden } = await import("./contact");
+    const daten = testDaten();
+    daten.delete("hcaptcha_einwilligung_am");
+    await expect(senden(daten, "Test", "Test")).resolves.toBe("pruefung");
     expect(netz).not.toHaveBeenCalled();
   });
 
@@ -71,6 +83,8 @@ describe("Formularübermittlung mit konfiguriertem Dienst", () => {
     expect(gesendet.get("termin")).toBe("KW 48");
     expect(gesendet.get("firma")).toBe("Testunternehmen");
     expect(gesendet.get("name")).toBe("Testkontakt");
+    expect(gesendet.get("hcaptcha_einwilligung_version")).toBe("2026-10-19");
+    expect(gesendet.get("hcaptcha_einwilligung_am")).toBe("2026-10-19T12:00:00.000Z");
     expect(gesendet.has("datenschutz")).toBe(false);
   });
 

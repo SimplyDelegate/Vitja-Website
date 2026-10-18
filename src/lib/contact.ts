@@ -44,6 +44,7 @@ export type VersandErgebnis = "gesendet" | "gesperrt" | "pruefung" | "fehler";
 export async function sendeFormular(daten: FormData, betreff: string, absender: string): Promise<VersandErgebnis> {
   if (!contactAccessKey) return "gesperrt";
   if (!String(daten.get("h-captcha-response") ?? "").trim()) return "pruefung";
+  if (!String(daten.get("hcaptcha_einwilligung_am") ?? "").trim() || !String(daten.get("hcaptcha_einwilligung_version") ?? "").trim()) return "pruefung";
 
   daten.set("access_key", contactAccessKey);
   daten.set("botcheck", "");
