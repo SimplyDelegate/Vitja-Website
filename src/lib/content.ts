@@ -194,28 +194,28 @@ export const services: Service[] = [
     id: "industrieisolierung", title: "Industrieisolierung", requestValue: "Industrieisolierung",
     gallery: [
       {
-        src: "/media/services/industrieisolierung/industrieisolierung-blechmantel-formteil.webp",
-        alt: "Segmentierte metallische Ummantelung an einem großformatigen Rohrbogen",
-        focus: "center 50%"
-      },
-      {
-        src: "/media/services/industrieisolierung/industrieisolierung-uebergang-daemmung-blech.webp",
-        alt: "Übergang von Mineralwolldämmung zu metallischer Rohrverkleidung",
-        focus: "center 50%"
-      },
-      {
-        src: "/media/services/industrieisolierung/industrieisolierung-rohrleitung-behaelter.webp",
-        alt: "Metallisch ummantelte Rohrleitung vor einem isolierten Industriebehälter",
-        focus: "center 50%"
-      },
-      {
-        src: "/media/services/industrieisolierung/industrieisolierung-rohrbogen-montagebereich.webp",
-        alt: "Segmentierter Blechmantel an einem Rohrbogen über einer Arbeitsbühne",
-        focus: "center 50%"
+        src: "/media/projects/gallery/industrieisolierung-behaelter-daemmung.webp",
+        alt: "Großbehälter mit montierter Mineralwolldämmung im Anlagenbestand",
+        focus: "center 48%"
       },
       {
         src: "/media/services/industrieisolierung/industrieisolierung-luftkanal-folienmantel.webp",
         alt: "Folienummantelte Luftkanäle und Formteile in einer technischen Anlage",
+        focus: "center 50%"
+      },
+      {
+        src: "/media/projects/gallery/industrieisolierung-matratzendaemmung.webp",
+        alt: "Matratzendämmung an Rohrleitungen, Formteilen und einer Anlagenwand",
+        focus: "center 48%"
+      },
+      {
+        src: "/media/projects/gallery/industrieisolierung-anlagenkomponente.webp",
+        alt: "Isolierte technische Anlagenkomponente mit metallischer Schutzummantelung",
+        focus: "center 48%"
+      },
+      {
+        src: "/media/services/industrieisolierung/industrieisolierung-uebergang-daemmung-blech.webp",
+        alt: "Übergang von Mineralwolldämmung zu metallischer Rohrverkleidung",
         focus: "center 50%"
       }
     ],

@@ -41,11 +41,11 @@ describe("Website-Inhalte", () => {
     expect(insulationGallery).toHaveLength(5);
     expect(new Set(insulationGallery.map((image) => image.src)).size).toBe(5);
     expect(insulationGallery.map((image) => image.src)).toEqual([
-      "/media/services/industrieisolierung/industrieisolierung-blechmantel-formteil.webp",
-      "/media/services/industrieisolierung/industrieisolierung-uebergang-daemmung-blech.webp",
-      "/media/services/industrieisolierung/industrieisolierung-rohrleitung-behaelter.webp",
-      "/media/services/industrieisolierung/industrieisolierung-rohrbogen-montagebereich.webp",
-      "/media/services/industrieisolierung/industrieisolierung-luftkanal-folienmantel.webp"
+      "/media/projects/gallery/industrieisolierung-behaelter-daemmung.webp",
+      "/media/services/industrieisolierung/industrieisolierung-luftkanal-folienmantel.webp",
+      "/media/projects/gallery/industrieisolierung-matratzendaemmung.webp",
+      "/media/projects/gallery/industrieisolierung-anlagenkomponente.webp",
+      "/media/services/industrieisolierung/industrieisolierung-uebergang-daemmung-blech.webp"
     ]);
 
     const rohrbauGallery = galleryServices.find((service) => service.id === "rohrbau")?.gallery ?? [];
