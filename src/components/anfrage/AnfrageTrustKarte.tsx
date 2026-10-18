@@ -9,8 +9,8 @@ import * as ui from "./anfrage-ui";
  * denen das dreistufige Formular daneben zu viel ist.
  *
  * Im pult-Modus füllt die Karte die feste Rasterhöhe der Spalte; die Felder
- * behalten ihre Höhe, der Kontaktblock sitzt am Kartenboden und die Restfläche
- * wird zur Luft dazwischen.
+ * behalten ihre Höhe. Bei zusätzlichem Platzbedarf durch den Spamschutz scrollt
+ * das kurze Formular; die direkten Kontaktwege bleiben am Kartenboden sichtbar.
  */
 export function AnfrageTrustKarte({
   onStoerfall,
@@ -22,7 +22,7 @@ export function AnfrageTrustKarte({
 }) {
   return (
     <aside
-      className="flex min-w-0 shrink-0 flex-col gap-5 rounded-2xl border border-line bg-surface-2 p-6 sm:p-7 pult:min-h-full pult:gap-4 pult:p-6"
+      className="flex min-w-0 shrink-0 flex-col gap-5 rounded-2xl border border-line bg-surface-2 p-6 sm:p-7 pult:h-full pult:min-h-0 pult:gap-4 pult:p-6"
       aria-label="Kurznachricht und Direktkontakt"
     >
       <Kurznachricht />

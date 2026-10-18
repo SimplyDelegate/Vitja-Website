@@ -15,8 +15,9 @@ import {
   versandGesperrtMeldung,
   wurdeZuSchnellAusgefuellt
 } from "@/lib/anfrage";
-import { contactUploadsEnabled, leseFormularWerte, sendeFormular, versandFreigeschaltet } from "@/lib/contact";
+import { contactUploadsEnabled, leseFormularWerte, sendeFormular, spamPruefungMeldung, versandFreigeschaltet } from "@/lib/contact";
 import { AnfrageTrustKarte } from "./AnfrageTrustKarte";
+import { FormularSchutz, FormularSchutzHandle } from "./FormularSchutz";
 import * as ui from "./anfrage-ui";
 
 /**
@@ -132,6 +133,8 @@ export function Anfrageformular() {
   const erfolgRef = useRef<HTMLElement>(null);
   const fokusGewuenscht = useRef(false);
   const startedAt = useRef(Number.MAX_SAFE_INTEGER);
+  const schutzRef = useRef<FormularSchutzHandle>(null);
+  const akutSchutzRef = useRef<FormularSchutzHandle>(null);
 
   const [stufe, setStufe] = useState(1);
   const [ausgewaehltePfade, setAusgewaehltePfade] = useState<string[]>([]);
@@ -147,8 +150,8 @@ export function Anfrageformular() {
   const [stoerfallUpload, setStoerfallUpload] = useState<UploadAnzeige>(uploadStart);
   const [zusammenfassung, setZusammenfassung] = useState<Array<[string, string]>>([]);
 
-  // Ohne JavaScript gibt es keinen Schleier: das Formular bleibt im statischen
-  // Export vollständig bedienbar (wie schon die Fortschrittsleiste).
+  // Ohne JavaScript wird kein Schleier aktiviert; der Kontaktbereich zeigt
+  // stattdessen einen ausdrücklichen Hinweis auf Telefon und E-Mail.
   const schleierAktiv = jsBereit && schleier !== "offen";
   // Gesperrt nur bis zum Klick — während des Verwehens ist das Formular schon
   // bedienbar (der Schleier lässt Zeiger durch) und kann den Fokus annehmen.
@@ -184,6 +187,8 @@ export function Anfrageformular() {
       const ziel = findePfad((event as CustomEvent<string>).detail);
       if (!ziel) return;
       setErfolg(false);
+      setStatusMeldung("");
+      setFehler({});
       schleierLoesen();
       if (ziel === stoerfall.id) {
         setAkut(true);
@@ -253,7 +258,7 @@ export function Anfrageformular() {
     if (!fokusGewuenscht.current) return;
     fokusGewuenscht.current = false;
     seiteZumFormular();
-    sichtbaresPanel(formRef.current)?.querySelector<HTMLElement>("h4")?.focus({ preventScroll: true });
+    sichtbaresPanel(formRef.current)?.querySelector<HTMLElement>("h3")?.focus({ preventScroll: true });
   }, [stufe, akut]);
 
   // Der Fokus wandert erst hier ins Formular: im Klickmoment ist es noch inert.
@@ -263,7 +268,7 @@ export function Anfrageformular() {
   useEffect(() => {
     if (schleier !== "weht") return;
     seiteZumFormular();
-    sichtbaresPanel(formRef.current)?.querySelector<HTMLElement>("h4")?.focus({ preventScroll: true });
+    sichtbaresPanel(formRef.current)?.querySelector<HTMLElement>("h3")?.focus({ preventScroll: true });
     const timer = window.setTimeout(() => setSchleier("offen"), SCHLEIER_DAUER);
     return () => window.clearTimeout(timer);
   }, [schleier]);
@@ -293,7 +298,7 @@ export function Anfrageformular() {
       if (!werte.name?.trim()) neu.name = "Bitte geben Sie Ihren Namen an.";
       const kontaktweg = pruefeKontaktweg(werte.email ?? "", werte.telefon ?? "");
       if (kontaktweg) neu.kontaktweg = kontaktweg;
-      if (werte.datenschutz !== "1") neu.datenschutz = "Ohne Ihre Zustimmung dürfen wir die Anfrage nicht bearbeiten.";
+      if (werte.datenschutz !== "1") neu.datenschutz = "Bitte bestätigen Sie, dass Sie die Datenschutzhinweise zur Kenntnis genommen haben.";
     }
     return neu;
   }
@@ -306,7 +311,7 @@ export function Anfrageformular() {
     if (!werte.firma?.trim()) neu.a_firma = "Bitte geben Sie Ihr Unternehmen an.";
     if (!werte.name?.trim()) neu.a_name = "Bitte geben Sie Ihren Namen an.";
     if (!werte.telefon?.trim()) neu.a_telefon = "Bitte geben Sie eine Nummer an, unter der wir Sie sofort erreichen.";
-    if (werte.datenschutz !== "1") neu.a_datenschutz = "Ohne Ihre Zustimmung dürfen wir die Meldung nicht bearbeiten.";
+    if (werte.datenschutz !== "1") neu.a_datenschutz = "Bitte bestätigen Sie, dass Sie die Datenschutzhinweise zur Kenntnis genommen haben.";
     return neu;
   }
 
@@ -345,6 +350,7 @@ export function Anfrageformular() {
   function zeigeStoerfall() {
     fokusGewuenscht.current = true;
     setFehler({});
+    setStatusMeldung("");
     schleierLoesen();
     setAkut(true);
   }
@@ -357,6 +363,7 @@ export function Anfrageformular() {
   function zurueckZuStandard() {
     fokusGewuenscht.current = true;
     setFehler({});
+    setStatusMeldung("");
     setAkut(false);
     setStufe(1);
   }
@@ -424,6 +431,13 @@ export function Anfrageformular() {
     const form = event.currentTarget;
     const daten = new FormData(form);
     daten.delete("website");
+    const schutz = akut ? akutSchutzRef.current : schutzRef.current;
+    const token = schutz?.token();
+    if (!token) {
+      setStatusMeldung(spamPruefungMeldung);
+      return;
+    }
+    daten.set("h-captcha-response", token);
     daten.set("pfad_aktiv", akut ? stoerfall.id : ausgewaehltePfade.join(", "));
 
     // Leere Datei-Slots entfernen; echte Anhänge unter dem von Web3Forms
@@ -436,6 +450,7 @@ export function Anfrageformular() {
     setStatusMeldung("");
     const betreff = akut ? "Störfallmeldung über das Anfrageformular" : `Anfrage: ${leistungsanzeige}`;
     const ergebnis = await sendeFormular(daten, betreff, werte.name ?? "");
+    schutz?.reset();
     setSendet(false);
 
     if (ergebnis === "gesendet") {
@@ -445,7 +460,8 @@ export function Anfrageformular() {
     }
     setStatusMeldung(ergebnis === "gesperrt"
       ? versandGesperrtMeldung
-      : "Die Anfrage konnte gerade nicht übermittelt werden. Bitte versuchen Sie es erneut oder rufen Sie uns an.");
+      : ergebnis === "pruefung" ? spamPruefungMeldung
+      : "Die Übermittlung konnte nicht bestätigt werden. Ihre Angaben bleiben erhalten. Bitte versuchen Sie es erneut oder kontaktieren Sie uns per E-Mail oder Telefon.");
   }
 
   /* ------------------------------------------------------------------- Markup */
@@ -473,11 +489,14 @@ export function Anfrageformular() {
 
   return (
     <div ref={wurzelRef} className="anfrage">
+      {!versandFreigeschaltet && <p role="status" className="mb-5 rounded-xl border border-line bg-surface px-5 py-4 text-sm leading-relaxed text-ink-2">
+        Der Formularversand ist derzeit nicht verfügbar. Bitte kontaktieren Sie uns unter <a href={anfrageKontakt.telefonLink} className="font-semibold underline underline-offset-2">{anfrageKontakt.telefonAnzeige}</a> oder per <a href={`mailto:${anfrageKontakt.email}`} className="font-semibold underline underline-offset-2">E-Mail an {anfrageKontakt.email}</a>.
+      </p>}
       <div className="grid gap-7 lg:grid-cols-[minmax(350px,390px)_minmax(0,1fr)] xl:grid-cols-[minmax(390px,430px)_minmax(0,1fr)] pult:h-[calc(100svh-var(--anfrage-kopf,102px)-5rem)] pult:min-h-[44rem] pult:max-h-[54rem]">
         {/* Linke Spalte: Kurznachricht und Direktkontakt. Die Überschrift
             steht nur noch für Screenreader da — die Sektion in page.tsx nennt
             sich über aria-labelledby danach, sichtbar wäre sie Ballast. */}
-        <div className="flex min-w-0 flex-col">
+        <div className="flex min-w-0 flex-col pult:min-h-0">
           <h2 id="anfrage-titel" className="sr-only">Sagen Sie uns, was ansteht.</h2>
           <AnfrageTrustKarte onStoerfall={zeigeStoerfall} stoerfallAktiv={akut} />
         </div>
@@ -584,7 +603,7 @@ export function Anfrageformular() {
                 {/* ================= Stufe 1 ================= */}
                 <section hidden={akut || stufe !== 1} className={ui.panel} aria-labelledby="anfrage-stufe-1">
                   <div className={ui.panelHead}>
-                    <h4 id="anfrage-stufe-1" tabIndex={-1} className={ui.panelTitle}>Worum geht es?</h4>
+                    <h3 id="anfrage-stufe-1" tabIndex={-1} className={ui.panelTitle}>Worum geht es?</h3>
                     <p className={ui.panelLead}>
                       Wählen Sie eine oder mehrere Leistungen. Danach folgen nur noch allgemeine Angaben zu Ihrem Vorhaben.
                     </p>
@@ -627,7 +646,7 @@ export function Anfrageformular() {
                 {/* ================= Stufe 2 ================= */}
                 <section hidden={akut || stufe !== 2} className={ui.panel} aria-labelledby="anfrage-stufe-2">
                   <div className={ui.panelHead}>
-                    <h4 id="anfrage-stufe-2" tabIndex={-1} className={ui.panelTitle}>Was sollten wir über das Vorhaben wissen?</h4>
+                    <h3 id="anfrage-stufe-2" tabIndex={-1} className={ui.panelTitle}>Was sollten wir über das Vorhaben wissen?</h3>
                     <p className={ui.panelLead}>
                       Ein kurzer Überblick reicht. Fehlende technische Details klären wir anschließend gemeinsam.
                     </p>
@@ -704,7 +723,7 @@ export function Anfrageformular() {
                 {/* ================= Stufe 3 ================= */}
                 <section hidden={akut || stufe !== 3} className={ui.panel} aria-labelledby="anfrage-stufe-3">
                   <div className={ui.panelHead}>
-                    <h4 id="anfrage-stufe-3" tabIndex={-1} className={ui.panelTitle}>Wie erreichen wir Sie?</h4>
+                    <h3 id="anfrage-stufe-3" tabIndex={-1} className={ui.panelTitle}>Wie erreichen wir Sie?</h3>
                     <p className={ui.panelLead}>
                       Firma, Name und ein Kontaktweg genügen. Rückfragen kommen direkt von der Person, die Ihr Vorhaben bearbeitet.
                     </p>
@@ -769,20 +788,20 @@ export function Anfrageformular() {
                         <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("datenschutz")} />
                         <span>
                           Ich habe die <Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{" "}
-                          gelesen und stimme der Verarbeitung meiner Angaben zur Bearbeitung dieser Anfrage zu.{pflichtStern}
+                          zur Kenntnis genommen.{pflichtStern}
                         </span>
                       </label>
                       {fehler.datenschutz && <p className={ui.fehler}>{fehler.datenschutz}</p>}
                       <details className="mt-3 text-sm text-mute">
                         <summary className="cursor-pointer font-semibold text-ink-2">Hinweis zur Datenverarbeitung</summary>
                         <p className="mt-2 leading-relaxed">
-                          Verantwortlich ist {anfrageKontakt.verantwortlich}. Ihre Angaben werden ausschließlich zur Bearbeitung der Anfrage verwendet.
-                          Sie können Ihre Einwilligung jederzeit per E-Mail an{" "}
-                          <a href={`mailto:${anfrageKontakt.email}`} className="font-semibold text-accent underline underline-offset-2">{anfrageKontakt.email}</a>{" "}
-                          widerrufen.
+                          Verantwortlich ist {anfrageKontakt.verantwortlich}. Wir verarbeiten Ihre Angaben zur Bearbeitung der Anfrage und übermitteln sie dafür an den in der Datenschutzerklärung genannten Formulardienst.
+                          Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei Vertrags- und Angebotsanfragen, ansonsten unser berechtigtes Interesse an der Beantwortung Ihrer Nachricht gemäß Art. 6 Abs. 1 lit. f DSGVO.
                         </p>
                       </details>
                     </div>
+
+                    {versandFreigeschaltet && !akut && stufe === 3 && <FormularSchutz ref={schutzRef} />}
 
                     <label className="absolute left-[-9999px] top-auto size-px overflow-hidden" aria-hidden="true">
                       Website
@@ -806,7 +825,7 @@ export function Anfrageformular() {
                     <button type="button" className="mb-3 inline-flex items-center gap-1.5 text-xs font-bold text-mute underline underline-offset-4 hover:text-ink" onClick={zurueckZuStandard}>
                       ← Kein Störfall, zurück zur normalen Anfrage
                     </button>
-                    <h4 id="anfrage-stoerfall" tabIndex={-1} className={ui.panelTitle}>Störfall melden</h4>
+                    <h3 id="anfrage-stoerfall" tabIndex={-1} className={ui.panelTitle}>Störfall melden</h3>
                     <p className={ui.panelLead}>
                       Wenn es eilt, rufen Sie an: <a href={anfrageKontakt.telefonLink} className="font-bold text-signal-dark underline underline-offset-2">{anfrageKontakt.telefonAnzeige}</a>.
                       Das Formular ist der schriftliche Weg – wir brauchen nur das Nötigste.
@@ -878,11 +897,16 @@ export function Anfrageformular() {
                         <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("a_datenschutz")} />
                         <span>
                           Ich habe die <Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{" "}
-                          gelesen und stimme der Verarbeitung meiner Angaben zu.{pflichtStern}
+                          zur Kenntnis genommen.{pflichtStern}
                         </span>
                       </label>
                       {fehler.a_datenschutz && <p className={ui.fehler}>{fehler.a_datenschutz}</p>}
                     </div>
+                    {versandFreigeschaltet && akut && <FormularSchutz ref={akutSchutzRef} />}
+                    <label className="absolute left-[-9999px] top-auto size-px overflow-hidden" aria-hidden="true">
+                      Website
+                      <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+                    </label>
                   </div>
 
                   <div className={ui.stageActionsPair} data-panel-actions>

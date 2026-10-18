@@ -92,6 +92,7 @@ export function ProjectGallery() {
       <dialog
         ref={dialogRef}
         className="project-dialog"
+        aria-labelledby="project-dialog-title"
         onCancel={(event) => {
           event.preventDefault();
           setSelected(null);
@@ -109,7 +110,7 @@ export function ProjectGallery() {
           <div className="dialog-card">
             <button className="dialog-close" type="button" onClick={() => setSelected(null)} aria-label="Großansicht schließen"><X aria-hidden="true" /></button>
             <div className="dialog-image"><Image src={asset(selected.src)} alt={selected.alt} fill sizes="90vw" /></div>
-            <div><span>{selected.category}</span><p>{selected.caption}</p></div>
+            <div><span>{selected.category}</span><p id="project-dialog-title">{selected.caption}</p></div>
           </div>
         )}
       </dialog>

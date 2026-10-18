@@ -119,7 +119,7 @@ export function pruefeKurznachricht(werte: {
   if (!email) fehler.email = "Bitte geben Sie Ihre E-Mail-Adresse an.";
   else if (!istEmailPlausibel(email)) fehler.email = "Diese E-Mail-Adresse sieht unvollständig aus.";
   if (!(werte.nachricht ?? "").trim()) fehler.nachricht = "Bitte schildern Sie kurz, worum es geht.";
-  if (werte.datenschutz !== "1") fehler.datenschutz = "Ohne Ihre Zustimmung dürfen wir die Nachricht nicht bearbeiten.";
+  if (werte.datenschutz !== "1") fehler.datenschutz = "Bitte bestätigen Sie, dass Sie die Datenschutzhinweise zur Kenntnis genommen haben.";
 
   return fehler;
 }

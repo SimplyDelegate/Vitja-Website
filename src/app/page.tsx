@@ -110,7 +110,17 @@ export default function HomePage() {
 
       {/* --anfrage-kopf = Platzbedarf des fixierten Headers (92px) plus Luft,
           identisch zum scroll-padding-top; Basis der Höhenrechnung im pult-Modus. */}
-      <section className="section contact-section" id="kontakt" aria-labelledby="anfrage-titel" style={{ "--anfrage-kopf": "102px" } as React.CSSProperties}><div className="shell reveal"><Anfrageformular /></div></section>
+      <section className="section contact-section" id="kontakt" aria-labelledby="anfrage-titel" style={{ "--anfrage-kopf": "102px" } as React.CSSProperties}>
+        <div className="shell reveal">
+          <noscript>
+            <style>{".anfrage form { display: none !important; } .anfrage > .grid { display: block; height: auto; min-height: 0; max-height: none; }"}</style>
+            <p className="mb-6 rounded-xl border border-line bg-surface p-5 text-ink-2">
+              Für das Anfrageformular ist JavaScript erforderlich. Sie erreichen uns direkt unter <a href={`tel:${siteConfig.phoneHref}`} className="font-semibold underline">{siteConfig.phone}</a> oder per <a href={`mailto:${siteConfig.email}`} className="font-semibold underline">E-Mail an {siteConfig.email}</a>.
+            </p>
+          </noscript>
+          <Anfrageformular />
+        </div>
+      </section>
     </main>
   );
 }

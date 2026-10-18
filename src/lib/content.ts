@@ -13,6 +13,9 @@ export type SiteConfig = {
   contactRole: string;
   address: string;
   register: string;
+  registerCourt: string;
+  vatId: string;
+  businessId: string;
   taxId: string;
   taxOffice: string;
   bankName: string;
@@ -151,7 +154,7 @@ const configuredDomain = publicValue(process.env.NEXT_PUBLIC_SITE_URL, "https://
 
 export const siteConfig: SiteConfig = {
   name: "Triumph Technical Services",
-  legalName: publicValue(process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME, "Triumphbaugesellschaft UG"),
+  legalName: publicValue(process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME, "Triumph Technical Services UG (haftungsbeschränkt)"),
   domain: configuredDomain,
   email: publicValue(process.env.NEXT_PUBLIC_CONTACT_EMAIL, "info@triumph-baugesellschaft.de"),
   phone: publicValue(process.env.NEXT_PUBLIC_CONTACT_PHONE, "+49 176 40076405"),
@@ -159,7 +162,10 @@ export const siteConfig: SiteConfig = {
   contactPerson: "Viktor Jakobi",
   contactRole: "Geschäftsführer",
   address: publicValue(process.env.NEXT_PUBLIC_COMPANY_ADDRESS, "Auf dem Jarten 6, 27607 Geestland"),
-  register: publicValue(process.env.NEXT_PUBLIC_COMPANY_REGISTER, "Handelsregister: HRB 211.346"),
+  register: publicValue(process.env.NEXT_PUBLIC_COMPANY_REGISTER, "HRB 211346"),
+  registerCourt: publicValue(process.env.NEXT_PUBLIC_COMPANY_REGISTER_COURT, "Amtsgericht Tostedt"),
+  vatId: process.env.NEXT_PUBLIC_COMPANY_VAT_ID?.trim() ?? "",
+  businessId: process.env.NEXT_PUBLIC_COMPANY_BUSINESS_ID?.trim() ?? "",
   taxId: publicValue(process.env.NEXT_PUBLIC_COMPANY_TAX_ID, "Steuernummer: 49/200/32853"),
   taxOffice: publicValue(process.env.NEXT_PUBLIC_COMPANY_TAX_OFFICE, "Finanzamt Wesermünde"),
   bankName: publicValue(process.env.NEXT_PUBLIC_COMPANY_BANK_NAME, "Oldenburgische Landesbank AG"),

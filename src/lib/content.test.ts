@@ -210,14 +210,17 @@ describe("Website-Inhalte", () => {
 
   it("enthält die freigegebenen Unternehmens- und Kontaktdaten", () => {
     expect(siteConfig).toMatchObject({
-      legalName: "Triumphbaugesellschaft UG",
+      legalName: "Triumph Technical Services UG (haftungsbeschränkt)",
       email: "info@triumph-baugesellschaft.de",
       phone: "+49 176 40076405",
       phoneHref: "+4917640076405",
       contactPerson: "Viktor Jakobi",
       contactRole: "Geschäftsführer",
       address: "Auf dem Jarten 6, 27607 Geestland",
-      register: "Handelsregister: HRB 211.346",
+      register: "HRB 211346",
+      registerCourt: "Amtsgericht Tostedt",
+      vatId: "",
+      businessId: "",
       taxId: "Steuernummer: 49/200/32853",
       taxOffice: "Finanzamt Wesermünde",
       bankName: "Oldenburgische Landesbank AG",

@@ -18,14 +18,24 @@ export function VideoHighlight() {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || reducedMotion) return;
+    if (!video) return;
+    if (reducedMotion) {
+      video.pause();
+      return;
+    }
 
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) void video.play();
+      if (entry.isIntersecting) {
+        void video.play().catch((error: unknown) => {
+          // Schnelles Weiterscrollen kann play() abbrechen. Blockiert der
+          // Browser die Wiedergabe, bleibt sie über die Steuerung erreichbar.
+          if (!(error instanceof DOMException && error.name === "AbortError")) video.controls = true;
+        });
+      }
       else video.pause();
     }, { threshold: 0.45 });
     observer.observe(video);
-    return () => observer.disconnect();
+    return () => { observer.disconnect(); video.pause(); };
   }, [reducedMotion]);
 
   return (
@@ -40,7 +50,7 @@ export function VideoHighlight() {
       aria-label="GFK-Rohrbaugruppe während der Fertigung"
       controls={reducedMotion}
     >
-      {!reducedMotion && <source src={asset("/media/video/gfk-systembau.mp4")} type="video/mp4" />}
+      <source src={asset("/media/video/gfk-systembau.mp4")} type="video/mp4" />
     </video>
   );
 }

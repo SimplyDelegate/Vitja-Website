@@ -1080,11 +1080,10 @@ html { scroll-padding-top: 102px; }
 /* Featured projects: proof-led outsourcing examples between competence and services */
 .featured-projects-section {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   padding-top: var(--section-space);
-  /* Der folgende Leistungsabschnitt liefert bereits den vertikalen Abstand.
-     So addieren sich an der durchgehenden Inhaltsflaeche nicht zwei volle
-     Abschnittsabstaende. */
+  /* Der folgende Abschnitt liefert den Abstand. Die Kartenschatten dürfen
+     darüber hinausreichen, damit am letzten Projekt keine Schnittkante entsteht. */
   padding-bottom: 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
@@ -1133,7 +1132,9 @@ html { scroll-padding-top: 102px; }
 
 .featured-project-media {
   display: grid;
-  height: var(--featured-project-panel-height);
+  min-width: 0;
+  min-height: var(--featured-project-panel-height);
+  height: 100%;
   grid-template-columns: minmax(0, 1.55fr) minmax(180px, .82fr);
   grid-template-rows: repeat(2, minmax(0, 1fr));
   gap: 12px;
@@ -1164,12 +1165,13 @@ html { scroll-padding-top: 102px; }
 .featured-project-copy {
   position: relative;
   display: flex;
-  height: var(--featured-project-panel-height);
+  min-width: 0;
+  min-height: var(--featured-project-panel-height);
   overflow: hidden;
   flex-direction: column;
   justify-content: space-evenly;
   gap: 0;
-  padding: 0 clamp(40px, 3.4vw, 48px);
+  padding: 24px clamp(40px, 3.4vw, 48px);
   border: 1px solid rgba(255, 255, 255, .11);
   border-radius: 28px;
   background: var(--carbon-soft);
@@ -1293,7 +1295,8 @@ html { scroll-padding-top: 102px; }
   .featured-project { --featured-project-panel-height: 500px; grid-template-columns: 1fr; gap: 32px; }
   .featured-project:nth-child(even) { grid-template-columns: 1fr; }
   .featured-project:nth-child(even) .featured-project-media { order: 0; }
-  .featured-project-copy { padding: 0 clamp(34px, 4.8vw, 42px); }
+  .featured-project-media { height: var(--featured-project-panel-height); }
+  .featured-project-copy { padding: 24px clamp(34px, 4.8vw, 42px); }
   .featured-project-copy h3 { font-size: clamp(2.7rem, 6vw, 3.1rem); }
   .featured-project-description { font-size: var(--type-secondary); }
   .featured-project-metrics li { padding-block: 19px 15px; }
@@ -1313,7 +1316,7 @@ html { scroll-padding-top: 102px; }
   .featured-project-lead { grid-row: 1 / -1; }
   .featured-project-detail { border-radius: 15px; }
   .featured-project-lead { border-radius: 20px; }
-  .featured-project-copy { gap: 0; padding: 0 16px; border-radius: 20px; }
+  .featured-project-copy { gap: 16px; padding: 24px 16px; border-radius: 20px; }
   .featured-project-category { font-size: var(--type-label); }
   .featured-project-copy h3 { margin-top: 11px; font-size: clamp(2.35rem, 10.8vw, 2.85rem); }
   .featured-project-description { font-size: var(--type-secondary); line-height: 1.55; }

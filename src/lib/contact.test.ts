@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { contactAccessKey, contactEndpointOrigin, contactUploadsEnabled, sendeFormular } from "./contact";
 
 describe("Versand-Konfiguration", () => {
@@ -8,6 +8,78 @@ describe("Versand-Konfiguration", () => {
 
   it("hält Datei-Uploads ohne ausdrückliche Freischaltung deaktiviert", () => {
     expect(contactUploadsEnabled).toBe(false);
+  });
+});
+
+describe("Formularübermittlung mit konfiguriertem Dienst", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv("NEXT_PUBLIC_CONTACT_ACCESS_KEY", "test-key");
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+    vi.useRealTimers();
+  });
+
+  function testDaten() {
+    const daten = new FormData();
+    daten.set("h-captcha-response", "test-token");
+    daten.set("telefon", "+49 123 456789");
+    daten.set("email", "");
+    return daten;
+  }
+
+  it("sendet ohne bestätigte Spamprüfung nichts", async () => {
+    const netz = vi.fn();
+    vi.stubGlobal("fetch", netz);
+    const { sendeFormular: senden } = await import("./contact");
+    await expect(senden(new FormData(), "Test", "Test")).resolves.toBe("pruefung");
+    expect(netz).not.toHaveBeenCalled();
+  });
+
+  it("übermittelt Token, Betreff und telefonischen Kontakt ohne leeres E-Mail-Feld", async () => {
+    const netz = vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: true })));
+    vi.stubGlobal("fetch", netz);
+    const { sendeFormular: senden } = await import("./contact");
+    const daten = testDaten();
+    await expect(senden(daten, "Störfall", "Testfirma")).resolves.toBe("gesendet");
+    expect(daten.get("email")).toBeNull();
+    expect(daten.get("telefon")).toBe("+49 123 456789");
+    expect(daten.get("h-captcha-response")).toBe("test-token");
+    expect(daten.get("access_key")).toBe("test-key");
+    expect(daten.get("subject")).toBe("Störfall");
+    expect(netz).toHaveBeenCalledWith("https://api.web3forms.com/submit", expect.objectContaining({ method: "POST", body: daten, signal: expect.any(AbortSignal) }));
+  });
+
+  it.each([
+    [200, { success: false }],
+    [400, { success: true }],
+    [200, { success: "true" }]
+  ])("zeigt bei einer abgelehnten oder ungültigen Antwort keinen Erfolg (%s, %j)", async (status, body) => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(body), { status })));
+    const { sendeFormular: senden } = await import("./contact");
+    await expect(senden(testDaten(), "Test", "Test")).resolves.toBe("fehler");
+  });
+
+  it("fängt ungültiges JSON und Netzwerkausfälle ab", async () => {
+    const netz = vi.fn().mockResolvedValueOnce(new Response("not json")).mockRejectedValueOnce(new TypeError("offline"));
+    vi.stubGlobal("fetch", netz);
+    const { sendeFormular: senden } = await import("./contact");
+    await expect(senden(testDaten(), "Test", "Test")).resolves.toBe("fehler");
+    await expect(senden(testDaten(), "Test", "Test")).resolves.toBe("fehler");
+  });
+
+  it("beendet eine hängende Übermittlung nach 20 Sekunden", async () => {
+    vi.useFakeTimers();
+    vi.stubGlobal("fetch", vi.fn((_url, options: RequestInit) => new Promise((_resolve, reject) => {
+      options.signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")));
+    })));
+    const { sendeFormular: senden } = await import("./contact");
+    const ergebnis = senden(testDaten(), "Test", "Test");
+    await vi.advanceTimersByTimeAsync(20_000);
+    await expect(ergebnis).resolves.toBe("fehler");
+    expect(vi.getTimerCount()).toBe(0);
   });
 });
 

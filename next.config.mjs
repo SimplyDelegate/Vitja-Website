@@ -12,9 +12,8 @@ const nextConfig = {
     // Kein Image-Optimizer auf einem statischen Host.
     unoptimized: true
   }
-  // Security-Header koennen hier nicht gesetzt werden: der statische Export wird
-  // von GitHub Pages ausgeliefert, nicht von einem Next-Server. Was per Dokument
-  // moeglich ist, steht als <meta http-equiv> in src/app/layout.tsx.
+  // HTTP-Sicherheitsheader für Cloudflare Pages stehen in public/_headers;
+  // die CSP liegt zusätzlich im HTML (src/app/layout.tsx).
 };
 
 export default nextConfig;

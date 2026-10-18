@@ -19,9 +19,10 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob:",
   "media-src 'self'",
   "font-src 'self'",
-  "style-src 'self' 'unsafe-inline'",
-  process.env.NODE_ENV === "development" ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self' 'unsafe-inline'",
-  ["connect-src 'self'", contactEndpointOrigin()].filter(Boolean).join(" ")
+  "style-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
+  "frame-src https://hcaptcha.com https://*.hcaptcha.com",
+  process.env.NODE_ENV === "development" ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://hcaptcha.com https://*.hcaptcha.com" : "script-src 'self' 'unsafe-inline' https://hcaptcha.com https://*.hcaptcha.com",
+  ["connect-src 'self' https://hcaptcha.com https://*.hcaptcha.com", contactEndpointOrigin()].filter(Boolean).join(" ")
 ].join("; ");
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });

@@ -1,9 +1,8 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-// Die Seite laeuft als statischer Export auf GitHub Pages, VERCEL_ENV gibt es
-// dort nicht. Der Pages-Workflow setzt SITE_ENV, sobald die Freigabepruefung
-// scharf geschaltet werden soll.
+// Der statische Export läuft auf Cloudflare Pages. Die Hauptdomain erhält erst
+// nach den tatsächlich abgeschlossenen Prüfungen einen Produktionsbuild.
 const isProduction = process.env.SITE_ENV === "production" || process.argv.includes("--force");
 
 if (!isProduction) {
@@ -20,15 +19,12 @@ const required = [
   "NEXT_PUBLIC_COMPANY_ADDRESS",
   "NEXT_PUBLIC_COMPANY_LEGAL_NAME",
   "NEXT_PUBLIC_COMPANY_REGISTER",
-  "NEXT_PUBLIC_COMPANY_TAX_ID",
-  "NEXT_PUBLIC_COMPANY_TAX_OFFICE",
-  "NEXT_PUBLIC_COMPANY_BANK_NAME",
-  "NEXT_PUBLIC_COMPANY_IBAN",
-  "NEXT_PUBLIC_COMPANY_BIC",
+  "NEXT_PUBLIC_COMPANY_REGISTER_COURT",
   "NEXT_PUBLIC_COMPANY_RESPONSIBLE",
   "NEXT_PUBLIC_CONTACT_ACCESS_KEY",
   "LEGAL_REVIEW_CONFIRMED",
-  "QUALIFICATION_REVIEW_CONFIRMED"
+  "FORM_DELIVERY_CONFIRMED",
+  "SPAM_PROTECTION_CONFIRMED"
 ];
 
 const missing = required.filter((name) => !process.env[name]?.trim());
@@ -44,15 +40,16 @@ try {
   errors.push("NEXT_PUBLIC_SITE_URL ist keine gültige URL.");
 }
 if (process.env.NEXT_PUBLIC_SITE_INDEXING !== "true") errors.push("NEXT_PUBLIC_SITE_INDEXING muss für den öffentlichen Produktionsbuild true sein.");
-if (process.env.LEGAL_REVIEW_CONFIRMED !== "true") errors.push("LEGAL_REVIEW_CONFIRMED muss nach rechtlicher Prüfung auf true gesetzt werden.");
-if (process.env.QUALIFICATION_REVIEW_CONFIRMED !== "true") errors.push("QUALIFICATION_REVIEW_CONFIRMED muss nach Prüfung von Rechtsträger, Qualifikationen und Geltungsbereichen auf true gesetzt werden.");
+if (process.env.LEGAL_REVIEW_CONFIRMED !== "true") errors.push("LEGAL_REVIEW_CONFIRMED muss nach Prüfung von Unternehmensdaten und Datenschutzhinweisen auf true gesetzt werden.");
+if (process.env.FORM_DELIVERY_CONFIRMED !== "true") errors.push("FORM_DELIVERY_CONFIRMED muss nach Eingang einer echten Testanfrage auf true gesetzt werden.");
+if (process.env.SPAM_PROTECTION_CONFIRMED !== "true") errors.push("SPAM_PROTECTION_CONFIRMED muss nach Prüfung des verpflichtenden serverseitigen Spamschutzes auf true gesetzt werden.");
 
 const qualifications = JSON.parse(readFileSync(resolve("src/data/qualifications.json"), "utf8"));
 const evidence = JSON.parse(readFileSync(resolve("src/data/evidence-registry.json"), "utf8"));
 const featuredProjectMetrics = JSON.parse(readFileSync(resolve("src/data/featured-project-metrics.json"), "utf8"));
 const evidenceById = new Map(evidence.map((entry) => [entry.id, entry]));
 const publicQualifications = qualifications.filter((entry) => entry.publicVisibility === "summary");
-if (!publicQualifications.length) errors.push("Mindestens ein fachlich geprüfter öffentlicher Qualifikationsnachweis fehlt.");
+if (publicQualifications.length && process.env.QUALIFICATION_REVIEW_CONFIRMED !== "true") errors.push("Öffentliche Qualifikationsnachweise müssen fachlich freigegeben sein (QUALIFICATION_REVIEW_CONFIRMED=true).");
 
 for (const qualification of publicQualifications) {
   const missingFields = ["standard", "scope", "issuer", "certificateNumber", "validUntil", "evidenceId"].filter((field) => !qualification[field]);

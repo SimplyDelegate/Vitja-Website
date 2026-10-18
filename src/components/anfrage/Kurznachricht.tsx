@@ -4,7 +4,8 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { KurzFehler, pruefeKurznachricht, versandGesperrtMeldung, wurdeZuSchnellAusgefuellt } from "@/lib/anfrage";
-import { leseFormularWerte, sendeFormular, versandFreigeschaltet } from "@/lib/contact";
+import { leseFormularWerte, sendeFormular, spamPruefungMeldung, versandFreigeschaltet } from "@/lib/contact";
+import { FormularSchutz, FormularSchutzHandle } from "./FormularSchutz";
 import * as ui from "./anfrage-ui";
 
 /**
@@ -26,6 +27,7 @@ export function Kurznachricht() {
   const formRef = useRef<HTMLFormElement>(null);
   const bestaetigungRef = useRef<HTMLDivElement>(null);
   const startedAt = useRef(Number.MAX_SAFE_INTEGER);
+  const schutzRef = useRef<FormularSchutzHandle>(null);
 
   const [fehler, setFehler] = useState<KurzFehler>({});
   const [statusMeldung, setStatusMeldung] = useState("");
@@ -84,10 +86,17 @@ export function Kurznachricht() {
 
     const daten = new FormData(event.currentTarget);
     daten.delete("website");
+    const token = schutzRef.current?.token();
+    if (!token) {
+      setStatusMeldung(spamPruefungMeldung);
+      return;
+    }
+    daten.set("h-captcha-response", token);
 
     setSendet(true);
     setStatusMeldung("");
     const ergebnis = await sendeFormular(daten, BETREFF, werte.firma ?? "");
+    schutzRef.current?.reset();
     setSendet(false);
 
     if (ergebnis === "gesendet") {
@@ -96,7 +105,8 @@ export function Kurznachricht() {
     }
     setStatusMeldung(ergebnis === "gesperrt"
       ? versandGesperrtMeldung
-      : "Die Nachricht konnte gerade nicht übermittelt werden. Bitte versuchen Sie es erneut oder rufen Sie uns an.");
+      : ergebnis === "pruefung" ? spamPruefungMeldung
+      : "Die Übermittlung konnte nicht bestätigt werden. Ihre Angaben bleiben erhalten. Bitte versuchen Sie es erneut oder kontaktieren Sie uns per E-Mail oder Telefon.");
   }
 
   const pflichtStern = <span className="text-signal" aria-hidden="true"> *</span>;
@@ -123,7 +133,7 @@ export function Kurznachricht() {
   return (
     <form
       ref={formRef}
-      className="flex min-w-0 flex-col gap-3.5"
+      className="flex min-w-0 flex-col gap-3.5 pult:min-h-0 pult:flex-1 pult:overflow-y-auto pult:overscroll-contain pult:pr-1"
       method="post"
       noValidate
       aria-label="Kurznachricht schreiben"
@@ -193,11 +203,13 @@ export function Kurznachricht() {
           />
           <span>
             Ich habe die <Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{" "}
-            gelesen und stimme der Verarbeitung meiner Angaben zu.{pflichtStern}
+            zur Kenntnis genommen.{pflichtStern}
           </span>
         </label>
         {fehler.datenschutz && <p id="kurz-fehler-datenschutz" className={ui.fehlerKlein}>{fehler.datenschutz}</p>}
       </div>
+
+      {versandFreigeschaltet && <FormularSchutz ref={schutzRef} />}
 
       <div
         role="alert"

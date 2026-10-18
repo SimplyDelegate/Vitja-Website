@@ -2,7 +2,7 @@
 // Formularversand laeuft deshalb ueber einen externen Dienst; der Access-Key ist
 // bei diesen Diensten oeffentlich und darf im Client-Bundle stehen.
 export const contactEndpoint = process.env.NEXT_PUBLIC_CONTACT_ENDPOINT ?? "https://api.web3forms.com/submit";
-export const contactAccessKey = process.env.NEXT_PUBLIC_CONTACT_ACCESS_KEY ?? "";
+export const contactAccessKey = (process.env.NEXT_PUBLIC_CONTACT_ACCESS_KEY ?? "").trim();
 
 // Datei-Anhaenge sind bei Web3Forms ein Pro-Feature. Erst aktivieren, wenn der
 // Tarif sie traegt – sonst blendet das Formular die Upload-Felder aus und
@@ -34,7 +34,7 @@ export function leseFormularWerte(form: HTMLFormElement | null): Record<string, 
 export const versandFreigeschaltet = contactAccessKey.length > 0;
 
 /** Ausgang eines Versandversuchs; die Meldungstexte bleiben beim Aufrufer. */
-export type VersandErgebnis = "gesendet" | "gesperrt" | "fehler";
+export type VersandErgebnis = "gesendet" | "gesperrt" | "pruefung" | "fehler";
 
 /**
  * Gemeinsamer Versandweg beider Formulare: ergänzt die Pflichtfelder des
@@ -43,17 +43,27 @@ export type VersandErgebnis = "gesendet" | "gesperrt" | "fehler";
  */
 export async function sendeFormular(daten: FormData, betreff: string, absender: string): Promise<VersandErgebnis> {
   if (!contactAccessKey) return "gesperrt";
+  if (!String(daten.get("h-captcha-response") ?? "").trim()) return "pruefung";
 
   daten.set("access_key", contactAccessKey);
   daten.set("botcheck", "");
   daten.set("from_name", absender);
   daten.set("subject", betreff);
+  // Auch Anfragen mit ausschließlich telefonischem Rückkontakt zulassen.
+  if (!String(daten.get("email") ?? "").trim()) daten.delete("email");
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20_000);
 
   try {
-    const antwort = await fetch(contactEndpoint, { method: "POST", body: daten, headers: { Accept: "application/json" } });
+    const antwort = await fetch(contactEndpoint, { method: "POST", body: daten, headers: { Accept: "application/json" }, signal: controller.signal });
     const ergebnis = (await antwort.json()) as { success?: boolean };
-    return antwort.ok && ergebnis.success ? "gesendet" : "fehler";
+    return antwort.ok && ergebnis.success === true ? "gesendet" : "fehler";
   } catch {
     return "fehler";
+  } finally {
+    clearTimeout(timeout);
   }
 }
+
+export const spamPruefungMeldung = "Bitte aktivieren und bestätigen Sie den Spamschutz. Eine abgelaufene Prüfung muss erneut bestätigt werden.";
