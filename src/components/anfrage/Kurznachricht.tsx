@@ -1,27 +1,26 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { KurzFehler, pruefeKurznachricht, versandGesperrtMeldung, wurdeZuSchnellAusgefuellt } from "@/lib/anfrage";
 import { leseFormularWerte, sendeFormular, spamPruefungMeldung, versandFreigeschaltet } from "@/lib/contact";
-import { FormularSchutz, FormularSchutzHandle } from "./FormularSchutz";
+import { FormularDatenschutz, FormularSchutz, FormularSchutzHandle } from "./FormularSchutz";
 import * as ui from "./anfrage-ui";
 
 /**
- * Kurznachricht in der Ansprechpartner-Karte: drei Felder und die Zustimmung,
- * mehr nicht. Wer es ausführlich mag, nutzt das Detailformular daneben.
+ * Kurznachricht: drei Felder und eine Spamprüfung. Wer es ausführlich mag,
+ * nutzt das Detailformular daneben.
  *
  * Bewusst ein eigenes <form>: verschachteln ließe es sich ohnehin nicht, und
- * getrennte Formulare halten die gleichnamigen Felder (firma, email,
- * datenschutz) beider Seiten auseinander. Prüfregeln und Versand liegen in
+ * getrennte Formulare halten die gleichnamigen Felder (firma, email)
+ * beider Seiten auseinander. Prüfregeln und Versand liegen in
  * src/lib, damit sie ohne Browser testbar bleiben.
  */
 
 const BETREFF = "Kurznachricht über das Kontaktformular";
 
 /** Reihenfolge, in der ein Fehler den Fokus bekommt – entspricht der Feldfolge. */
-const FEHLER_REIHENFOLGE = ["firma", "email", "nachricht", "datenschutz"] as const;
+const FEHLER_REIHENFOLGE = ["firma", "email", "nachricht"] as const;
 
 export function Kurznachricht() {
   const formRef = useRef<HTMLFormElement>(null);
@@ -190,25 +189,6 @@ export function Kurznachricht() {
         {fehler.nachricht && <span id="kurz-fehler-nachricht" className={ui.fehlerKlein}>{fehler.nachricht}</span>}
       </label>
 
-      <div className="shrink-0">
-        <label className="flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-ink-2">
-          <input
-            type="checkbox"
-            name="datenschutz"
-            value="1"
-            className={`${ui.choiceInput} mt-0.5`}
-            aria-invalid={fehler.datenschutz ? true : undefined}
-            aria-describedby={fehler.datenschutz ? "kurz-fehler-datenschutz" : undefined}
-            onChange={() => loescheFehler("datenschutz")}
-          />
-          <span className="min-w-0">
-            Ich habe die <span className="whitespace-nowrap"><Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{pflichtStern}</span>{" "}
-            zur Kenntnis genommen.
-          </span>
-        </label>
-        {fehler.datenschutz && <p id="kurz-fehler-datenschutz" className={ui.fehlerKlein}>{fehler.datenschutz}</p>}
-      </div>
-
       {versandFreigeschaltet && <FormularSchutz ref={schutzRef} />}
 
       <div
@@ -223,6 +203,7 @@ export function Kurznachricht() {
       <button type="submit" className={`${ui.btnPrimary} w-full shrink-0`} disabled={sendet}>
         {sendet ? "Wird gesendet …" : "Nachricht senden"} <ArrowRight className="size-4" aria-hidden="true" />
       </button>
+      <FormularDatenschutz />
     </form>
   );
 }

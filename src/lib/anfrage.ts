@@ -100,7 +100,7 @@ export function pruefeKontaktweg(email: string, telefon: string): string | null 
 }
 
 /** Fehlerschlüssel der Kurznachricht in der Ansprechpartner-Karte. */
-export type KurzFehler = Partial<Record<"firma" | "email" | "nachricht" | "datenschutz", string>>;
+export type KurzFehler = Partial<Record<"firma" | "email" | "nachricht", string>>;
 
 /**
  * Regeln der Kurznachricht. Anders als in Stufe 3 ist die E-Mail Pflicht: das
@@ -110,7 +110,6 @@ export function pruefeKurznachricht(werte: {
   firma?: string;
   email?: string;
   nachricht?: string;
-  datenschutz?: string;
 }): KurzFehler {
   const fehler: KurzFehler = {};
   const email = (werte.email ?? "").trim();
@@ -119,7 +118,6 @@ export function pruefeKurznachricht(werte: {
   if (!email) fehler.email = "Bitte geben Sie Ihre E-Mail-Adresse an.";
   else if (!istEmailPlausibel(email)) fehler.email = "Diese E-Mail-Adresse sieht unvollständig aus.";
   if (!(werte.nachricht ?? "").trim()) fehler.nachricht = "Bitte schildern Sie kurz, worum es geht.";
-  if (werte.datenschutz !== "1") fehler.datenschutz = "Bitte bestätigen Sie, dass Sie die Datenschutzhinweise zur Kenntnis genommen haben.";
 
   return fehler;
 }

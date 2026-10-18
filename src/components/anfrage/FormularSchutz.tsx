@@ -1,23 +1,30 @@
 "use client";
 
 import HCaptcha from "@hcaptcha/react-hcaptcha";
+import { Check, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { anfrageKontakt } from "@/lib/anfrage";
 
 export type FormularSchutzHandle = { token: () => string; reset: () => void };
+type Pruefstatus = "laedt" | "bereit" | "prueft" | "bestaetigt" | "abgelaufen" | "fehler";
 
-/** Direkt sichtbar am Formular; außerhalb des sichtbaren Bereichs wird hCaptcha noch nicht geladen. */
+const beschriftung: Record<Pruefstatus, string> = {
+  laedt: "Prüfung wird geladen …",
+  bereit: "Ich bin ein Mensch",
+  prueft: "Wird geprüft …",
+  bestaetigt: "Prüfung bestätigt",
+  abgelaufen: "Bitte erneut bestätigen",
+  fehler: "Prüfung erneut laden"
+};
+
+/** Eigener Auslöser in Feldbreite, verbunden mit der offiziellen Invisible-API.
+ * Ein Häkchen erscheint ausschließlich nach erfolgreicher hCaptcha-Prüfung. */
 export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
   const container = useRef<HTMLDivElement>(null);
   const captcha = useRef<HCaptcha>(null);
   const response = useRef("");
-  const sizeRef = useRef<"normal" | "compact">("compact");
-  const [size, setSize] = useState<"normal" | "compact">("compact");
   const [sichtbar, setSichtbar] = useState(false);
-  const [geladen, setGeladen] = useState(false);
-  const [fehler, setFehler] = useState(false);
-  const [abgelaufen, setAbgelaufen] = useState(false);
+  const [status, setStatus] = useState<Pruefstatus>("laedt");
   const [versuch, setVersuch] = useState(0);
 
   useEffect(() => {
@@ -30,44 +37,67 @@ export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
       }
     });
     observer.observe(element);
-    const resize = new ResizeObserver(([entry]) => {
-      const nextSize = entry.contentRect.width >= 304 ? "normal" : "compact";
-      if (sizeRef.current === nextSize) return;
-      sizeRef.current = nextSize;
-      response.current = "";
-      setGeladen(false);
-      setAbgelaufen(false);
-      setSize(nextSize);
-    });
-    resize.observe(element);
-    return () => { observer.disconnect(); resize.disconnect(); };
+    return () => observer.disconnect();
   }, []);
 
   useImperativeHandle(ref, () => ({
     token: () => response.current,
-    reset: () => { response.current = ""; setAbgelaufen(false); captcha.current?.resetCaptcha(); }
+    reset: () => { response.current = ""; captcha.current?.resetCaptcha(); setStatus("bereit"); }
   }), []);
 
+  function pruefen() {
+    if (status === "fehler") {
+      response.current = "";
+      setStatus("laedt");
+      setVersuch((bisher) => bisher + 1);
+      return;
+    }
+    if (!captcha.current?.isReady() || response.current || status === "prueft") return;
+    setStatus("prueft");
+    try {
+      captcha.current.execute();
+    } catch {
+      response.current = "";
+      setStatus("fehler");
+    }
+  }
+
+  const bestaetigt = status === "bestaetigt";
+  const wartet = status === "laedt" || status === "prueft";
+
   return (
-    <div ref={container} className="min-w-0 shrink-0 rounded-xl border border-line bg-surface px-3.5 py-3 text-xs leading-relaxed text-mute" aria-label="Spamprüfung">
-      <p className="font-semibold text-ink-2">Spamschutz</p>
-      <div className={`relative mt-2 ${size === "normal" ? "min-h-20" : "min-h-36"}`}>
-        {!geladen && !fehler && <p role="status" className="absolute inset-x-0 top-0">Spamprüfung wird geladen …</p>}
-        {sichtbar && <HCaptcha key={`${size}-${versuch}`} ref={captcha} sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2" reCaptchaCompat={false} languageOverride="de" size={size}
-          onReady={() => { setGeladen(true); setFehler(false); }}
-          onVerify={(token) => { response.current = token; setFehler(false); setAbgelaufen(false); }}
-          onExpire={() => { response.current = ""; setAbgelaufen(true); }} onChalExpired={() => { response.current = ""; setAbgelaufen(true); }}
-          onError={() => { response.current = ""; setFehler(true); }} />}
+    <div ref={container} className="min-w-0 shrink-0" aria-label="Spamprüfung">
+      <div className="captcha-control" data-verified={bestaetigt || undefined}>
+        <button type="button" role="checkbox" aria-checked={bestaetigt} aria-busy={wartet} onClick={pruefen}
+          disabled={wartet || bestaetigt} className="captcha-trigger">
+          <span className="captcha-checkmark" aria-hidden="true">
+            {bestaetigt ? <Check /> : wartet ? <LoaderCircle className="animate-spin motion-reduce:animate-none" /> : null}
+          </span>
+          <span aria-live="polite">{beschriftung[status]}</span>
+        </button>
+        <div className="captcha-provider">
+          <a href="https://www.hcaptcha.com/" target="_blank" rel="noopener noreferrer" className="captcha-brand" aria-label="Geschützt durch hCaptcha">hCaptcha</a>
+          <span>
+            <a href="https://www.hcaptcha.com/privacy" target="_blank" rel="noopener noreferrer">Datenschutz</a>
+            <span aria-hidden="true"> · </span>
+            <a href="https://www.hcaptcha.com/terms" target="_blank" rel="noopener noreferrer">Bedingungen</a>
+          </span>
+        </div>
       </div>
-      {abgelaufen && <p role="status" className="mt-2">Die Prüfung ist abgelaufen. Bitte bestätigen Sie erneut „Ich bin ein Mensch“.</p>}
-      {fehler && <>
-        <p role="alert" className="mt-2 text-signal-dark">Die Spamprüfung konnte nicht geladen werden. Ihre Eingaben bleiben erhalten.</p>
-        <button type="button" className="action-button mt-2 min-h-11 rounded-lg border border-line px-3 py-2 font-semibold text-ink transition-colors hover:border-accent" onClick={() => { response.current = ""; setGeladen(false); setFehler(false); setAbgelaufen(false); setVersuch((bisher) => bisher + 1); }}>Spamprüfung erneut laden</button>
-      </>}
-      <p className="mt-2">
-        hCaptcha schützt vor automatisierten Anfragen. <Link href="/datenschutz/#spamschutz" target="_blank" rel="noopener" className="font-semibold text-accent underline underline-offset-2">Datenschutzhinweise</Link>.
-        Alternativ: <a href={`mailto:${anfrageKontakt.email}`} className="font-semibold text-accent underline underline-offset-2">E-Mail</a> oder <a href={anfrageKontakt.telefonLink} className="font-semibold text-accent underline underline-offset-2">Telefon</a>.
-      </p>
+      {status === "fehler" && <p role="alert" className="mt-2 text-xs leading-relaxed text-signal-dark">Die Prüfung konnte nicht geladen werden. Bitte versuchen Sie es erneut. Ihre Eingaben bleiben erhalten.</p>}
+      {sichtbar && <HCaptcha key={versuch} ref={captcha} sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2" reCaptchaCompat={false} languageOverride="de" size="invisible"
+        onReady={() => setStatus("bereit")}
+        onVerify={(token) => { response.current = token; setStatus("bestaetigt"); }}
+        onExpire={() => { response.current = ""; setStatus("abgelaufen"); }}
+        onChalExpired={() => { response.current = ""; setStatus("abgelaufen"); }}
+        onClose={() => { setStatus((bisher) => bisher === "prueft" ? "bereit" : bisher); }}
+        onError={() => { response.current = ""; setStatus("fehler"); }} />}
     </div>
   );
+}
+
+export function FormularDatenschutz({ className = "" }: { className?: string }) {
+  return <p className={`shrink-0 text-xs leading-relaxed text-mute ${className}`}>
+    <Link href="/datenschutz/" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-accent">Datenschutzhinweise</Link>
+  </p>;
 }

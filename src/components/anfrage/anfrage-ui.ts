@@ -77,10 +77,6 @@ export const fehler = "mt-2 block text-sm font-semibold text-signal-dark";
 /** Dieselbe Meldung in der schmalen Karte – dort zählt jede Zeile. */
 export const fehlerKlein = fehler.replace("mt-2", "mt-1.5").replace("text-sm", "text-xs");
 
-/** Ruhige Informations- und Zustimmungsflächen im Fragenbereich */
-export const infoBox = "mt-7 rounded-xl border border-line bg-surface-2 p-4 text-sm leading-relaxed text-mute";
-export const consentBox = "mt-7 rounded-xl border border-line bg-surface-2 p-4";
-
 /** Buttons */
 export const btnBase =
   "action-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 font-body text-sm font-bold transition-colors duration-150";
@@ -113,7 +109,7 @@ export const stageActions = [
 
 /** Störfallaktionen bleiben mobil als zwei gleich breite Buttons in einer Zeile. */
 export const stageActionsPair = [
-  "grid shrink-0 grid-cols-2 items-center gap-2 sm:flex sm:justify-between sm:gap-3",
+  "grid shrink-0 grid-cols-2 items-center gap-2 sm:flex sm:flex-wrap sm:justify-between sm:gap-3",
   "border-t border-line bg-surface px-5 py-4 sm:px-8",
   "transition-shadow duration-200"
 ].join(" ");

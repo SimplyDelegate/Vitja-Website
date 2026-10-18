@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { ChangeEvent, FormEvent, ReactNode, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
@@ -17,7 +16,7 @@ import {
 } from "@/lib/anfrage";
 import { contactUploadsEnabled, leseFormularWerte, sendeFormular, spamPruefungMeldung, versandFreigeschaltet } from "@/lib/contact";
 import { AnfrageTrustKarte } from "./AnfrageTrustKarte";
-import { FormularSchutz, FormularSchutzHandle } from "./FormularSchutz";
+import { FormularDatenschutz, FormularSchutz, FormularSchutzHandle } from "./FormularSchutz";
 import * as ui from "./anfrage-ui";
 
 /**
@@ -32,8 +31,8 @@ const STUFEN_LABELS = ["Leistungen wählen", "Projekt beschreiben", "Kontaktdate
 
 const FEHLER_REIHENFOLGE = [
   "leistungen",
-  "firma", "name", "kontaktweg", "datenschutz",
-  "a_betrieb", "a_beschreibung", "a_plz", "a_firma", "a_name", "a_telefon", "a_datenschutz"
+  "firma", "name", "kontaktweg",
+  "a_betrieb", "a_beschreibung", "a_plz", "a_firma", "a_name", "a_telefon"
 ] as const;
 
 type Fehler = Partial<Record<(typeof FEHLER_REIHENFOLGE)[number], string>>;
@@ -298,7 +297,6 @@ export function Anfrageformular() {
       if (!werte.name?.trim()) neu.name = "Bitte geben Sie Ihren Namen an.";
       const kontaktweg = pruefeKontaktweg(werte.email ?? "", werte.telefon ?? "");
       if (kontaktweg) neu.kontaktweg = kontaktweg;
-      if (werte.datenschutz !== "1") neu.datenschutz = "Bitte bestätigen Sie, dass Sie die Datenschutzhinweise zur Kenntnis genommen haben.";
     }
     return neu;
   }
@@ -311,7 +309,6 @@ export function Anfrageformular() {
     if (!werte.firma?.trim()) neu.a_firma = "Bitte geben Sie Ihr Unternehmen an.";
     if (!werte.name?.trim()) neu.a_name = "Bitte geben Sie Ihren Namen an.";
     if (!werte.telefon?.trim()) neu.a_telefon = "Bitte geben Sie eine Nummer an, unter der wir Sie sofort erreichen.";
-    if (werte.datenschutz !== "1") neu.a_datenschutz = "Bitte bestätigen Sie, dass Sie die Datenschutzhinweise zur Kenntnis genommen haben.";
     return neu;
   }
 
@@ -778,30 +775,7 @@ export function Anfrageformular() {
                       </label>
                     </fieldset>
 
-                    <p className={ui.infoBox}>
-                      Mit dem Absenden entsteht noch kein Auftrag. Wir prüfen Ihre Angaben und melden uns mit Rückfragen oder einem Terminvorschlag.
-                    </p>
-
-                    <div className={ui.consentBox} id="gruppe-datenschutz">
-                      <span className={ui.kicker}>Datenschutz</span>
-                      <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-2">
-                        <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("datenschutz")} />
-                        <span>
-                          Ich habe die <span className="whitespace-nowrap"><Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{pflichtStern}</span>{" "}
-                          zur Kenntnis genommen.
-                        </span>
-                      </label>
-                      {fehler.datenschutz && <p className={ui.fehler}>{fehler.datenschutz}</p>}
-                      <details className="mt-3 text-sm text-mute">
-                        <summary className="cursor-pointer font-semibold text-ink-2">Hinweis zur Datenverarbeitung</summary>
-                        <p className="mt-2 leading-relaxed">
-                          Verantwortlich ist {anfrageKontakt.verantwortlich}. Wir verarbeiten Ihre Angaben zur Bearbeitung der Anfrage und übermitteln sie dafür an den in der Datenschutzerklärung genannten Formulardienst.
-                          Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO bei Vertrags- und Angebotsanfragen, ansonsten unser berechtigtes Interesse an der Beantwortung Ihrer Nachricht gemäß Art. 6 Abs. 1 lit. f DSGVO.
-                        </p>
-                      </details>
-                    </div>
-
-                    {versandFreigeschaltet && !akut && stufe === 3 && <FormularSchutz ref={schutzRef} />}
+                    {versandFreigeschaltet && !akut && stufe === 3 && <div className="mt-6"><FormularSchutz ref={schutzRef} /></div>}
 
                     <label className="absolute left-[-9999px] top-auto size-px overflow-hidden" aria-hidden="true">
                       Website
@@ -814,6 +788,7 @@ export function Anfrageformular() {
                     <button type="submit" className={ui.btnPrimary} disabled={sendet}>
                       {sendet ? "Wird gesendet …" : "Anfrage senden"} <ArrowRight className="size-4" aria-hidden="true" />
                     </button>
+                    <FormularDatenschutz className="basis-full" />
                   </div>
                 </section>
               </fieldset>
@@ -891,18 +866,7 @@ export function Anfrageformular() {
                       </div>
                     </Gruppe>
 
-                    <div className={ui.consentBox} id="gruppe-a_datenschutz">
-                      <span className={ui.kicker}>Datenschutz</span>
-                      <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-2">
-                        <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("a_datenschutz")} />
-                        <span>
-                          Ich habe die <span className="whitespace-nowrap"><Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{pflichtStern}</span>{" "}
-                          zur Kenntnis genommen.
-                        </span>
-                      </label>
-                      {fehler.a_datenschutz && <p className={ui.fehler}>{fehler.a_datenschutz}</p>}
-                    </div>
-                    {versandFreigeschaltet && akut && <FormularSchutz ref={akutSchutzRef} />}
+                    {versandFreigeschaltet && akut && <div className="mt-6"><FormularSchutz ref={akutSchutzRef} /></div>}
                     <label className="absolute left-[-9999px] top-auto size-px overflow-hidden" aria-hidden="true">
                       Website
                       <input type="text" name="website" tabIndex={-1} autoComplete="off" />
@@ -914,6 +878,7 @@ export function Anfrageformular() {
                     <button type="submit" className={ui.btnSignalCompact} disabled={sendet}>
                       {sendet ? "Wird gesendet …" : stoerfall.submitLabel} <ArrowRight className="hidden size-4 shrink-0 sm:block" aria-hidden="true" />
                     </button>
+                    <FormularDatenschutz className="col-span-2 basis-full" />
                   </div>
                 </fieldset>
               </section>

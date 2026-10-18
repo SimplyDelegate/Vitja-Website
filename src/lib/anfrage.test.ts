@@ -82,17 +82,16 @@ describe("Kurznachricht", () => {
   const vollstaendig = {
     firma: "Nordwerft GmbH",
     email: "planung@nordwerft.de",
-    nachricht: "Wir brauchen eine Isolierung an zwei Kesseln.",
-    datenschutz: "1"
+    nachricht: "Wir brauchen eine Isolierung an zwei Kesseln."
   };
 
-  it("lässt vollständige Angaben durch", () => {
+  it("lässt vollständige Angaben ohne zusätzliche Datenschutz-Bestätigung durch", () => {
     expect(pruefeKurznachricht(vollstaendig)).toEqual({});
   });
 
   it("bemängelt jedes fehlende Pflichtfeld einzeln", () => {
     const fehler = pruefeKurznachricht({});
-    expect(Object.keys(fehler).sort()).toEqual(["datenschutz", "email", "firma", "nachricht"]);
+    expect(Object.keys(fehler).sort()).toEqual(["email", "firma", "nachricht"]);
   });
 
   it("wertet Eingaben aus reinen Leerzeichen als fehlend", () => {
@@ -107,10 +106,6 @@ describe("Kurznachricht", () => {
     expect(pruefeKurznachricht({ ...vollstaendig, email: "planung@nordwerft.de" }).email).toBeUndefined();
   });
 
-  it("besteht auf der Datenschutz-Zustimmung", () => {
-    expect(pruefeKurznachricht({ ...vollstaendig, datenschutz: undefined }).datenschutz).toBeDefined();
-    expect(pruefeKurznachricht({ ...vollstaendig, datenschutz: "0" }).datenschutz).toBeDefined();
-  });
 });
 
 describe("Upload-Grenzen", () => {

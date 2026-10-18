@@ -52,6 +52,28 @@ describe("Formularübermittlung mit konfiguriertem Dienst", () => {
     expect(netz).toHaveBeenCalledWith("https://api.web3forms.com/submit", expect.objectContaining({ method: "POST", body: daten, signal: expect.any(AbortSignal) }));
   });
 
+  it("erhält mehrere Leistungen und Projektdetails beim Versand einer ausführlichen Anfrage", async () => {
+    const netz = vi.fn().mockResolvedValue(new Response(JSON.stringify({ success: true })));
+    vi.stubGlobal("fetch", netz);
+    const { sendeFormular: senden } = await import("./contact");
+    const daten = testDaten();
+    daten.append("leistungen[]", "industrieisolierung");
+    daten.append("leistungen[]", "rohrbau");
+    daten.set("beschreibung", "Isolierung und Rohrleitungen zum geplanten Stillstand anpassen.");
+    daten.set("zeitrahmen", "stillstand");
+    daten.set("termin", "KW 48");
+    daten.set("firma", "Testunternehmen");
+    daten.set("name", "Testkontakt");
+    await expect(senden(daten, "Anfrage: Industrieisolierung, Rohrleitungsbau", "Testkontakt")).resolves.toBe("gesendet");
+    const gesendet = netz.mock.calls[0][1].body as FormData;
+    expect(gesendet.getAll("leistungen[]")).toEqual(["industrieisolierung", "rohrbau"]);
+    expect(gesendet.get("beschreibung")).toContain("Stillstand");
+    expect(gesendet.get("termin")).toBe("KW 48");
+    expect(gesendet.get("firma")).toBe("Testunternehmen");
+    expect(gesendet.get("name")).toBe("Testkontakt");
+    expect(gesendet.has("datenschutz")).toBe(false);
+  });
+
   it.each([
     [200, { success: false }],
     [400, { success: true }],

@@ -30,7 +30,7 @@ Für Cloudflare bleibt `NEXT_PUBLIC_BASE_PATH` leer.
 5. Neu deployen. Kurzformular, ausführliche Anfrage und Störfallpfad prüfen. E-Mail und reinen Telefonkontakt berücksichtigen. Eine echte Anfrage absenden und ihren Eingang im Empfängerpostfach einschließlich Spamordner prüfen. Bei vorhandener Absender-E-Mail muss eine Antwort an diese Adresse möglich sein.
 6. Mit fehlendem, ungültigem und bereits verwendetem Captcha-Token prüfen, dass der Dienst die Übermittlung ablehnt. Nach jeder Übermittlung bzw. Ablauf muss die Prüfung erneuert werden.
 
-Ohne Access-Key wird kein Versand behauptet oder ausgelöst; die Website zeigt direkte Kontaktwege. hCaptcha erscheint ohne zusätzlichen Aktivierungsknopf, sobald der jeweilige Formularbereich sichtbar wird. Die Prüfung bleibt vor jedem Versand verpflichtend. Eingaben bleiben bei Fehlern erhalten, und hängende Requests werden nach 20 Sekunden abgebrochen.
+Ohne Access-Key wird kein Versand behauptet oder ausgelöst; die Website zeigt direkte Kontaktwege. Eine einzige Prüfzeile in Feldbreite startet hCaptcha über dessen offizielle Invisible-API. Das Häkchen wird ausschließlich nach erfolgreicher Prüfung gesetzt; eine zusätzliche Bilderaufgabe kann weiterhin erforderlich sein. Ein separater Datenschutz-Haken wird nicht verlangt; ein kurzer Link steht am Senden-Button. Der Dienst wird erst beim sichtbaren Formular geladen, die Prüfung bleibt vor jedem Versand verpflichtend. Eingaben bleiben bei Fehlern erhalten, und hängende Requests werden nach 20 Sekunden abgebrochen.
 Dateianhänge bleiben deaktiviert. Sie benötigen einen passenden Tarif und einen gesonderten Funktionstest; Nachreichen per E-Mail ist möglich.
 
 ## Hauptdomain veröffentlichen
