@@ -27,6 +27,10 @@
   --type-body: 1rem;
   --type-secondary: .9375rem;
   --type-label: .75rem;
+  --focus-color: #8b551f;
+  --focus-halo: rgba(139, 85, 31, .22);
+  --focus-width: 2px;
+  --focus-offset: 3px;
 }
 
 * { box-sizing: border-box; }
@@ -61,7 +65,35 @@ button { color: inherit; }
 .review-note-view button:first-child { color: #ffb29b; }
 .review-note-view button:last-child { background: var(--gold); color: var(--carbon); }
 
-:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+:focus-visible,
+.form-choice:has(:focus-visible) {
+  outline: var(--focus-width) solid var(--focus-color);
+  outline-offset: var(--focus-offset);
+}
+.hero, .project-section, .project-dialog, .site-footer, .mobile-nav {
+  --focus-color: var(--gold);
+}
+.form-choice input:focus-visible { outline: none; }
+.form-control:hover:not(:disabled):not(:focus):not([aria-invalid="true"]) { border-color: #a49a8b; }
+.form-control:focus {
+  border-color: var(--focus-color);
+  background: white;
+  outline: none;
+  box-shadow: 0 0 0 var(--focus-width) var(--focus-halo);
+}
+.form-control[aria-invalid="true"] {
+  border-color: #d4520a;
+  box-shadow: 0 0 0 var(--focus-width) rgba(212, 82, 10, .2);
+}
+/* Platz für den kompletten Fokusrahmen an allen vier Seiten des Scrollbereichs. */
+@media (min-width: 1024px) and (min-height: 760px) {
+  .quick-contact-form { margin: -6px; padding: 6px; scrollbar-gutter: stable; }
+}
+.action-button:active:not(:disabled), .button:active { filter: brightness(.96); }
+.action-button:disabled, button:disabled { cursor: not-allowed; }
+@media (forced-colors: active) {
+  .form-control:focus { outline: 2px solid Highlight; outline-offset: -3px; }
+}
 .skip-link { position: fixed; top: 10px; left: 10px; z-index: 999; transform: translateY(-150%); padding: 10px 16px; background: var(--gold); color: var(--carbon); font-weight: 700; }
 .skip-link:focus { transform: none; }
 .shell { width: var(--shell); margin-inline: auto; }
@@ -75,7 +107,7 @@ h3 { font-size: var(--type-card-title); }
 p { margin: 0; }
 
 .button { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 10px; padding: 13px 22px; border: 1px solid var(--gold); background: var(--gold); color: var(--carbon); font-size: .875rem; font-weight: 800; letter-spacing: 0.035em; line-height: 1.15; transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease; }
-.button:hover { background: #f4bd70; border-color: #f4bd70; transform: translateY(-2px); }
+.button:hover { background: #f4bd70; border-color: #f4bd70; }
 .button-small { min-height: 44px; padding: 10px 17px; font-size: .875rem; }
 .button-ghost { border-color: rgba(255,255,255,.6); background: rgba(13,15,18,.18); color: white; backdrop-filter: blur(8px); }
 .button-ghost:hover { border-color: white; background: white; color: var(--carbon); }
@@ -134,7 +166,7 @@ p { margin: 0; }
 .service-card:hover .service-card-image { filter: saturate(1.04) contrast(1.02); transform: scale(1.025); }
 .service-gallery-control { position: absolute; top: 50%; z-index: 4; display: grid; width: 44px; height: 44px; place-items: center; padding: 0; border: 1px solid rgba(255,255,255,.6); border-radius: 50%; background: rgba(13,15,18,.7); color: white; box-shadow: 0 7px 20px rgba(0,0,0,.2); cursor: pointer; transform: translateY(-50%); transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease, transform 180ms ease; backdrop-filter: blur(8px); }
 .service-gallery-control:hover { border-color: var(--gold); background: var(--gold); color: var(--carbon); transform: translateY(-50%) scale(1.04); }
-.service-gallery-control:focus-visible { outline: 3px solid white; outline-offset: 3px; border-color: var(--gold); }
+.service-gallery-control:focus-visible { --focus-color: var(--gold); border-color: var(--gold); }
 .service-gallery-control:disabled { cursor: wait; opacity: .62; }
 .service-gallery-control svg { width: 21px; height: 21px; stroke-width: 2; }
 .service-gallery-previous { left: 12px; }

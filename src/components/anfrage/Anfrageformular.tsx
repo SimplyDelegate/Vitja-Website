@@ -466,7 +466,7 @@ export function Anfrageformular() {
 
   /* ------------------------------------------------------------------- Markup */
 
-  const pflichtStern = <span className="text-signal" aria-hidden="true"> *</span>;
+  const pflichtStern = <span className="text-signal" aria-hidden="true">{"\u00a0*"}</span>;
 
   const uploadFeld = (
     <label className={uploadStil.signal.rahmen}>
@@ -787,8 +787,8 @@ export function Anfrageformular() {
                       <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-2">
                         <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("datenschutz")} />
                         <span>
-                          Ich habe die <Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{" "}
-                          zur Kenntnis genommen.{pflichtStern}
+                          Ich habe die <span className="whitespace-nowrap"><Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{pflichtStern}</span>{" "}
+                          zur Kenntnis genommen.
                         </span>
                       </label>
                       {fehler.datenschutz && <p className={ui.fehler}>{fehler.datenschutz}</p>}
@@ -896,8 +896,8 @@ export function Anfrageformular() {
                       <label className="mt-3 flex cursor-pointer items-start gap-3 text-sm leading-relaxed text-ink-2">
                         <input type="checkbox" name="datenschutz" value="1" className={`${ui.choiceInput} mt-0.5`} onChange={() => loescheFehler("a_datenschutz")} />
                         <span>
-                          Ich habe die <Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{" "}
-                          zur Kenntnis genommen.{pflichtStern}
+                          Ich habe die <span className="whitespace-nowrap"><Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{pflichtStern}</span>{" "}
+                          zur Kenntnis genommen.
                         </span>
                       </label>
                       {fehler.a_datenschutz && <p className={ui.fehler}>{fehler.a_datenschutz}</p>}

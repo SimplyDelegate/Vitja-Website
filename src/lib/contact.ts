@@ -66,4 +66,4 @@ export async function sendeFormular(daten: FormData, betreff: string, absender: 
   }
 }
 
-export const spamPruefungMeldung = "Bitte aktivieren und bestätigen Sie den Spamschutz. Eine abgelaufene Prüfung muss erneut bestätigt werden.";
+export const spamPruefungMeldung = "Bitte bestätigen Sie die Spamprüfung mit „Ich bin ein Mensch“. Eine abgelaufene Prüfung muss erneut bestätigt werden.";

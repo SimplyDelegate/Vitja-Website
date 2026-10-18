@@ -11,19 +11,17 @@ export const kicker = "font-body text-xs font-extrabold uppercase tracking-[0.14
 
 /** Auswahlkarte (Radio oder Checkbox) */
 export const choice = [
-  "relative flex h-full min-h-14 cursor-pointer items-center gap-3 rounded-xl",
+  "form-choice relative flex h-full min-h-14 cursor-pointer items-center gap-3 rounded-xl",
   "border border-line bg-surface-2 px-4 py-3 text-sm font-semibold leading-snug text-ink-2",
   "transition-colors duration-150",
   "hover:border-ink-2/40 hover:bg-surface",
-  "has-[:checked]:border-accent has-[:checked]:bg-accent/[0.06] has-[:checked]:text-ink",
-  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-accent"
+  "has-[:checked]:border-accent has-[:checked]:bg-accent/[0.06] has-[:checked]:text-ink"
 ].join(" ");
 
 /** Auswahlkarte im Störfall-Kontext */
 export const choiceSignal = choice
   .replace("has-[:checked]:border-accent", "has-[:checked]:border-signal")
-  .replace("has-[:checked]:bg-accent/[0.06]", "has-[:checked]:bg-signal/[0.07]")
-  .replace("has-[:focus-visible]:outline-accent", "has-[:focus-visible]:outline-signal");
+  .replace("has-[:checked]:bg-accent/[0.06]", "has-[:checked]:bg-signal/[0.07]");
 
 /** Der eigentliche Radio-/Checkbox-Input in einer Auswahlkarte */
 export const choiceInput = "size-4 shrink-0 accent-accent";
@@ -47,11 +45,9 @@ export const fieldLabel = "text-sm font-semibold text-ink-2";
 
 /** Eingabefelder */
 export const input = [
-  "min-h-[3rem] w-full rounded-xl border border-line bg-surface-2 px-3.5 py-2.5",
+  "form-control min-h-[3rem] w-full rounded-xl border border-line bg-surface-2 px-3.5 py-2.5",
   "text-[0.95rem] text-ink placeholder:text-mute/70",
-  "transition-colors duration-150",
-  "focus:border-accent focus:bg-surface focus:outline-none focus:ring-2 focus:ring-accent/25",
-  "aria-[invalid=true]:border-signal aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-signal/20"
+  "transition-colors duration-150"
 ].join(" ");
 
 export const textarea = `${input} min-h-[9.5rem] resize-y leading-relaxed`;
@@ -87,22 +83,22 @@ export const consentBox = "mt-7 rounded-xl border border-line bg-surface-2 p-4";
 
 /** Buttons */
 export const btnBase =
-  "inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 font-body text-sm font-bold transition-colors duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2";
-export const btnPrimary = `${btnBase} bg-gold text-carbon hover:bg-[#F4BD70] focus-visible:outline-accent disabled:opacity-60`;
-export const btnSecondary = `${btnBase} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink focus-visible:outline-accent`;
-export const btnSignal = `${btnBase} bg-signal text-white hover:bg-signal-dark focus-visible:outline-signal disabled:opacity-60`;
+  "action-button inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 font-body text-sm font-bold transition-colors duration-150";
+export const btnPrimary = `${btnBase} bg-gold text-carbon hover:bg-[#F4BD70] disabled:opacity-60`;
+export const btnSecondary = `${btnBase} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink`;
+export const btnSignal = `${btnBase} bg-signal text-white hover:bg-signal-dark disabled:opacity-60`;
 
 /** Kompakte Varianten für zwei gleich breite Aktionen auf schmalen Displays. */
 const btnBaseCompact = `${btnBase.replace("px-5", "px-2").replace("text-sm", "text-xs")} w-full min-w-0 whitespace-nowrap sm:w-auto sm:px-5 sm:text-sm`;
-export const btnSecondaryCompact = `${btnBaseCompact} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink focus-visible:outline-accent`;
-export const btnSignalCompact = `${btnBaseCompact} bg-signal text-white hover:bg-signal-dark focus-visible:outline-signal disabled:opacity-60`;
+export const btnSecondaryCompact = `${btnBaseCompact} border border-line bg-surface text-ink-2 hover:border-ink-2/40 hover:text-ink`;
+export const btnSignalCompact = `${btnBaseCompact} bg-signal text-white hover:bg-signal-dark disabled:opacity-60`;
 
 /**
  * Störfall-Shortcut der Karte: Geometrie des Senden-Buttons, aber als ruhige
  * Signalfläche statt Vollton – er ist der dritte gleichgroße Weg neben dem
  * goldenen Senden- und dem dunklen Anruf-Button, nicht deren Konkurrenz.
  */
-export const btnSignalLeise = `${btnBase} w-full border border-signal/35 bg-signal/[0.05] text-ink hover:border-signal/60 focus-visible:outline-signal aria-[current]:border-signal/60`;
+export const btnSignalLeise = `${btnBase} w-full border border-signal/35 bg-signal/[0.05] text-ink hover:border-signal/60 aria-[current]:border-signal/60`;
 
 /**
  * Aktionsleiste am Panelfuß. Bleibt im pult-Modus unten stehen; `data-mehr`
@@ -134,7 +130,7 @@ export const panelLead = "mt-2 max-w-[60ch] text-[0.9375rem] leading-relaxed tex
 export const panelBody = [
   "px-5 py-6 sm:px-8",
   "pult:min-h-0 pult:flex-1 pult:overflow-y-auto pult:overscroll-contain",
-  "pult:focus-visible:outline pult:focus-visible:-outline-offset-2 pult:focus-visible:outline-accent"
+  "pult:focus-visible:-outline-offset-2"
 ].join(" ");
 
 /** Stufen-/Störfallpanel: im pult-Modus Flex-Spalte auf voller Arbeitsflächenhöhe */
@@ -144,7 +140,7 @@ export const panel = "pult:flex pult:min-h-0 pult:flex-1 pult:flex-col";
 export const panelWrapper = "m-0 block min-w-0 border-0 p-0 pult:flex pult:min-h-0 pult:flex-1 pult:flex-col";
 
 /** Dunkler CTA auf warmem Grund (entspricht .button-dark der Site) */
-export const btnDark = `${btnBase} bg-carbon text-white hover:bg-[#292E35] focus-visible:outline-carbon`;
+export const btnDark = `${btnBase} bg-carbon text-white hover:bg-[#292E35]`;
 
 /** Anruf-CTA der Karte: dunkler Button mit der Rufnummer, sonst wie btnPrimary. */
 export const callButton = `${btnDark} w-full`;

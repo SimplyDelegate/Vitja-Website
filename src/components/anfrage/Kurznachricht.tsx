@@ -109,7 +109,7 @@ export function Kurznachricht() {
       : "Die Übermittlung konnte nicht bestätigt werden. Ihre Angaben bleiben erhalten. Bitte versuchen Sie es erneut oder kontaktieren Sie uns per E-Mail oder Telefon.");
   }
 
-  const pflichtStern = <span className="text-signal" aria-hidden="true"> *</span>;
+  const pflichtStern = <span className="text-signal" aria-hidden="true">{"\u00a0*"}</span>;
 
   if (gesendet) {
     return (
@@ -133,7 +133,7 @@ export function Kurznachricht() {
   return (
     <form
       ref={formRef}
-      className="flex min-w-0 flex-col gap-3.5 pult:min-h-0 pult:flex-1 pult:overflow-y-auto pult:overscroll-contain pult:pr-1"
+      className="quick-contact-form flex min-w-0 flex-col gap-3.5 pult:min-h-0 pult:flex-1 pult:overflow-y-auto pult:overscroll-contain"
       method="post"
       noValidate
       aria-label="Kurznachricht schreiben"
@@ -201,9 +201,9 @@ export function Kurznachricht() {
             aria-describedby={fehler.datenschutz ? "kurz-fehler-datenschutz" : undefined}
             onChange={() => loescheFehler("datenschutz")}
           />
-          <span>
-            Ich habe die <Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{" "}
-            zur Kenntnis genommen.{pflichtStern}
+          <span className="min-w-0">
+            Ich habe die <span className="whitespace-nowrap"><Link href="/datenschutz" className="font-semibold text-accent underline underline-offset-2" target="_blank" rel="noopener">Datenschutzerklärung</Link>{pflichtStern}</span>{" "}
+            zur Kenntnis genommen.
           </span>
         </label>
         {fehler.datenschutz && <p id="kurz-fehler-datenschutz" className={ui.fehlerKlein}>{fehler.datenschutz}</p>}

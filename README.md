@@ -30,7 +30,7 @@ Für Cloudflare bleibt `NEXT_PUBLIC_BASE_PATH` leer.
 5. Neu deployen. Kurzformular, ausführliche Anfrage und Störfallpfad prüfen. E-Mail und reinen Telefonkontakt berücksichtigen. Eine echte Anfrage absenden und ihren Eingang im Empfängerpostfach einschließlich Spamordner prüfen. Bei vorhandener Absender-E-Mail muss eine Antwort an diese Adresse möglich sein.
 6. Mit fehlendem, ungültigem und bereits verwendetem Captcha-Token prüfen, dass der Dienst die Übermittlung ablehnt. Nach jeder Übermittlung bzw. Ablauf muss die Prüfung erneuert werden.
 
-Ohne Access-Key wird kein Versand behauptet oder ausgelöst; die Website zeigt direkte Kontaktwege. Die Integration lädt hCaptcha erst nach bewusster Aktivierung. Eingaben bleiben bei Fehlern erhalten, und hängende Requests werden nach 20 Sekunden abgebrochen.
+Ohne Access-Key wird kein Versand behauptet oder ausgelöst; die Website zeigt direkte Kontaktwege. hCaptcha erscheint ohne zusätzlichen Aktivierungsknopf, sobald der jeweilige Formularbereich sichtbar wird. Die Prüfung bleibt vor jedem Versand verpflichtend. Eingaben bleiben bei Fehlern erhalten, und hängende Requests werden nach 20 Sekunden abgebrochen.
 Dateianhänge bleiben deaktiviert. Sie benötigen einen passenden Tarif und einen gesonderten Funktionstest; Nachreichen per E-Mail ist möglich.
 
 ## Hauptdomain veröffentlichen
@@ -47,7 +47,7 @@ Pages-Adressen bleiben über HTTP-Header von der Indexierung ausgeschlossen. Ein
 Am 18.10.2026 vom Betreiber bestätigt: Triumph Technical Services UG (haftungsbeschränkt), Amtsgericht Tostedt, HRB 211346, Auf dem Jarten 6, 27607 Geestland; Geschäftsführer Viktor Jakobi. Keine USt-IdNr. oder Wirtschafts-ID angegeben. Die interne Steuernummer und die Bankverbindung werden nicht als Impressumspflichten veröffentlicht.
 Am 18.10.2026 als öffentliche Kontakt- und Formular-Empfängeradresse bestätigt: `Jakobi@triumph-ts.de`.
 Web3Forms ist für dieses Postfach angelegt. Verpflichtendes hCaptcha und automatische Löschung der gespeicherten Anfragen nach sieben Tagen sind im Dienst eingestellt. Der öffentliche Formularschlüssel wird in Cloudflare und lokal über Umgebungsvariablen eingebunden.
-Die Datenschutzhinweise beschreiben Cloudflare Pages, Web3Forms, dessen Unterauftragsverarbeiter und die nach Aktivierung geladene hCaptcha-Prüfung. Bei Änderungen an Anbietern, Analysefunktionen, Empfänger- oder Unternehmensdaten sind die Texte anzupassen. Die Umsetzung ist keine anwaltliche Freigabe.
+Die Datenschutzhinweise beschreiben Cloudflare Pages, Web3Forms, dessen Unterauftragsverarbeiter und die beim sichtbaren Formular automatisch geladene hCaptcha-Prüfung. Die Direktanzeige ist als erforderliche Sicherheitsfunktion auf berechtigtes Interesse und § 25 Abs. 2 Nr. 2 TDDDG gestützt. Diese Einordnung der konkreten Einbindung einschließlich möglicher Endgerätezugriffe und Drittlandübermittlungen ist vor Veröffentlichung auf der Hauptdomain rechtlich zu prüfen; die Umsetzung ist keine anwaltliche Freigabe. Bei Änderungen an Anbietern, Analysefunktionen, Empfänger- oder Unternehmensdaten sind die Texte anzupassen.
 
 ## Sicherheitsprüfung
 
