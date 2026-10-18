@@ -91,7 +91,8 @@ button { color: inherit; }
 }
 .action-button:active:not(:disabled), .button:active { filter: brightness(.96); }
 .action-button:disabled, button:disabled { cursor: not-allowed; }
-.captcha-control { position: relative; display: grid; width: 100%; min-width: 0; grid-template-columns: 14px minmax(0, 1fr) 12px max-content 14px; grid-template-rows: 14px minmax(24px, auto) 24px 14px; }
+/* Gleicher Platz über und unter der Prüfzeile hält Text und Logo exakt in der Kachelmitte. */
+.captcha-control { position: relative; display: grid; width: 100%; min-width: 0; grid-template-columns: 14px minmax(0, 1fr) 12px max-content 14px; grid-template-rows: 28px minmax(24px, auto) 28px; }
 .captcha-trigger {
   grid-area: 1 / 1 / -1 / -1;
   display: grid;
@@ -123,8 +124,9 @@ button { color: inherit; }
 .captcha-provider { display: contents; color: #687078; line-height: 1.2; }
 .captcha-provider .captcha-brand { grid-area: 2 / 4; align-self: center; justify-self: center; gap: 4px; font-size: .8125rem; font-weight: 800; letter-spacing: -.025em; }
 .captcha-provider .captcha-brand img { width: 24px; height: 24px; flex-shrink: 0; }
-.captcha-provider > span { grid-area: 3 / 2 / 4 / 5; display: flex; align-items: center; justify-self: end; gap: 6px; font-size: .5625rem; white-space: nowrap; }
+.captcha-provider > span { grid-area: 3 / 2 / 4 / 5; display: flex; align-items: end; align-self: end; justify-self: end; gap: 6px; padding-bottom: 4px; font-size: .5625rem; white-space: nowrap; }
 .captcha-provider a { display: inline-flex; min-height: 24px; align-items: center; }
+.captcha-provider > span a { align-items: end; }
 .captcha-provider a:hover { color: #8b551f; text-decoration: underline; text-underline-offset: 2px; }
 @media (forced-colors: active) {
   .form-control:focus { outline: 2px solid Highlight; outline-offset: -3px; }
