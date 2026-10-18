@@ -35,6 +35,7 @@ describe("SEO-Freigabe und URL-Konsistenz", () => {
     }
     expect(seo.robots()).toMatchObject({ rules: { allow: "/" }, sitemap: "https://www.firma.de/sitemap.xml" });
     expect(entries[0].images?.length).toBeGreaterThan(0);
+    expect(entries[0].images).toContain("https://www.firma.de/media/services/rohrbau/rohrbau-fertigungskomponenten.webp");
     for (const image of entries[0].images ?? []) {
       expect(existsSync(join(process.cwd(), "public", new URL(image).pathname))).toBe(true);
     }

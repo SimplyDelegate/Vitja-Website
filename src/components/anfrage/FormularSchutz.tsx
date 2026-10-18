@@ -4,7 +4,7 @@ import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { Check, LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { Ref, useImperativeHandle, useRef, useState } from "react";
 import { asset } from "@/lib/assets";
 
 export type FormularSchutzHandle = { token: () => string; reset: () => void };
@@ -22,42 +22,41 @@ const beschriftung: Record<Pruefstatus, string> = {
 /** Eigener Auslöser in Feldbreite, verbunden mit der offiziellen Invisible-API.
  * Ein Häkchen erscheint ausschließlich nach erfolgreicher hCaptcha-Prüfung. */
 export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
-  const container = useRef<HTMLDivElement>(null);
   const captcha = useRef<HCaptcha>(null);
   const response = useRef("");
-  const [sichtbar, setSichtbar] = useState(false);
-  const [status, setStatus] = useState<Pruefstatus>("laedt");
+  const pruefungAngefordert = useRef(false);
+  const [aktiviert, setAktiviert] = useState(false);
+  const [status, setStatus] = useState<Pruefstatus>("bereit");
   const [versuch, setVersuch] = useState(0);
-
-  useEffect(() => {
-    const element = container.current;
-    if (!element) return;
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        setSichtbar(true);
-        observer.disconnect();
-      }
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
 
   useImperativeHandle(ref, () => ({
     token: () => response.current,
-    reset: () => { response.current = ""; captcha.current?.resetCaptcha(); setStatus("bereit"); }
+    reset: () => { pruefungAngefordert.current = false; response.current = ""; captcha.current?.resetCaptcha(); setStatus("bereit"); }
   }), []);
 
   function pruefen() {
-    if (status === "fehler") {
+    if (response.current || status === "laedt" || status === "prueft") return;
+    pruefungAngefordert.current = true;
+    if (status === "fehler" || !captcha.current?.isReady()) {
       response.current = "";
       setStatus("laedt");
+      setAktiviert(true);
       setVersuch((bisher) => bisher + 1);
       return;
     }
-    if (!captcha.current?.isReady() || response.current || status === "prueft") return;
+    startePruefung();
+  }
+
+  function startePruefung() {
+    pruefungAngefordert.current = false;
+    const instanz = captcha.current;
+    if (!instanz?.isReady()) {
+      setStatus("fehler");
+      return;
+    }
     setStatus("prueft");
     try {
-      captcha.current.execute();
+      instanz.execute();
     } catch {
       response.current = "";
       setStatus("fehler");
@@ -68,7 +67,7 @@ export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
   const wartet = status === "laedt" || status === "prueft";
 
   return (
-    <div ref={container} className="min-w-0 shrink-0" aria-label="Spamprüfung">
+    <div className="min-w-0 shrink-0" aria-label="Spamprüfung">
       <div className="captcha-control" data-verified={bestaetigt || undefined}>
         <button type="button" role="checkbox" aria-checked={bestaetigt} aria-busy={wartet} onClick={pruefen}
           disabled={wartet || bestaetigt} className="captcha-trigger">
@@ -91,8 +90,8 @@ export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
         </div>
       </div>
       {status === "fehler" && <p role="alert" className="mt-2 text-xs leading-relaxed text-signal-dark">Die Prüfung konnte nicht geladen werden. Bitte versuchen Sie es erneut. Ihre Eingaben bleiben erhalten.</p>}
-      {sichtbar && <HCaptcha key={versuch} ref={captcha} sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2" reCaptchaCompat={false} languageOverride="de" size="invisible"
-        onReady={() => setStatus("bereit")}
+      {aktiviert && <HCaptcha key={versuch} ref={captcha} sitekey="50b2fe65-b00b-4b9e-ad62-3ba471098be2" reCaptchaCompat={false} sentry={false} languageOverride="de" size="invisible"
+        onReady={() => { if (pruefungAngefordert.current) startePruefung(); else setStatus("bereit"); }}
         onVerify={(token) => { response.current = token; setStatus("bestaetigt"); }}
         onExpire={() => { response.current = ""; setStatus("abgelaufen"); }}
         onChalExpired={() => { response.current = ""; setStatus("abgelaufen"); }}

@@ -16,11 +16,6 @@ export type SiteConfig = {
   registerCourt: string;
   vatId: string;
   businessId: string;
-  taxId: string;
-  taxOffice: string;
-  bankName: string;
-  iban: string;
-  bic: string;
   responsible: string;
   description: string;
   isDraft: boolean;
@@ -166,11 +161,6 @@ export const siteConfig: SiteConfig = {
   registerCourt: publicValue(process.env.NEXT_PUBLIC_COMPANY_REGISTER_COURT, "Amtsgericht Tostedt"),
   vatId: process.env.NEXT_PUBLIC_COMPANY_VAT_ID?.trim() ?? "",
   businessId: process.env.NEXT_PUBLIC_COMPANY_BUSINESS_ID?.trim() ?? "",
-  taxId: publicValue(process.env.NEXT_PUBLIC_COMPANY_TAX_ID, "Steuernummer: 49/200/32853"),
-  taxOffice: publicValue(process.env.NEXT_PUBLIC_COMPANY_TAX_OFFICE, "Finanzamt Wesermünde"),
-  bankName: publicValue(process.env.NEXT_PUBLIC_COMPANY_BANK_NAME, "Oldenburgische Landesbank AG"),
-  iban: publicValue(process.env.NEXT_PUBLIC_COMPANY_IBAN, "DE29 2802 0050 1022 4707 00"),
-  bic: publicValue(process.env.NEXT_PUBLIC_COMPANY_BIC, "OLBODEH2XXX"),
   responsible: publicValue(process.env.NEXT_PUBLIC_COMPANY_RESPONSIBLE, "Viktor Jakobi, Geschäftsführer"),
   description: "Industrieisolierung, Rohrleitungsbau, GFK-Instandhaltung und Schweißarbeiten aus Geestland. Technische Leistungen in Norddeutschland und bundesweit.",
   isDraft: process.env.NEXT_PUBLIC_SITE_INDEXING !== "true" || !isPublicSiteUrl(process.env.NEXT_PUBLIC_SITE_URL)

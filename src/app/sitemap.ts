@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { featuredProjects, heroSlides, projectMedia, siteConfig } from "@/lib/content";
+import { featuredProjects, heroSlides, projectMedia, services, siteConfig } from "@/lib/content";
 import { absoluteAssetUrl } from "@/lib/assets";
 import { siteUrl } from "@/lib/seo";
 
@@ -11,6 +11,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const images = [...new Set([
     ...heroSlides.map((image) => image.src),
     ...projectMedia.map((image) => image.src),
+    ...services.flatMap((service) => service.gallery ?? (service.image ? [service.image] : [])).map((image) => image.src),
     ...featuredProjects.flatMap((project) => [project.leadImage, ...project.detailImages].map((image) => image.src))
   ])].map((path) => absoluteAssetUrl(path, siteConfig.domain));
 

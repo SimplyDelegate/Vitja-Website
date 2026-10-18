@@ -221,12 +221,10 @@ describe("Website-Inhalte", () => {
       registerCourt: "Amtsgericht Tostedt",
       vatId: "",
       businessId: "",
-      taxId: "Steuernummer: 49/200/32853",
-      taxOffice: "Finanzamt Wesermünde",
-      bankName: "Oldenburgische Landesbank AG",
-      iban: "DE29 2802 0050 1022 4707 00",
-      bic: "OLBODEH2XXX",
       responsible: "Viktor Jakobi, Geschäftsführer"
     });
+    for (const internal of ["taxId", "taxOffice", "bankName", "iban", "bic"]) {
+      expect(siteConfig).not.toHaveProperty(internal);
+    }
   });
 });
