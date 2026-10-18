@@ -72,10 +72,12 @@ export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
       <div className="captcha-control" data-verified={bestaetigt || undefined}>
         <button type="button" role="checkbox" aria-checked={bestaetigt} aria-busy={wartet} onClick={pruefen}
           disabled={wartet || bestaetigt} className="captcha-trigger">
-          <span className="captcha-checkmark" aria-hidden="true">
-            {bestaetigt ? <Check /> : wartet ? <LoaderCircle className="animate-spin motion-reduce:animate-none" /> : null}
+          <span className="captcha-label">
+            <span className="captcha-checkmark" aria-hidden="true">
+              {bestaetigt ? <Check /> : wartet ? <LoaderCircle className="animate-spin motion-reduce:animate-none" /> : null}
+            </span>
+            <span aria-live="polite">{beschriftung[status]}</span>
           </span>
-          <span aria-live="polite">{beschriftung[status]}</span>
         </button>
         <div className="captcha-provider">
           <a href="https://www.hcaptcha.com/" target="_blank" rel="noopener noreferrer" className="captcha-brand" aria-label="Geschützt durch hCaptcha">
@@ -83,8 +85,8 @@ export function FormularSchutz({ ref }: { ref: Ref<FormularSchutzHandle> }) {
             <span>hCaptcha</span>
           </a>
           <span>
-            <a href="https://www.hcaptcha.com/privacy" target="_blank" rel="noopener noreferrer">Datenschutz</a>
             <a href="https://www.hcaptcha.com/terms" target="_blank" rel="noopener noreferrer">Bedingungen</a>
+            <a href="https://www.hcaptcha.com/privacy" target="_blank" rel="noopener noreferrer">Datenschutz</a>
           </span>
         </div>
       </div>
