@@ -20,6 +20,16 @@ export function ServiceMedia({ images, serviceTitle }: ServiceMediaProps) {
   const [liveMessage, setLiveMessage] = useState(images.length ? `Bild 1 von ${images.length}` : "");
   const mediaRef = useRef<HTMLDivElement>(null);
   const transitionRef = useRef<number | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const pendingRef = useRef<number | null>(null);
+
+  const clearTransition = useCallback(() => {
+    if (frameRef.current !== null) window.cancelAnimationFrame(frameRef.current);
+    if (transitionRef.current !== null) window.clearTimeout(transitionRef.current);
+    frameRef.current = null;
+    transitionRef.current = null;
+    pendingRef.current = null;
+  }, []);
 
   useEffect(() => {
     if (images.length < 2 || !mediaRef.current) return;
@@ -47,36 +57,42 @@ export function ServiceMedia({ images, serviceTitle }: ServiceMediaProps) {
     return () => observer.disconnect();
   }, [activeIndex, images]);
 
-  useEffect(() => () => {
-    if (transitionRef.current !== null) window.clearTimeout(transitionRef.current);
-  }, []);
+  useEffect(() => clearTransition, [clearTransition]);
 
   const selectImage = useCallback((targetIndex: number) => {
-    if (targetIndex === activeIndex || incomingIndex !== null) return;
+    if (targetIndex === activeIndex || pendingRef.current !== null) return;
+    pendingRef.current = targetIndex;
     setIncomingIndex(targetIndex);
-  }, [activeIndex, incomingIndex]);
+  }, [activeIndex]);
 
   const completeTransition = useCallback((targetIndex: number) => {
-    if (targetIndex !== incomingIndex) return;
+    if (pendingRef.current !== targetIndex || frameRef.current !== null || transitionRef.current !== null) return;
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setActiveIndex(targetIndex);
-      setIncomingIndex(null);
-      setLiveMessage(`Bild ${targetIndex + 1} von ${images.length}`);
-      return;
-    }
-
-    window.requestAnimationFrame(() => setIncomingVisible(true));
-    transitionRef.current = window.setTimeout(() => {
+    const finish = () => {
+      if (pendingRef.current !== targetIndex) return;
       setActiveIndex(targetIndex);
       setIncomingIndex(null);
       setIncomingVisible(false);
       setLiveMessage(`Bild ${targetIndex + 1} von ${images.length}`);
-      transitionRef.current = null;
-    }, TRANSITION_DURATION);
-  }, [images.length, incomingIndex]);
+      clearTransition();
+    };
 
-  const rejectTransition = () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finish();
+      return;
+    }
+
+    frameRef.current = window.requestAnimationFrame(() => {
+      frameRef.current = null;
+      if (pendingRef.current !== targetIndex) return;
+      setIncomingVisible(true);
+      transitionRef.current = window.setTimeout(finish, TRANSITION_DURATION);
+    });
+  }, [clearTransition, images.length]);
+
+  const rejectTransition = (targetIndex: number) => {
+    if (pendingRef.current !== targetIndex) return;
+    clearTransition();
     setIncomingIndex(null);
     setIncomingVisible(false);
     setLiveMessage("Das nächste Bild konnte nicht geladen werden.");
@@ -86,9 +102,7 @@ export function ServiceMedia({ images, serviceTitle }: ServiceMediaProps) {
     return <div className="service-card-media is-empty" aria-hidden="true" />;
   }
 
-  const activeImage = images[activeIndex];
-  const incomingImageIndex = incomingIndex;
-  const incomingImage = incomingImageIndex === null ? null : images[incomingImageIndex];
+  const visibleIndices = incomingIndex === null ? [activeIndex] : [activeIndex, incomingIndex];
   const hasGallery = images.length > 1;
 
   const navigate = (direction: -1 | 1) => {
@@ -98,28 +112,26 @@ export function ServiceMedia({ images, serviceTitle }: ServiceMediaProps) {
 
   return (
     <div className={`service-card-media has-image${hasGallery ? " has-gallery" : ""}`} ref={mediaRef}>
-      <Image
-        className="service-card-image service-card-image-current"
-        src={asset(activeImage.src)}
-        alt={activeImage.alt}
-        fill
-        sizes="(max-width: 820px) calc(100vw - 38px), (max-width: 1120px) 50vw, 33vw"
-        style={{ objectPosition: activeImage.focus }}
-      />
-
-      {incomingImage && incomingImageIndex !== null && (
-        <Image
-          aria-hidden="true"
-          className={`service-card-image service-card-image-incoming${incomingVisible ? " is-visible" : ""}`}
-          src={asset(incomingImage.src)}
-          alt=""
-          fill
-          sizes="(max-width: 820px) calc(100vw - 38px), (max-width: 1120px) 50vw, 33vw"
-          style={{ objectPosition: incomingImage.focus }}
-          onLoad={() => completeTransition(incomingImageIndex)}
-          onError={rejectTransition}
-        />
-      )}
+      {visibleIndices.map((index) => {
+        const image = images[index];
+        const incoming = index === incomingIndex;
+        return (
+          <Image
+            // Derselbe geladene Bildknoten bleibt auch nach der Überblendung erhalten.
+            key={image.src}
+            aria-hidden={incoming || undefined}
+            className={`service-card-image ${incoming ? `service-card-image-incoming${incomingVisible ? " is-visible" : ""}` : "service-card-image-current"}`}
+            src={asset(image.src)}
+            alt={incoming ? "" : image.alt}
+            fill
+            loading={incoming ? "eager" : undefined}
+            sizes="(max-width: 820px) calc(100vw - 38px), (max-width: 1120px) 50vw, 33vw"
+            style={{ objectPosition: image.focus }}
+            onLoad={incoming ? () => completeTransition(index) : undefined}
+            onError={incoming ? () => rejectTransition(index) : undefined}
+          />
+        );
+      })}
 
       {hasGallery && (
         <>
