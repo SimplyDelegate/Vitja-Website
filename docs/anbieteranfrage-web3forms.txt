@@ -1,0 +1,22 @@
+Subject: GDPR documentation: free-plan hCaptcha integration and international transfers
+
+Hello Web3Forms privacy/support team,
+
+We are preparing the website https://triumphtechnicalservices.de for our client, Triumph Technical Services UG (haftungsbeschraenkt), Germany. The account/reply address is Jakobi@triumph-ts.de. The free-plan form uses your documented shared hCaptcha sitekey through @hcaptcha/react-hcaptcha, with hCaptcha required in the dashboard. The SDK loads only after an informed user click; optional SDK Sentry telemetry is disabled. No real customer form submissions have been sent during this review.
+
+Please provide written documentation addressing these points:
+
+1. What is the complete Article 28 GDPR contractual chain for hCaptcha in this setup? Is Intuition Machines your subprocessor, or must the website operator contract directly with it? Please supply the applicable DPA/subprocessor terms and explain how they bind and cover our client when using your shared sitekey without a separate hCaptcha account. Intuition Machines is not expressly named in Annex 3 of the Web3Forms DPA we reviewed.
+
+2. Please identify the full legal name and business address of the Web3Creative entity acting as processor, and confirm how the customer/controller is identified for this business account.
+
+3. Which countries and AWS regions currently handle form submission content, backups, email delivery and technical logs for this free-plan form? Can personnel in India or other countries access this data, and for which purposes? Your FAQ mentions US-East, while the DPA leaves AWS regions unspecified. Please distinguish hosting location from remote administrative access.
+
+4. For EEA-to-India and onward transfers, please provide the applicable SCC module(s), completed annexes, and your transfer-impact assessment or equivalent documentation covering government access and supplementary safeguards. Please describe who can decrypt submitted content and the relevant access restrictions; a general statement that TLS and encryption at rest are used does not resolve those questions.
+
+We have independently verified Intuition Machines' active EU-US DPF listing, including hCaptcha non-HR data. This request concerns the contractual chain and the remaining processing/transfer details. Links or existing standard documents are welcome.
+
+Please reply to Jakobi@triumph-ts.de. This is a documentation request only; please do not change the account, subscription, security settings or data retention, and do not initiate any paid audit or service.
+
+Thank you,
+Website administration for Triumph Technical Services UG (haftungsbeschraenkt)
