@@ -16,12 +16,12 @@ describe("Website-Inhalte", () => {
     expect(new Set(services.map((service) => service.id)).size).toBe(8);
   });
 
-  it("ordnet nur fachlich belegten Leistungen ein Projektbild zu", () => {
+  it("verwendet für alle Leistungen lokale Bilder mit Alternativtext und Bildausschnitt", () => {
     const illustrated = services.filter((service) => service.image || service.gallery);
     const withoutImage = services.filter((service) => !service.image && !service.gallery).map((service) => service.id).sort();
 
-    expect(illustrated).toHaveLength(7);
-    expect(withoutImage).toEqual(["blechherstellung"]);
+    expect(illustrated).toHaveLength(8);
+    expect(withoutImage).toEqual([]);
     for (const service of illustrated) {
       const images = service.gallery ?? (service.image ? [service.image] : []);
       for (const image of images) {

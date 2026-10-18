@@ -306,6 +306,12 @@ export const services: Service[] = [
   },
   {
     id: "blechherstellung", title: "Blechvorrichtungen", requestValue: "Blechvorrichtungen",
+    // Frei nutzbares Symbolfoto; Quelle und Urheber stehen im Impressum.
+    image: {
+      src: "/media/services/blechvorrichtungen/blechvorrichtungen-rohrformteile.webp",
+      alt: "Gestapelte runde Lüftungsrohre aus geformtem Metallblech",
+      focus: "center 50%"
+    },
     short: "Projektbezogene Blechvorrichtungen und Verkleidungen als Bestandteil einer koordinierten Gesamtlösung.",
   }
 ];

@@ -17,6 +17,8 @@ export default function ImpressumPage() {
         <h2>Bankverbindung</h2><p>{siteConfig.bankName}<br />IBAN: {siteConfig.iban}<br />BIC: {siteConfig.bic}</p>
         <h2>Verantwortlich für den Inhalt</h2><p>{siteConfig.responsible}<br />{siteConfig.address}</p>
         <h2>Haftungshinweise</h2><p>Die finalen Haftungs- und Streitbeilegungshinweise werden nach Vorliegen der vollständigen Unternehmensdaten rechtlich geprüft und vor Veröffentlichung ergänzt.</p>
+        <h2 id="bildnachweis">Bildnachweis</h2>
+        <p>Symbolbild zur Leistung „Blechvorrichtungen“: <a href="https://commons.wikimedia.org/wiki/File:Air_duct_pipes_at_Viborg_Katedralskole.jpg" target="_blank" rel="noopener noreferrer">„Air duct pipes at Viborg Katedralskole“</a> von <a href="https://commons.wikimedia.org/wiki/User:W.carter" target="_blank" rel="noopener noreferrer">W.carter / Wikimedia Commons</a>, vom Urheber weltweit als gemeinfrei freigegeben. Für die Webdarstellung verkleinert und in WebP umgewandelt.</p>
       </div>
     </main>
   );
