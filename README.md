@@ -67,7 +67,7 @@ Vor dem Launch verbleiben:
 - In Cloudflare die bestätigten Unternehmensdaten aus `.env.example` ausdrücklich als Produktionsvariablen ergänzen und erst nach den tatsächlichen Prüfungen die Freigabevariablen setzen.
 - Die Hauptdomain verbinden, `www` auf die Hauptdomain umleiten, HTTPS und Indexierung auf der echten Domain prüfen und anschließend die Sitemap in der Google Search Console einreichen.
 
-Die Google Search Console ist am 19.10.2026 zur Anmeldung geöffnet. Da die Website einem Kunden gehört, soll ein vom Kunden kontrolliertes Google-Konto die Domain-Property verwalten und die Agentur anschließend als berechtigten Nutzer hinzufügen. Ohne Anmeldung und einen von Google erzeugten TXT-Wert kann die DNS-Bestätigung nicht abgeschlossen werden. Weder Domain noch Indexierung werden dafür vorzeitig freigeschaltet; die Sitemap wird erst nach dem Launch eingereicht.
+Die Google Search Console ist seit dem 19.10.2026 für die Domain-Property `triumphtechnicalservices.de` im Kundenkonto `jakobi@triumph-ts.de` eingerichtet. Google hat die Inhaberschaft nach einem manuell ergänzten TXT-Eintrag bei Cloudflare bestätigt. Den Google-Bestätigungseintrag dauerhaft beibehalten. Hauptdomain, Weiterleitung und öffentliche Indexierung wurden dafür nicht freigeschaltet; die Sitemap wird erst nach dem Launch eingereicht. Weitere Nutzerrechte für die Agentur wurden nicht vergeben.
 
 ## Sicherheitsprüfung
 
